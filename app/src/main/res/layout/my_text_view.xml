@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent">
+    <TextView
+        android:id="@+id/jotting_name"
+        android:textSize="@dimen/btn_textSize"
+        android:layout_width="match_parent"
+        android:padding="3dp"
+        android:background="@color/cherryRasboraSecondary"
+        android:layout_marginTop="@dimen/activity_vertical_margin"/>
+</GridLayout>

@@ -25,6 +25,10 @@
         <activity
             android:name=".HomeActivity"
             android:label="@string/action_home" />
+
+        <activity
+            android:name=".TaskActivity"
+            android:label="Task"/>
     </application>
 
 </manifest>

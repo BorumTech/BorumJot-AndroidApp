@@ -26,4 +26,5 @@
     <string name="support_link_title">Help &amp; Feedback</string>
     <string name="notes">Notes</string>
     <string name="tasks">Tasks</string>
+    <string name="task_title">Task Name</string>
 </resources>
