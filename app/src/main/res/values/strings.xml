@@ -1,13 +1,29 @@
 <resources>
     <string name="app_name">Borum Jot</string>
-    <!-- Strings related to login -->
+
+    <!-- Strings related to login/register -->
+    <string name="prompt_first_name">First Name</string>
+    <string name="prompt_last_name">Last Name</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
+    <string name="prompt_confirm_pass">Confirm Password</string>
+
+    <!-- Actions -->
     <string name="action_register">Register</string>
     <string name="action_sign_in">Sign in</string>
+    <string name="action_home">Home</string>
+
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="borum_borumjot_affiliation">Your Borum Jot account is your Borum account</string>
+    <string name="register_for_borum">Register for Borum</string>
+
+    <!-- Default menu -->
+    <string name="default_menu_title">Default Menu</string>
+    <string name="options_link_title">Options</string>
+    <string name="support_link_title">Help &amp; Feedback</string>
+    <string name="notes">Notes</string>
+    <string name="tasks">Tasks</string>
 </resources>

@@ -21,6 +21,10 @@
         <activity
             android:name=".RegisterActivity"
             android:label="@string/action_register" />
+
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/action_home" />
     </application>
 
 </manifest>

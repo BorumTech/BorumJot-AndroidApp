@@ -13,4 +13,8 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         setSupportActionBar((Toolbar) findViewById(R.id.my_toolbar));
     }
+
+    private void enableRegisterBtn() {
+        findViewById(R.id.registerbtn).setEnabled(true);
+    }
 }
