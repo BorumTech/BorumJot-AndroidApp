@@ -31,7 +31,9 @@
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+
+        style="@style/formInputFields" />
 
     <EditText
         android:id="@+id/password"
@@ -49,34 +51,30 @@
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username" />
+        app:layout_constraintTop_toBottomOf="@+id/username"
+
+        style="@style/formInputFields" />
 
     <Button
         android:id="@+id/login"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="wrap_content"
         android:enabled="true"
         android:text="@string/action_sign_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.2"
-        android:textSize="@dimen/btn_textSize"
-        android:onClick="submitLogin"/>
+        android:onClick="submitLogin"
+        style="@style/OneSelectButtonGradient"/>
 
     <Button
         android:id="@+id/registernavbtn"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="wrap_content"
         android:text="@string/action_register"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="@id/login"
-        app:layout_constraintEnd_toEndOf="@id/login"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:onClick="navToRegister"
-        android:textSize="@dimen/btn_textSize"/>
+        style="@style/OneSelectButtonGradient" />
 
     <ProgressBar
         android:id="@+id/loading"

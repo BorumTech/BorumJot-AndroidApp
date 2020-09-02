@@ -121,15 +121,12 @@
 
     <Button
         android:id="@+id/registerbtn"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="wrap_content"
         android:enabled="false"
         android:text="@string/register_for_borum"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/confirm_password"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:textSize="@dimen/btn_textSize"
-        android:textColor="?attr/colorAccent"/>
+        style="@style/OneSelectButtonGradient"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

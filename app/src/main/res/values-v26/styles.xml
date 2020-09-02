@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="oneSelectButtonGradient" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textSize">@dimen/formcontrol_txtSize</item>
+        <item name="android:layout_marginVertical">5dp</item>
+        <item name="android:layout_width">@dimen/button_width</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+</resources>

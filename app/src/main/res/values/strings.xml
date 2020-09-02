@@ -10,7 +10,7 @@
 
     <!-- Actions -->
     <string name="action_register">Register</string>
-    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in">Login</string>
     <string name="action_home">Home</string>
 
     <string name="welcome">"Welcome !"</string>
