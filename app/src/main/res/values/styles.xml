@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/cherryRasboraAccent</item>
         <item name="colorSurface">@color/cherryRasboraBackgroundSurface</item>
         <item name="colorOnPrimarySurface">@color/cherryRasboraPrimarySurface</item>
-        <item name="editTextStyle">@style/formInputFields</item>
+        <item name="editTextStyle">@style/FormInputFields</item>
     </style>
 
     <style name="GoldenToad" parent="Theme.AppCompat.Light.NoActionBar">
@@ -19,16 +19,23 @@
         <item name="colorOnPrimarySurface">@color/goldenToadPrimarySurface</item>
     </style>
 
-    <style name="formInputFields" parent="Widget.AppCompat.EditText">
+    <style name="FormInputFields" parent="Widget.AppCompat.EditText">
         <item name="android:textSize">@dimen/formcontrol_txtSize</item>
     </style>
 
     <style name="OneSelectButtonGradient" parent="@android:style/TextAppearance">
         <item name="android:textSize">@dimen/formcontrol_txtSize</item>
-        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginTop">50dp</item>
         <item name="android:layout_width">@dimen/button_width</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/cherryRasboraAccent</item>
+    </style>
+
+    <style name="HeaderButton" parent="TextAppearance.AppCompat.Button">
+        <item name="android:layout_width">@dimen/header_btn_width</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="background">@drawable/header_button</item>
     </style>
 
 </resources>

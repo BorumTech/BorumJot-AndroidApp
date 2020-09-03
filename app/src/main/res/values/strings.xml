@@ -27,4 +27,7 @@
     <string name="notes">Notes</string>
     <string name="tasks">Tasks</string>
     <string name="task_title">Task Name</string>
+    <string name="search">Search</string>
+    <string name="prompt_share">Share</string>
+    <string name="prompt_task_delete">Delete Task</string>
 </resources>

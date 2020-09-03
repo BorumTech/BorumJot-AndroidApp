@@ -31,7 +31,7 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
         }
 
         public void navToJot(View v) {
-            context.startActivity(new Intent(context, TaskActivity.class));
+            context.startActivity(new Intent(context, NoteActivity.class));
         }
     }
 

@@ -8,6 +8,6 @@
         android:textSize="@dimen/formcontrol_txtSize"
         android:layout_width="match_parent"
         android:padding="3dp"
-        android:background="@color/cherryRasboraSecondary"
+        android:background="?attr/colorSecondary"
         android:layout_marginTop="@dimen/activity_vertical_margin"/>
 </GridLayout>

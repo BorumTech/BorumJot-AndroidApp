@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/login_container"
@@ -14,8 +15,7 @@
         android:name="com.boruminc.borumjot.android.AppNameAppBarFragment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
-
+        tools:layout="@layout/appbar_appname_fragment" />
 
     <EditText
         android:id="@+id/username"
@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
-        style="@style/formInputFields" />
+        style="@style/FormInputFields" />
 
     <EditText
         android:id="@+id/password"
@@ -53,28 +53,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/username"
 
-        style="@style/formInputFields" />
+        style="@style/FormInputFields" />
 
-    <Button
-        android:id="@+id/login"
-        android:enabled="true"
-        android:text="@string/action_sign_in"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:alignContent="space_between"
+        app:justifyContent="space_evenly"
+        app:flexWrap="wrap"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        android:onClick="submitLogin"
-        style="@style/OneSelectButtonGradient"/>
+        app:layout_constraintTop_toBottomOf="@+id/password">
 
-    <Button
-        android:id="@+id/registernavbtn"
-        android:text="@string/action_register"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:onClick="navToRegister"
-        style="@style/OneSelectButtonGradient" />
+        <Button
+            android:id="@+id/login"
+            style="@style/OneSelectButtonGradient"
+            android:enabled="true"
+            android:onClick="submitLogin"
+            android:text="@string/action_sign_in" />
+
+        <Button
+            android:id="@+id/registernavbtn"
+            style="@style/OneSelectButtonGradient"
+            android:onClick="navToRegister"
+            android:text="@string/action_register"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/password" />
+    </com.google.android.flexbox.FlexboxLayout>
 
     <ProgressBar
         android:id="@+id/loading"
