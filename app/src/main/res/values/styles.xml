@@ -38,4 +38,18 @@
         <item name="background">@drawable/header_button</item>
     </style>
 
+    <style name="ShareField" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:layout_width">@dimen/button_width</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_marginTop">40dp</item>
+    </style>
+
+    <style name="NoteArea" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
 </resources>

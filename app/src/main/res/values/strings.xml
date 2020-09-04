@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Borum Jot</string>
 
+    <!-- Prompts -->
+
     <!-- Strings related to login/register -->
     <string name="prompt_first_name">First Name</string>
     <string name="prompt_last_name">Last Name</string>
@@ -8,10 +10,21 @@
     <string name="prompt_password">Password</string>
     <string name="prompt_confirm_pass">Confirm Password</string>
 
+    <!-- String related to Jottings -->
+    <string name="prompt_task_delete">Delete Task</string>
+    <string name="prompt_note_delete">Delete Note</string>
+
     <!-- Actions -->
+
+    <!-- Strings related to login/register -->
     <string name="action_register">Register</string>
     <string name="action_sign_in">Login</string>
     <string name="action_home">Home</string>
+
+    <!-- Strings related to Jottings -->
+    <string name="action_share">Share</string>
+
+    <!-- Labels -->
 
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
@@ -21,6 +34,7 @@
     <string name="register_for_borum">Register for Borum</string>
 
     <!-- Default menu -->
+
     <string name="default_menu_title">Default Menu</string>
     <string name="options_link_title">Options</string>
     <string name="support_link_title">Help &amp; Feedback</string>
@@ -28,6 +42,8 @@
     <string name="tasks">Tasks</string>
     <string name="task_title">Task Name</string>
     <string name="search">Search</string>
-    <string name="prompt_share">Share</string>
-    <string name="prompt_task_delete">Delete Task</string>
+
+    <string name="prompt_share">Enter the email of Borum account</string>
+    <string name="note_hint">Enter note here</string>
+
 </resources>

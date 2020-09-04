@@ -33,6 +33,14 @@
         <activity
             android:name=".NoteActivity"
             android:label="Note"/>
+
+        <activity
+            android:name=".ShareActivity"
+            android:label="Share">
+            <meta-data
+                android:name="com.boruminc.borumjot.android.NoteActivity"
+                android:value=".NoteActivity" />
+        </activity>
     </application>
 
 </manifest>

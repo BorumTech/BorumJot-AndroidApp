@@ -17,19 +17,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/note_appbar">
-        
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal">
-                <Button
-                    android:layout_height="match_parent"
-                    android:text="@string/prompt_share"
-                    style="@style/HeaderButton" />
-                <Button
-                    android:layout_height="match_parent"
-                    android:text="@string/prompt_task_delete"
-                    style="@style/HeaderButton" />
-        </LinearLayout>
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/note_header_btns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                app:layout_constraintTop_toTopOf="parent">
+                    <Button
+                        android:id="@+id/nav_to_share_btn"
+                        android:layout_height="match_parent"
+                        android:text="@string/action_share"
+                        style="@style/HeaderButton" />
+                    <Button
+                        android:id="@+id/delete_note_btn"
+                        android:layout_height="match_parent"
+                        android:text="@string/prompt_note_delete"
+                        style="@style/HeaderButton" />
+            </LinearLayout>
+
+            <EditText
+                android:inputType="text|textMultiLine"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/note_header_btns"
+                android:autofillHints=""
+                android:hint="@string/note_hint"
+                style="@style/NoteArea"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </RelativeLayout>
