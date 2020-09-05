@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <com.androidessence.lib.RichTextView
             android:id="@+id/privacy_policy_content"
             style="@style/Legal.PrivacyPolicy"/>
     </ScrollView>

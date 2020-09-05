@@ -1,5 +1,6 @@
 package com.boruminc.borumjot;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -7,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.androidessence.lib.RichTextView;
+import com.boruminc.borumjot.android.AndroidMarkdown;
 import com.boruminc.borumjot.android.R;
 
 import java.io.BufferedReader;
@@ -30,12 +33,12 @@ public class PrivacyPolicyActivity extends FragmentActivity {
      */
     private String getPrivacyPolicyContent() {
         try (InputStream raw = getResources().openRawResource(R.raw.privacy_policy)){
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 BufferedReader is = new BufferedReader(new InputStreamReader(raw, StandardCharsets.UTF_8));
                 StringBuilder fileContents = new StringBuilder();
                 String currentLine;
                 while ((currentLine = is.readLine()) != null) {
-                    fileContents.append(currentLine);
+                    fileContents.append(currentLine).append("\n");
                 }
                 return fileContents.toString();
             }
@@ -49,7 +52,12 @@ public class PrivacyPolicyActivity extends FragmentActivity {
     }
 
     private void setPrivacyPolicyContent() {
-        TextView privacyPolicyContent = findViewById(R.id.privacy_policy_content);
+        // Retrieve RichTextView and content as plaintext
+        RichTextView privacyPolicyContent = findViewById(R.id.privacy_policy_content);
         privacyPolicyContent.setText(getPrivacyPolicyContent());
+
+        // Display as markdown
+        AndroidMarkdown contentInMarkdown = new AndroidMarkdown(privacyPolicyContent);
+        contentInMarkdown.formatRichTextView();
     }
 }

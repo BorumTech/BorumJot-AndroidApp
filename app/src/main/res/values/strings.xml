@@ -14,6 +14,9 @@
     <string name="prompt_task_delete">Delete Task</string>
     <string name="prompt_note_delete">Delete Note</string>
 
+    <!-- Strings related to Options -->
+    <string name="prompt_share">Enter the email of Borum account</string>
+
     <!-- Actions -->
 
     <!-- Strings related to login/register -->
@@ -24,6 +27,11 @@
     <!-- Strings related to Jottings -->
     <string name="action_share">Share</string>
 
+    <!-- Strings related to Options -->
+    <string name="action_report_bug">Report Bug</string>
+    <string name="action_donate">Donate</string>
+    <string name="action_forum">Forum</string>
+
     <!-- Labels -->
 
     <string name="welcome">"Welcome !"</string>
@@ -33,17 +41,24 @@
     <string name="borum_borumjot_affiliation">Your Borum Jot account is your Borum account</string>
     <string name="register_for_borum">Register for Borum</string>
 
-    <!-- Default menu -->
+
+    <!-- Titles -->
 
     <string name="default_menu_title">Default Menu</string>
     <string name="options_link_title">Options</string>
     <string name="support_link_title">Help &amp; Feedback</string>
-    <string name="notes">Notes</string>
-    <string name="tasks">Tasks</string>
+    <string name="notes_title">Notes</string>
+    <string name="tasks_title">Tasks</string>
     <string name="task_title">Task Name</string>
-    <string name="search">Search</string>
+    <string name="search_title">Search</string>
+    <string name="contact_title">Contact</string>
 
-    <string name="prompt_share">Enter the email of Borum account</string>
+    <!-- Hints -->
     <string name="note_hint">Enter note here</string>
+
+    <!-- Content Descriptions -->
+    <string name="rating_contentdesc">Yellow star button</string>
+    <string name="call_contentdesc">Call button</string>
+
 
 </resources>

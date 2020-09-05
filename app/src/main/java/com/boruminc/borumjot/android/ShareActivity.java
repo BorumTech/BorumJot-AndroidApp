@@ -1,15 +1,12 @@
 package com.boruminc.borumjot.android;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class ShareActivity extends FragmentActivity {
     @Override
@@ -18,7 +15,7 @@ public class ShareActivity extends FragmentActivity {
         setContentView(R.layout.share_activity);
 
         ((AutoCompleteTextView) findViewById(R.id.share_email_field)).setAdapter(getSuggestions());
-        ((Button) findViewById(R.id.delete_note_btn)).setOnClickListener(this::showDeleteDialog);
+
     }
 
     public ArrayAdapter<String> getSuggestions() {
@@ -29,7 +26,5 @@ public class ShareActivity extends FragmentActivity {
         return adapter;
     }
 
-    public void showDeleteDialog(View view) {
-        // TODO AlertDialog Builder
-    }
+
 }

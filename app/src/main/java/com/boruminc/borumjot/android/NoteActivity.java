@@ -14,9 +14,14 @@ public class NoteActivity extends FragmentActivity {
         setContentView(R.layout.note_activity);
 
         findViewById(R.id.nav_to_share_btn).setOnClickListener(this::navigateToShare);
+        findViewById(R.id.delete_note_btn).setOnClickListener(this::showDeleteDialog);
     }
 
     public void navigateToShare(View view) {
         startActivity(new Intent(this, ShareActivity.class));
+    }
+
+    public void showDeleteDialog(View view) {
+        // TODO AlertDialog Builder
     }
 }

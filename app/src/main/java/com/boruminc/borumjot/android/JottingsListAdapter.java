@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.core.content.ContextCompat;
+import com.boruminc.borumjot.*;
 
 public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsListAdapter.MyViewHolder> {
     private String[] mDataset;
@@ -39,6 +40,7 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
     public JottingsListAdapter(String[] myDataset, Context c) {
         mDataset = myDataset;
         context = c;
+        new Label();
     }
 
     // Create new views (invoked by the layout manager)

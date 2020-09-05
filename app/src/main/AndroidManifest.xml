@@ -7,11 +7,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
-        android:theme="@style/CherryRasbora">
+        android:theme="@style/CherryRasbora"
+        android:fullBackupContent="@xml/backup_descriptor">
 
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -45,6 +47,10 @@
         <activity
             android:name="com.boruminc.borumjot.PrivacyPolicyActivity"
             android:label="Privacy Policy" />
+
+        <activity
+            android:name=".HelpAndFeedbackActivity"
+            android:label="Support" />
     </application>
 
 </manifest>

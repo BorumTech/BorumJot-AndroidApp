@@ -16,7 +16,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setSupportActionBar(findViewById(R.id.my_toolbar));
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         setGradientsBackgrounds();
     }
 
