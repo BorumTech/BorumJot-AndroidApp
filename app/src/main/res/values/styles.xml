@@ -52,4 +52,11 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="Legal.PrivacyPolicy" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">5dp</item>
+        <item name="lineHeight">10pt</item>
+    </style>
+
 </resources>

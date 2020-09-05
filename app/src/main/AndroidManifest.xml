@@ -28,11 +28,11 @@
 
         <activity
             android:name=".TaskActivity"
-            android:label="Task"/>
+            android:label="Task" />
 
         <activity
             android:name=".NoteActivity"
-            android:label="Note"/>
+            android:label="Note" />
 
         <activity
             android:name=".ShareActivity"
@@ -41,6 +41,10 @@
                 android:name="com.boruminc.borumjot.android.NoteActivity"
                 android:value=".NoteActivity" />
         </activity>
+
+        <activity
+            android:name="com.boruminc.borumjot.PrivacyPolicyActivity"
+            android:label="Privacy Policy" />
     </application>
 
 </manifest>
