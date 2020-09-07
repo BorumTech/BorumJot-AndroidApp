@@ -51,6 +51,11 @@
         <activity
             android:name=".HelpAndFeedbackActivity"
             android:label="Support" />
+
+        <activity
+            android:name=".OptionsActivity"
+            android:label="Options" />
+
     </application>
 
 </manifest>

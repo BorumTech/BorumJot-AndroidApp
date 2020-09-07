@@ -17,10 +17,16 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <Button
-                android:layout_width="wrap_content"
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/search"
+                android:title="@string/search_title"
+                android:icon="@drawable/ic_search"
+                app:showAsAction="collapseActionView|ifRoom"
+                app:actionViewClass="android.widget.SearchView"
                 android:layout_height="wrap_content"
-                android:text="@string/search_title" />
+                android:layout_width="wrap_content" />
+
             <TextView
                 style="@style/Widget.AppCompat.TextView"
                 android:layout_width="wrap_content"

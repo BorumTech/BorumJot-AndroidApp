@@ -3,6 +3,7 @@ package com.boruminc.borumjot.android;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -19,14 +20,13 @@ public class HelpAndFeedbackActivity extends FragmentActivity {
         for (int i = 0; i < ratingBar.getChildCount(); i++) {
             int finalI = i;
             ratingBar.getChildAt(i).setOnClickListener(v -> {
-                if (((CheckBox) v).isChecked()) {
+                if (v.isSelected()) {
                     for (int j = 0; j < finalI; j++) {
-                        ((CheckBox) v).setChecked(true);
+                        v.setSelected(true);
                     }
                 }
 
             });
-            Log.d("First view is checked", String.valueOf(((CheckBox) ratingBar.getChildAt(0)).isChecked()));
         }
     }
 }

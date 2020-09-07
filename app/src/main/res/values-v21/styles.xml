@@ -6,4 +6,15 @@
         <item name="android:layout_width">@dimen/header_btn_width</item>
         <item name="background">@drawable/header_button</item>
     </style>
+
+    <style name="ColorThemeImage">
+        <item name="android:layout_width">wrap_content</item>0
+        <item name="android:layout_height">100dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_rowWeight">1</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_column">0</item>
+        <item name="android:layout_row">1</item>
+        <item name="android:src">@android:drawable/alert_light_frame</item>
+    </style>
 </resources>

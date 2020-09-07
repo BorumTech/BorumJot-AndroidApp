@@ -84,4 +84,23 @@
         <item name="android:textSize">12pt</item>
     </style>
 
+    <style name="ColorThemeGrid">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:columnCount">2</item>
+        <item name="android:rowCount">2</item>
+        <item name="android:rowOrderPreserved">false</item>
+        <item name="android:useDefaultMargins">true</item>
+        <item name="android:alignmentMode">alignBounds</item>
+    </style>
+
+    <style name="ColorThemeImage">
+        <item name="android:layout_width">wrap_content</item>0
+        <item name="android:layout_height">100dp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_row">1</item>
+        <item name="android:src">@android:drawable/alert_light_frame</item>
+    </style>
+
 </resources>

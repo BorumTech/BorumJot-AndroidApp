@@ -1,41 +1,53 @@
 package com.boruminc.borumjot.android;
 
-import com.androidessence.lib.RichTextView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.widget.TextView;
+import android.text.style.StyleSpan;
+import android.graphics.Typeface;
+
+import java.lang.reflect.Type;
 
 public final class AndroidMarkdown {
-    private RichTextView richTextView;
+    private TextView richView;
+    private SpannableStringBuilder spannableStringBuilder;
 
-    public AndroidMarkdown(RichTextView r) {
-        richTextView = r;
+    public AndroidMarkdown(TextView r) {
+        richView = r;
+        spannableStringBuilder = new SpannableStringBuilder(getMarkdown());
     }
 
-    public void formatRichTextView() {
+    public String formatRichTextView() {
         setBoldSpannables();
         setItalicSpannables();
+        return spannableStringBuilder.toString();
     }
 
     private void setBoldSpannables() {
-        String boldMarker = "**";
-
-        richTextView.formatSpan(
-            getMarkdown().indexOf(boldMarker),
-            getMarkdown().substring(
-                    getMarkdown().indexOf(boldMarker) + 1)
-                    .indexOf(boldMarker),
-            RichTextView.FormatType.BOLD
-        );
+        setFontSpannables("**", Typeface.BOLD);
     }
 
     private void setItalicSpannables() {
-        String italicMarker = "__";
-        richTextView.formatSpan(
-            getMarkdown().indexOf(italicMarker),
-            getMarkdown().substring(getMarkdown().indexOf(italicMarker) + 1).indexOf(italicMarker),
-            RichTextView.FormatType.ITALIC
-        );
+        setFontSpannables("__", Typeface.ITALIC);
     }
 
     private String getMarkdown() {
-        return richTextView.getText().toString();
+        return richView.getText().toString();
+    }
+
+    /* Helper Methods */
+
+
+    private void setFontSpannables(String marker, int typeface) {
+        int markerFirstInd = getMarkdown().indexOf(marker);
+
+        spannableStringBuilder.setSpan(
+                new StyleSpan(typeface),
+                markerFirstInd,
+                getMarkdown().substring(
+                        markerFirstInd + marker.length())
+                        .indexOf(marker) + markerFirstInd,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
     }
 }

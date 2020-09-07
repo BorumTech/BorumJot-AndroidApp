@@ -8,7 +8,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
-import com.androidessence.lib.RichTextView;
 import com.boruminc.borumjot.android.AndroidMarkdown;
 import com.boruminc.borumjot.android.R;
 
@@ -53,11 +52,11 @@ public class PrivacyPolicyActivity extends FragmentActivity {
 
     private void setPrivacyPolicyContent() {
         // Retrieve RichTextView and content as plaintext
-        RichTextView privacyPolicyContent = findViewById(R.id.privacy_policy_content);
+        TextView privacyPolicyContent = findViewById(R.id.privacy_policy_content);
         privacyPolicyContent.setText(getPrivacyPolicyContent());
 
         // Display as markdown
         AndroidMarkdown contentInMarkdown = new AndroidMarkdown(privacyPolicyContent);
-        contentInMarkdown.formatRichTextView();
+        privacyPolicyContent.setText(contentInMarkdown.formatRichTextView());
     }
 }

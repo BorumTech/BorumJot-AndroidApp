@@ -47,6 +47,7 @@
     <string name="default_menu_title">Default Menu</string>
     <string name="options_link_title">Options</string>
     <string name="support_link_title">Help &amp; Feedback</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
     <string name="notes_title">Notes</string>
     <string name="tasks_title">Tasks</string>
     <string name="task_title">Task Name</string>
@@ -59,6 +60,10 @@
     <!-- Content Descriptions -->
     <string name="rating_contentdesc">Yellow star button</string>
     <string name="call_contentdesc">Call button</string>
+    <string name="action_change_sign_in">Change Sign-In</string>
+    <string name="cherry_rasbora_title">Cherry Rasbora</string>
+    <string name="golden_toad_title">Golden Toad</string>
+    <string name="action_export_data">Export Data</string>
 
 
 </resources>
