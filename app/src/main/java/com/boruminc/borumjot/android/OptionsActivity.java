@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
-public class OptionsActivity extends FragmentActivity {
+public class OptionsActivity extends OptionsMenuItemActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,4 +42,5 @@ public class OptionsActivity extends FragmentActivity {
     protected void onRestart() {
         super.onRestart();
     }
+
 }

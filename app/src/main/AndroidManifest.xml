@@ -48,7 +48,7 @@
         </activity>
 
         <activity
-            android:name="com.boruminc.borumjot.PrivacyPolicyActivity"
+            android:name=".PrivacyPolicyActivity"
             android:label="Privacy Policy" />
 
         <activity

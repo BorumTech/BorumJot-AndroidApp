@@ -1,4 +1,4 @@
-package com.boruminc.borumjot;
+package com.boruminc.borumjot.android;
 
 import android.graphics.Typeface;
 import android.os.Build;
@@ -10,10 +10,6 @@ import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
-
-import com.boruminc.borumjot.android.AndroidMarkdown;
-import com.boruminc.borumjot.android.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +17,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-public class PrivacyPolicyActivity extends FragmentActivity {
+public class PrivacyPolicyActivity extends OptionsMenuItemActivity {
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

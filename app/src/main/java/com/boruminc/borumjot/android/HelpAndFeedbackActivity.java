@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
-public class HelpAndFeedbackActivity extends FragmentActivity {
+public class HelpAndFeedbackActivity extends OptionsMenuItemActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
