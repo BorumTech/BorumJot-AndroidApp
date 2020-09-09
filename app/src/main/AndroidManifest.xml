@@ -26,7 +26,10 @@
 
         <activity
             android:name=".HomeActivity"
-            android:label="@string/action_home" />
+            android:label="@string/action_home">
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
 
         <activity
             android:name=".TaskActivity"
@@ -56,6 +59,18 @@
             android:name=".OptionsActivity"
             android:label="Options" />
 
+        <activity
+            android:name=".LabelActivity"
+            android:label="Label" />
+
+        <activity
+            android:name=".SearchResultsActivity"
+            android:label="Search Results">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

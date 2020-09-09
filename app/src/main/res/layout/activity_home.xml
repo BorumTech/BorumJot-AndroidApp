@@ -17,7 +17,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
+<!--
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search"
                 android:title="@string/search_title"
@@ -25,7 +25,7 @@
                 app:showAsAction="collapseActionView|ifRoom"
                 app:actionViewClass="android.widget.SearchView"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content" />
+                android:layout_width="wrap_content" />-->
 
             <TextView
                 style="@style/Widget.AppCompat.TextView"

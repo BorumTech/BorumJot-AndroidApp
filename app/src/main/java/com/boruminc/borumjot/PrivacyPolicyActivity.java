@@ -1,7 +1,11 @@
 package com.boruminc.borumjot;
 
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -57,6 +61,14 @@ public class PrivacyPolicyActivity extends FragmentActivity {
 
         // Display as markdown
         AndroidMarkdown contentInMarkdown = new AndroidMarkdown(privacyPolicyContent);
+
+        new SpannableStringBuilder(getPrivacyPolicyContent()).setSpan(
+                new StyleSpan(Typeface.BOLD),
+                getPrivacyPolicyContent().indexOf("**"),
+                getPrivacyPolicyContent().indexOf("**", getPrivacyPolicyContent().indexOf("**") + 1),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
         privacyPolicyContent.setText(contentInMarkdown.formatRichTextView());
+
     }
 }

@@ -64,6 +64,7 @@
     <string name="cherry_rasbora_title">Cherry Rasbora</string>
     <string name="golden_toad_title">Golden Toad</string>
     <string name="action_export_data">Export Data</string>
+    <string name="search_hint">Search Jottings</string>
 
 
 </resources>

@@ -1,12 +1,15 @@
 package com.boruminc.borumjot.android;
 
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,6 +47,15 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+        // Starts SearchResultsActivity when
+        assert searchManager != null;
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -67,28 +79,19 @@ public class HomeActivity extends AppCompatActivity {
 
     private void navToSupport() {
         startActivity(
-                new Intent(
-                        this,
-                        HelpAndFeedbackActivity.class
-                )
+                new Intent(this, HelpAndFeedbackActivity.class)
         );
     }
 
     private void navToOptions() {
         startActivity(
-                new Intent(
-                        this,
-                        OptionsActivity.class
-                )
+                new Intent(this, OptionsActivity.class)
         );
     }
 
     private void navToPrivacyPolicy() {
         startActivity(
-                new Intent(
-                        this,
-                        PrivacyPolicyActivity.class
-                )
+                new Intent(this, PrivacyPolicyActivity.class)
         );
     }
 }
