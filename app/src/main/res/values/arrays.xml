@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="jotting_types">
+        <item>Note</item>
+        <item>Task</item>
+    </string-array>
+</resources>

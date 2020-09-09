@@ -7,7 +7,8 @@
         <item name="colorAccent">@color/cherryRasboraAccent</item>
         <item name="colorSurface">@color/cherryRasboraBackgroundSurface</item>
         <item name="colorOnPrimarySurface">@color/cherryRasboraPrimarySurface</item>
-        <item name="editTextStyle">@style/FormInputFields</item>
+        <item name="android:windowBackground">?attr/colorOnPrimarySurface</item>
+        <item name="android:editTextStyle">@style/FormInputFields</item>
     </style>
 
     <style name="GoldenToad" parent="Theme.AppCompat.Light.NoActionBar">
@@ -15,7 +16,7 @@
         <item name="colorSecondary">@color/goldenToadSecondary</item>
         <item name="colorAccent">@color/goldenToadAccent</item>
         <item name="colorSurface">@color/goldenToadBackgroundSurface</item>
-        <item name="colorOnPrimarySurface">@color/goldenToadPrimarySurface</item>
+        <item name="colorPrimarySurface">@color/goldenToadPrimarySurface</item>
     </style>
 
     <!-- Individual View styles -->
@@ -102,6 +103,21 @@
         <item name="android:gravity">center_horizontal</item>
         <item name="android:layout_row">1</item>
         <item name="android:src">@android:drawable/alert_light_frame</item>
+    </style>
+
+    <style name="FlexibleListBox" parent="CherryRasbora">
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="flexWrap">wrap</item>
+        <item name="android:buttonStyle">@style/FlexibleListItem</item>
+    </style>
+
+    <style name="FlexibleListItem" parent="android:style/Widget.Button">
+        <item name="android:layout_marginRight">15dp</item>
+        <item name="android:layout_width">@dimen/label_btn_width</item>
+        <item name="android:layout_height">@dimen/label_btn_height</item>
+        <item name="android:background">@android:drawable/arrow_up_float</item>
+        <item name="borderWidth">1dp</item>
     </style>
 
 </resources>

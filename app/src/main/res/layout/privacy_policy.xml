@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    tools:context="com.boruminc.borumjot.PrivacyPolicyActivity">
+    tools:context=".PrivacyPolicyActivity">
 
     <fragment
         android:id="@+id/login_appbar"

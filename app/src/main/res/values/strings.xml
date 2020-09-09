@@ -65,6 +65,6 @@
     <string name="golden_toad_title">Golden Toad</string>
     <string name="action_export_data">Export Data</string>
     <string name="search_hint">Search Jottings</string>
-
-
+    <string name="prompt_task_complete">Mark as Complete</string>
+    <string name="prompt_details_fill">Enter the task\'s details</string>
 </resources>

@@ -1,8 +1,11 @@
 package com.boruminc.borumjot.android;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -22,6 +25,18 @@ public class NoteActivity extends FragmentActivity {
     }
 
     public void showDeleteDialog(View view) {
-        // TODO AlertDialog Builder
+        AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
+        deleteDialog
+                .setTitle("Delete Note")
+                .setMessage("Are you sure you would like to delete this note?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    // TODO Delete
+                    startActivity(new Intent(this, HomeActivity.class));
+                    Toast.makeText(this, "The note was deleted", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+
+                });
+        deleteDialog.create().show();
     }
 }

@@ -7,41 +7,42 @@
     tools:context=".NoteActivity">
 
     <fragment
-        android:id="@+id/note_appbar"
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.boruminc.borumjot.android.AppNameAppBarFragment"
         tools:layout="@layout/appbar_appname_fragment" />
 
+    <LinearLayout
+        android:id="@+id/header_btns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appbar"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+        <Button
+            android:id="@+id/nav_to_share_btn"
+            android:layout_height="match_parent"
+            android:text="@string/action_share"
+            style="@style/HeaderButton" />
+        <Button
+            android:id="@+id/delete_note_btn"
+            android:layout_height="match_parent"
+            android:text="@string/prompt_note_delete"
+            style="@style/HeaderButton" />
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/note_appbar">
+        android:layout_below="@id/header_btns">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <LinearLayout
-                android:id="@+id/note_header_btns"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                app:layout_constraintTop_toTopOf="parent">
-                    <Button
-                        android:id="@+id/nav_to_share_btn"
-                        android:layout_height="match_parent"
-                        android:text="@string/action_share"
-                        style="@style/HeaderButton" />
-                    <Button
-                        android:id="@+id/delete_note_btn"
-                        android:layout_height="match_parent"
-                        android:text="@string/prompt_note_delete"
-                        style="@style/HeaderButton" />
-            </LinearLayout>
-
             <EditText
                 android:inputType="text|textMultiLine"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/note_header_btns"
+                app:layout_constraintTop_toTopOf="parent"
                 android:autofillHints=""
                 android:hint="@string/note_hint"
                 style="@style/NoteArea"/>
