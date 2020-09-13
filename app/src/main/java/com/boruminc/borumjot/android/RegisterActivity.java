@@ -9,6 +9,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void navToPrivacyPolicy() {
-        TextView promptConfirmPrivPolic = findViewById(R.id.prompt_confirm_priv_polic);
+        TextView promptConfirmPrivPolic = findViewById(R.id.confirm_priv_polic);
         ClickableSpan privPolicSpan = new ClickableSpan() {
             @Override
             public void onClick(@NonNull View widget) {
@@ -50,8 +51,13 @@ public class RegisterActivity extends AppCompatActivity {
         String privPolicPrompt = promptConfirmPrivPolic.getText().toString();
         SpannableString confirmPrivPolicPrompt = new SpannableString(privPolicPrompt);
         int privacyPolicyInd = privPolicPrompt.indexOf("Privacy Policy");
+
         confirmPrivPolicPrompt.setSpan(privPolicSpan, privacyPolicyInd, privacyPolicyInd + "Privacy Policy".length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         promptConfirmPrivPolic.setText(confirmPrivPolicPrompt);
         promptConfirmPrivPolic.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    public void toggle(View view) {
+        ((CheckedTextView) view).toggle();
     }
 }
