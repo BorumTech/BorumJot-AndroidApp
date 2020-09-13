@@ -9,4 +9,6 @@
     <dimen name="formcontrol_txtSize">25sp</dimen>
     <dimen name="label_btn_width">60dp</dimen>
     <dimen name="label_btn_height">30dp</dimen>
+
+    <dimen name="chkbox_txtSize">15sp</dimen>
 </resources>

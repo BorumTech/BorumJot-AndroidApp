@@ -21,4 +21,17 @@
         <item name="flexWrap">wrap</item>
         <item name="android:buttonStyle">@style/FlexibleListItem</item>
     </style>
+
+    <style name="Legal.PrivacyPolicy.CheckedTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginStart">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginVertical">@dimen/activity_vertical_margin</item>
+        <item name="android:drawableLeft">?android:attr/listChoiceIndicatorMultiple</item>
+        <item name="android:drawableStart">?android:attr/listChoiceIndicatorMultiple</item>
+        <item name="android:textSize">@dimen/chkbox_txtSize</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+    </style>
 </resources>

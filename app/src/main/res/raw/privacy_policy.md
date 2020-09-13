@@ -1,5 +1,3 @@
-# Privacy Policy
-
 **Preamble**
 
 These terms ("Terms") bind you to Borum Jot ("App") as the customer ("Consumer") of Borum Tech ("Company").
