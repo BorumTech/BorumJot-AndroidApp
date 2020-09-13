@@ -119,6 +119,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />
 
+    <CheckBox
+        android:id="@+id/confirm_priv_polic_chkbox"
+        android:layout_width="@dimen/label_btn_width"
+        android:layout_height="@dimen/label_btn_width"
+        app:layout_constraintTop_toBottomOf="@id/confirm_password"
+        app:layout_constraintStart_toStartOf="@id/confirm_password"
+        android:labelFor="@id/prompt_confirm_priv_polic"/>
+    <TextView
+        android:id="@+id/prompt_confirm_priv_polic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/privacy_policy_confirmation"
+        app:layout_constraintStart_toEndOf="@id/confirm_priv_polic_chkbox"
+        app:layout_constraintTop_toTopOf="@id/confirm_priv_polic_chkbox"
+        app:layout_constraintBottom_toBottomOf="@id/confirm_priv_polic_chkbox"/>
+
     <Button
         android:id="@+id/registerbtn"
         android:enabled="false"
