@@ -1,12 +1,14 @@
 package com.boruminc.borumjot;
 
+import androidx.annotation.NonNull;
+
 public class Task extends Jotting {
     public Task(String n) {
         super(n);
     }
 
-    @Override
+    @NonNull
     public String toString() {
-        return null;
+        return "Name: " + getName();
     }
 }

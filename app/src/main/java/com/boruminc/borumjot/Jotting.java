@@ -1,0 +1,54 @@
+package com.boruminc.borumjot;
+
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+
+abstract class Jotting {
+    ArrayList<Label> labels;
+    private String name;
+
+    Jotting(String n) {
+        labels = new ArrayList<Label>();
+        name = n;
+    }
+
+    public ArrayList<Label> getLabels() {
+        return labels;
+    }
+
+    /**
+     * Adds nLabel to labels list, if it isn't already in the list
+     * @param nLabel The label to be appended
+     */
+    void addLabel(Label nLabel) {
+        if (!labels.contains(nLabel)) {
+            labels.add(nLabel);
+        }
+    }
+
+    /**
+     * Removes an existing label from the labels list, if it is in the list
+     * @param oLabel The old label which already exists in the list
+     * @return whether or not the label was removed
+     */
+    boolean removeLabel(Label oLabel) {
+        return labels.remove(oLabel);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gives information about the jotting
+     * @return the string representation of the Task, Note, or other Jotting type
+     */
+    @Override
+    @NonNull
+    public abstract String toString();
+}
