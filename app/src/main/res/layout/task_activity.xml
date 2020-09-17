@@ -39,7 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/header_btns"
         android:hint="@string/prompt_details_fill"
-        style="@style/NoteArea"/>
+        style="@style/NoteArea"
+        android:inputType="textMultiLine" />
 
     <LinearLayout
         android:id="@+id/task_subtasks_box"

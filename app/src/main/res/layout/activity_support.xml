@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HelpAndFeedbackActivity">
+    tools:context=".HelpAndFeedbackActivity"
+    android:theme="@style/SupportTheme">
     <fragment
         android:id="@+id/appbar"
         android:layout_width="match_parent"
@@ -71,7 +72,8 @@
         android:layout_gravity="center_horizontal" />
 
     <RelativeLayout
-        style="@style/ContactBar">
+        style="@style/ContactBar"
+        android:layout_marginTop="100dp">
 
         <TextView
             android:text="@string/contact_title"
@@ -82,10 +84,17 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             style="@style/ContactBarItemButton">
+
+            <ImageButton
+                android:id="@+id/form_button"
+                style="@style/ContactBarItemButton"
+                android:contentDescription="@string/sms_contentdesc"
+                android:src="@android:drawable/ic_dialog_email" />
             <ImageButton
                 android:id="@+id/message_button"
-                android:src="@android:drawable/stat_sys_phone_call_forward"
-                style="@style/ContactBarItemButton" />
+                style="@style/ContactBarItemButton"
+                android:contentDescription="@string/sms_contentdesc"
+                android:src="@drawable/sms_icon" />
 
             <ImageButton
                 android:id="@+id/call_button"

@@ -67,4 +67,5 @@
     <string name="call_contentdesc">Call button</string>
     
     <string name="privacy_policy_confirmation">I have read and agree to the Privacy Policy</string>
+    <string name="sms_contentdesc" />
 </resources>

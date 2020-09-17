@@ -2,6 +2,7 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,28 +17,31 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
     private String[] mDataset;
     private Context context;
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView textView;
+    static class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView textView;
         private Context context;
 
-        public MyViewHolder(View v, Context c) {
+        MyViewHolder(View v, Context c) {
             super(v);
+            context = c;
+
             textView = v.findViewById(R.id.jotting_name);
             textView.setOnClickListener(this::navToJot);
-            context = c;
+            textView.setTextColor(Color.BLACK);
+            textView.setPadding((int) context.getResources().getDimension(R.dimen.activity_horizontal_margin), 0, 0, 0);
         }
 
-        public void bindView(String string) {
+        void bindView(String string) {
             textView.setText(string);
         }
 
-        public void navToJot(View v) {
+        void navToJot(View v) {
             context.startActivity(new Intent(context, NoteActivity.class));
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public JottingsListAdapter(String[] myDataset, Context c) {
+    JottingsListAdapter(String[] myDataset, Context c) {
         mDataset = myDataset;
         context = c;
         new Label();

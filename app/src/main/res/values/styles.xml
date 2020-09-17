@@ -26,7 +26,8 @@
 
     <style name="OneSelectButtonGradient" parent="@android:style/TextAppearance">
         <item name="android:textSize">@dimen/formcontrol_txtSize</item>
-        <item name="android:layout_marginTop">50dp</item>
+        <item name="android:layout_marginTop">25dp</item>
+        <item name="android:layout_marginBottom">25dp</item>
         <item name="android:layout_width">@dimen/button_width</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/cherryRasboraAccent</item>
@@ -64,7 +65,6 @@
     <style name="ContactBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">10dp</item>
         <item name="android:paddingLeft">50dp</item>
         <item name="android:paddingRight">50dp</item>
         <item name="android:background">@color/cherryRasboraAccent</item>
@@ -72,12 +72,16 @@
 
     <style name="ContactBarItem">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_centerVertical">true</item>
     </style>
 
     <style name="ContactBarItemButton" parent="ContactBarItem">
         <item name="android:layout_alignParentRight">true</item>
         <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:scaleType">fitCenter</item>
     </style>
 
     <style name="ContactBarLabel" parent="ContactBarItem">
@@ -132,5 +136,9 @@
         <item name="android:textSize">@dimen/chkbox_txtSize</item>
         <item name="android:gravity">center</item>
         <item name="android:clickable">true</item>
+    </style>
+
+    <style name="SupportTheme">
+        <item name="android:layout_marginBottom">10dp</item>
     </style>
 </resources>

@@ -1,7 +1,7 @@
 package com.boruminc.borumjot.android;
 
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -15,27 +15,35 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.boruminc.borumjot.ButtonGradient;
 
 public class RegisterActivity extends AppCompatActivity {
+    Button registerBtn;
+    private AsyncTask<?, ?, ?> registerUserTask;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         setSupportActionBar(findViewById(R.id.my_toolbar));
 
-        this.enableRegisterBtn();
         this.navToPrivacyPolicy();
+
+        registerBtn = findViewById(R.id.registerbtn);
+        registerBtn.setEnabled(true);
+        registerUserTask = new RegisterUser();
     }
 
-    private void enableRegisterBtn() {
-        GradientDrawable gradient = ButtonGradient.getOneSelectButtonGradient();
-        Button registerBtn = findViewById(R.id.registerbtn);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerBtn.setBackground(ButtonGradient.getOneSelectButtonGradient());
+    }
 
-        registerBtn.setEnabled(true);
-        registerBtn.setBackground(gradient);
+    public void validateRegistration(View view) {
+        registerUserTask.execute();
+        registerBtn.setEnabled(false); // Disable button because task can only be run once
     }
 
     private void navToPrivacyPolicy() {
@@ -59,5 +67,13 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void toggle(View view) {
         ((CheckedTextView) view).toggle();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Cancel running task(s) to avoid memory leaks
+        if (registerUserTask != null)
+            registerUserTask.cancel(true);
     }
 }
