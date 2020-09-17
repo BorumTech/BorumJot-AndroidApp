@@ -1,9 +1,11 @@
 package com.boruminc.borumjot.android;
 
 import android.app.SearchManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -107,10 +109,14 @@ public class HomeActivity extends AppCompatActivity {
                         (dialog, which) -> {
                             switch (which) {
                                 case 0:
-                                    activityToStart.set(new Intent(this, NoteActivity.class));
+                                    Intent activityIntent = new Intent(this, NoteActivity.class);
+                                    activityIntent.putExtra("Rename", true);
+                                    activityToStart.set(activityIntent);
                                     break;
                                 case 1:
-                                    activityToStart.set(new Intent(this, TaskActivity.class));
+                                    activityIntent = new Intent(this, TaskActivity.class);
+                                    activityIntent.putExtra("Rename", true);
+                                    activityToStart.set(activityIntent);
                                     break;
                             }
                         }
