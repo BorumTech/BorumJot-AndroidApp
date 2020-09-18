@@ -28,5 +28,9 @@ public class HelpAndFeedbackActivity extends OptionsMenuItemActivity {
 
             });
         }
+
+        // Set the title of the app bar
+        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        if (frag != null) frag.passTitle("Support");
     }
 }

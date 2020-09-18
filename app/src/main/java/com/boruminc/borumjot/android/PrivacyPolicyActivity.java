@@ -23,8 +23,10 @@ public class PrivacyPolicyActivity extends OptionsMenuItemActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.privacy_policy);
-
         setPrivacyPolicyContent();
+
+        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        if (frag != null) frag.passTitle("Privacy Policy");
     }
 
     /**

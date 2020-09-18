@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.boruminc.borumjot.ButtonGradient;
 
@@ -16,6 +17,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setSupportActionBar(findViewById(R.id.my_toolbar));
+
+        // Set the title of the app bar
+        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        if (frag != null) frag.passTitle("Login");
     }
 
     @Override
@@ -35,6 +40,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void submitLogin(View view) {
+        navToHome(view);
+    }
+
+    public void navToHome(View view) {
+        // TODO Validation
         startActivity(new Intent(this, HomeActivity.class));
     }
 }

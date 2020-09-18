@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 
-abstract class Jotting {
+public abstract class Jotting {
     ArrayList<Label> labels;
     private String name;
 

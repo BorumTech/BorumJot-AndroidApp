@@ -23,7 +23,7 @@ public class Note extends Jotting {
     /**
      * @return The value of the sharees PIV
      */
-    private HashSet<String> getSharees() {
+    public HashSet<String> getSharees() {
         return (HashSet<String>) sharees;
     }
 
@@ -33,7 +33,7 @@ public class Note extends Jotting {
      * @param newSharee The person who is requested to become a sharee for this note
      * @return Whether the new sharee was added
      */
-    private boolean addSharee(String newSharee) {
+    public boolean addSharee(String newSharee) {
         return sharees.add(newSharee);
     }
 
