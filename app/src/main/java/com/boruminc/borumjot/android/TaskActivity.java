@@ -1,18 +1,16 @@
 package com.boruminc.borumjot.android;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
+
+import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-
-import java.util.Objects;
 
 public class TaskActivity extends FragmentActivity {
     @Override
@@ -34,7 +32,15 @@ public class TaskActivity extends FragmentActivity {
                         .setCancelable(true)
                         .setOnCancelListener(dialog -> finish())
                         .setPositiveButton("Save", (dialog, which) -> {
+                            TextView titleTextView = ((Dialog) dialog).findViewById(R.id.task_name_edit);
 
+                            if (titleTextView == null) { // Display erorr and exit if appbar title could not be found
+                                Toast.makeText(this, "An error occured and you cannot name the task at this time. Try on the web or desktop apps.", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+
+                            AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+                            if (frag != null) frag.passTitle(titleTextView.getText().toString());
                         });
                 renameBuilder.create().show();
             } else {

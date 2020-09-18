@@ -3,7 +3,7 @@ package com.boruminc.borumjot.android;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.Fragment;
 
 public class OptionsActivity extends OptionsMenuItemActivity {
 
@@ -11,36 +11,15 @@ public class OptionsActivity extends OptionsMenuItemActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.options_activity);
+
+        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        if (frag != null) frag.passTitle("Options");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
     }
 
 }

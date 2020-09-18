@@ -68,4 +68,6 @@
     
     <string name="privacy_policy_confirmation">I have read and agree to the Privacy Policy</string>
     <string name="sms_contentdesc" />
+    <string name="prompt_use_as_guest">Use as Guest</string>
+    <string name="my_jottings_title">My Jottings</string>
 </resources>
