@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.boruminc.borumjot.ButtonGradient;
+import com.boruminc.borumjot.android.validation.LoginValidation;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -40,11 +42,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void submitLogin(View view) {
-        navToHome(view);
+        LoginValidation validation = new LoginValidation(
+             ((TextView) findViewById(R.id.username)).getText().toString(),
+             ((TextView) findViewById(R.id.password)).getText().toString()
+        );
+        String resultText = validation.validate();
+
+        if (resultText.equals(LoginValidation.SUCCESS)) navToHome(view);
+        else Toast.makeText(this, resultText, Toast.LENGTH_LONG).show();
     }
 
     public void navToHome(View view) {
-        // TODO Validation
         startActivity(new Intent(this, HomeActivity.class));
     }
 }
