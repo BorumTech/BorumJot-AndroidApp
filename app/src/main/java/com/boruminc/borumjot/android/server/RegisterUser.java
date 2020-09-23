@@ -1,8 +1,11 @@
-package com.boruminc.borumjot.android;
+package com.boruminc.borumjot.android.server;
 
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,31 +21,36 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
-public class RegisterUser extends AsyncTask<Object, Void, String> {
+public class RegisterUser extends AsyncTask<String, Void, JSONObject> {
     private String charset;
     private String query;
 
-    private void initialize() {
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             charset = java.nio.charset.StandardCharsets.UTF_8.name();
         } else {
             charset = "UTF-8";
         }
+    }
 
-        String firstName = "Varun"; //((TextView) findViewById(R.id.first_name)).getText().toString();
-        String lastName = "Singh"; //((TextView) findViewById(R.id.last_name)).getText().toString();
+    private void initialize(String...params) {
         try {
-            query = String.format("first_name=%s&last_name=%s",
-                    URLEncoder.encode(firstName, charset),
-                    URLEncoder.encode(lastName, charset));
+            query = String.format("first_name=%s&last_name=%s&email=%s&password=%s",
+                    URLEncoder.encode(params[0], charset),
+                    URLEncoder.encode(params[1], charset),
+                    URLEncoder.encode(params[2], charset),
+                    URLEncoder.encode(params[3], charset)
+            );
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    protected String doInBackground(Object... strings) {
-        initialize();
+    protected JSONObject doInBackground(String... strings) {
+        initialize(strings);
 
         // Setup
         String url = "https://api.jot.bforborum.com/api/v1/register?app_api_key=";
@@ -59,11 +67,12 @@ public class RegisterUser extends AsyncTask<Object, Void, String> {
                 output.write(query.getBytes(charset));
             }
 
-            InputStream response = connection.getInputStream();
-
             int status = ((HttpURLConnection) connection).getResponseCode();
-            for (Map.Entry<String, List<String>> header : connection.getHeaderFields().entrySet()) {
-                System.out.println(header.getKey() + "=" + header.getValue());
+            InputStream response;
+            if (status == 200) {
+                response = connection.getInputStream();
+            } else {
+                response = ((HttpURLConnection) connection).getErrorStream();
             }
 
             String contentType = connection.getHeaderField("Content-Type");
@@ -77,20 +86,27 @@ public class RegisterUser extends AsyncTask<Object, Void, String> {
             }
 
             if (charset != null) {
+                StringBuilder jsonResponse = new StringBuilder();
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(response, charset))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        Log.d("Line: ", line);
+                       jsonResponse.append(line);
                     }
                 }
+
+                Log.d("JSON", jsonResponse.toString());
+                return new JSONObject(jsonResponse.toString());
             }
 
+            return new JSONObject("{\"ok\": \"false\", \"error\": {\"message\": \"Charset was null\"}");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        return "Ran okay";
+        return null;
     }
 }

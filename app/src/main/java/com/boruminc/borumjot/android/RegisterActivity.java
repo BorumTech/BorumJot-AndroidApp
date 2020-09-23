@@ -1,26 +1,30 @@
 package com.boruminc.borumjot.android;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.boruminc.borumjot.ButtonGradient;
+import com.boruminc.borumjot.android.server.RegisterUser;
+import com.boruminc.borumjot.android.validation.RegistrationValidation;
 
 public class RegisterActivity extends AppCompatActivity {
     Button registerBtn;
-    private AsyncTask<?, ?, ?> registerUserTask;
+    ProgressBar loadingSpinner;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,18 +36,35 @@ public class RegisterActivity extends AppCompatActivity {
 
         registerBtn = findViewById(R.id.registerbtn);
         registerBtn.setEnabled(true);
-        registerUserTask = new RegisterUser();
+
+        loadingSpinner = findViewById(R.id.progressPanel);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         registerBtn.setBackground(ButtonGradient.getOneSelectButtonGradient());
+        loadingSpinner.setVisibility(View.INVISIBLE);
     }
 
     public void validateRegistration(View view) {
-        registerUserTask.execute();
-        registerBtn.setEnabled(false); // Disable button because task can only be run once
+        loadingSpinner.setVisibility(View.VISIBLE);
+        RegistrationValidation validation = new RegistrationValidation(
+                ((TextView) findViewById(R.id.first_name)).getText().toString(),
+                ((TextView) findViewById(R.id.last_name)).getText().toString(),
+                ((TextView) findViewById(R.id.email)).getText().toString(),
+                ((TextView) findViewById(R.id.password)).getText().toString(),
+                ((TextView) findViewById(R.id.confirm_password)).getText().toString()
+        );
+        String result = validation.validate();
+
+        Log.d("Toast Text", result);
+        if (!result.equals(RegistrationValidation.SUCCESS)) { // If registration not successful
+            Toast.makeText(this, result, Toast.LENGTH_LONG).show(); // Display error message
+        } else {
+            startActivity(new Intent(this, HomeActivity.class));
+        }
+        loadingSpinner.setVisibility(View.GONE);
     }
 
     private void navToPrivacyPolicy() {
@@ -73,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         // Cancel running task(s) to avoid memory leaks
-        if (registerUserTask != null)
-            registerUserTask.cancel(true);
+        if (RegistrationValidation.registerTask != null)
+            RegistrationValidation.registerTask.cancel(true);
     }
 }

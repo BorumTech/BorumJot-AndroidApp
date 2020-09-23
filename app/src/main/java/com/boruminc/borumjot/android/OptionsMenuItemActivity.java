@@ -1,12 +1,10 @@
 package com.boruminc.borumjot.android;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 
 import java.util.Objects;
 
