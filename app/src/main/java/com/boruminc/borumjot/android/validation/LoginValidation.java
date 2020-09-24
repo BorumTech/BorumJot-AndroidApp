@@ -1,6 +1,15 @@
 package com.boruminc.borumjot.android.validation;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.boruminc.borumjot.android.HomeActivity;
+import com.boruminc.borumjot.android.R;
 import com.boruminc.borumjot.android.server.LoginUser;
+import com.boruminc.borumjot.android.server.TaskRunner;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,6 +17,8 @@ import org.json.JSONObject;
 import java.util.concurrent.ExecutionException;
 
 public final class LoginValidation extends Validation {
+    private Activity context;
+    private ProgressBar progressBar;
 
     private static final String LOGIN_ERROR = "Login failed: An error occurred";
     private static final String CREDENTIALS_NOT_COMPLETE = "Login failed: Not all fields were filled out";
@@ -17,32 +28,34 @@ public final class LoginValidation extends Validation {
      * @param em The email entered by the user
      * @param pw The password entered by the user
      */
-    public LoginValidation(String em, String pw) {
+    public LoginValidation(Activity context, String em, String pw) {
         super(em, pw);
+        this.context = context;
+        progressBar = context.findViewById(R.id.progressPanel);
     }
 
     /**
-     * Check if credentials are valid
-     * @return Whether the credentials are valid:
-     * true if valid, false if invalid or an error occurred
      */
-    private String checkLogin() {
-        try {
-            JSONObject execution = new LoginUser().execute(getEmail(), getPassword()).get();
-            if (execution != null) {
-                if (execution.has("error"))
-                    return ((JSONObject) execution.get("error")).getString("message");
-                else return SUCCESS;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return LOGIN_ERROR;
+    public void checkLogin() {
+        new TaskRunner()
+                .executeAsync(
+                        new LoginUser(getEmail(), getPassword()),
+                        (data) -> {
+                            progressBar.setVisibility(View.GONE); // Remove progress bar to indicate request is complete
+                            try {
+                                if (data != null) {
+                                    if (data.isNull("error") && data.getInt("statusCode") == 200) {
+                                        context.startActivity(new Intent(context, HomeActivity.class));
+                                    } else if (data.getJSONObject("error").has("message")) {
+                                        Toast.makeText(context, (String) ((JSONObject) data.get("error")).get("message"), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Toast.makeText(context, LOGIN_ERROR, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                );
     }
 
     /**
@@ -53,6 +66,7 @@ public final class LoginValidation extends Validation {
         if (isMissingFields()) return CREDENTIALS_NOT_COMPLETE;
         if (!isEmailValid()) return INVALID_EMAIL;
 
-        return checkLogin();
+        progressBar.setVisibility(View.VISIBLE);
+        return SUCCESS;
     }
 }

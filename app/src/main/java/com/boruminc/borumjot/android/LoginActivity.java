@@ -28,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        findViewById(R.id.progressPanel).setVisibility(View.INVISIBLE);
         setGradientsBackgrounds();
     }
 
@@ -43,12 +44,14 @@ public class LoginActivity extends AppCompatActivity {
 
     public void submitLogin(View view) {
         LoginValidation validation = new LoginValidation(
-             ((TextView) findViewById(R.id.username)).getText().toString(),
-             ((TextView) findViewById(R.id.password)).getText().toString()
+            this,
+            ((TextView) findViewById(R.id.username)).getText().toString(),
+            ((TextView) findViewById(R.id.password)).getText().toString()
         );
+
         String resultText = validation.validate();
 
-        if (resultText.equals(LoginValidation.SUCCESS)) navToHome(view);
+        if (resultText.equals(LoginValidation.SUCCESS)) validation.checkLogin();
         else Toast.makeText(this, resultText, Toast.LENGTH_LONG).show();
     }
 

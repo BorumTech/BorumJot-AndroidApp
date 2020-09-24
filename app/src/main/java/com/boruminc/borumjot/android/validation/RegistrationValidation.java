@@ -55,7 +55,7 @@ public class RegistrationValidation extends Validation {
                 .executeAsync(
                         new RegisterUser(firstName, lastName, getEmail(), getPassword()),
                         (data) -> {
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
                             try {
                                 if (data != null) {
                                     if (data.isNull("error") && data.getInt("statusCode") == 200) {
@@ -66,7 +66,7 @@ public class RegistrationValidation extends Validation {
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                Toast.makeText(context, "Registration failed: An error occurred", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, REGISTRATION_ERROR, Toast.LENGTH_LONG).show();
                             }
                         }
                 );
