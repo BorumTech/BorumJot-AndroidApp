@@ -1,8 +1,11 @@
 package com.boruminc.borumjot.android.server;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.boruminc.borumjot.android.validation.LoginValidation;
+import com.boruminc.borumjot.android.validation.RegistrationValidation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,24 +21,26 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
-public class RegisterUser extends AsyncTask<String, Void, JSONObject> {
+public class RegisterUser implements Callable<JSONObject> {
     private String charset;
     private String query;
+    private String[] params;
 
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
+
+    public RegisterUser(String... p) {
+        params = p;
+    }
+
+    private void initialize() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             charset = java.nio.charset.StandardCharsets.UTF_8.name();
         } else {
             charset = "UTF-8";
         }
-    }
 
-    private void initialize(String...params) {
         try {
             query = String.format("first_name=%s&last_name=%s&email=%s&password=%s",
                     URLEncoder.encode(params[0], charset),
@@ -48,9 +53,8 @@ public class RegisterUser extends AsyncTask<String, Void, JSONObject> {
         }
     }
 
-    @Override
-    protected JSONObject doInBackground(String... strings) {
-        initialize(strings);
+    public JSONObject call() {
+        initialize();
 
         // Setup
         String url = "https://api.jot.bforborum.com/api/v1/register?app_api_key=";
@@ -84,21 +88,28 @@ public class RegisterUser extends AsyncTask<String, Void, JSONObject> {
                     break;
                 }
             }
+            JSONObject toReturn = new JSONObject();
+            JSONObject error = new JSONObject();
+            error.put("message", "Charset was null");
+            toReturn.put("ok", "false");
+            toReturn.put("error", error);
 
             if (charset != null) {
                 StringBuilder jsonResponse = new StringBuilder();
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(response, charset))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                       jsonResponse.append(line);
+                        jsonResponse.append(line);
                     }
                 }
-
-                Log.d("JSON", jsonResponse.toString());
-                return new JSONObject(jsonResponse.toString());
+                Log.d("JSON RESPONSE", String.valueOf(jsonResponse));
+                toReturn = new JSONObject(jsonResponse.toString());
             }
 
-            return new JSONObject("{\"ok\": \"false\", \"error\": {\"message\": \"Charset was null\"}");
+            response.close();
+            ((HttpURLConnection) connection).disconnect();
+
+            return toReturn;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

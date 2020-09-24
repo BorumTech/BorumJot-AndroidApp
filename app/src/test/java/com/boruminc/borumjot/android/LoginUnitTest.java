@@ -9,8 +9,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginUnitTest {
@@ -18,26 +20,44 @@ public class LoginUnitTest {
     Context mMockContext;
 
     /**
-     * Tests if login credential validation is correct
+     * Tests if login credential validation is correct for valid login credentials
      */
-    @Test
-    public void loginCredentialValidation_isCorrect() {
-        boolean resultWithInvalidCredentials= LoginValidation.isCredentialsValid("armageddon@gmail.com","pass");
-        assertTrue(resultWithInvalidCredentials);
 
-        boolean resultWithValidCredentials = LoginValidation.isCredentialsValid("armageddon@gmail.com", "pass123!");
-        assertFalse(resultWithValidCredentials);
+    public void loginCredentialValidation_isCorrect() {
+        LoginValidation loginValidation = new LoginValidation("armageddon@gmail.com","pass");
+        String resultWithInvalidCredentials = loginValidation.validate();
+        assertEquals(resultWithInvalidCredentials, LoginValidation.SUCCESS);
     }
 
     /**
-     * Tests if login email validation is correct
+     * Tests if login credential validation is correct for invalid login credentials
+     */
+
+    public void invalidLoginCredentialValidation_isCorrect() {
+        LoginValidation loginValidation = new LoginValidation("armageddon@gmail.com", "pass123!");
+        String resultWithValidCredentials = loginValidation.validate();
+        assertNotEquals(resultWithValidCredentials, LoginValidation.SUCCESS);
+    }
+
+    /**
+     * Tests if login email validation is correct for valid emails
+     * by asserting that a valid email returns true
      */
     @Test
     public void loginEmailValidation_isCorrect() {
-        boolean resultWithValidEmail = LoginValidation.isEmailValid("arigergage@gmail.com");
+        LoginValidation loginValidation = new LoginValidation("arigergage@gmail.com", "");
+        boolean resultWithValidEmail = loginValidation.isEmailValid();
         assertTrue(resultWithValidEmail);
+    }
 
-        boolean resultWithInvalidEmail = LoginValidation.isEmailValid("arifsid");
+    /**
+     * Tests if login email validation is correct for invalid emails
+     * by asserting that an invalid email returns false
+     */
+    @Test
+    public void invalidEmailValidation_isCorrect() {
+        LoginValidation loginValidation = new LoginValidation("arifsid", "");
+        boolean resultWithInvalidEmail = loginValidation.isEmailValid();
         assertFalse(resultWithInvalidEmail);
     }
 
