@@ -19,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.boruminc.borumjot.ButtonGradient;
-import com.boruminc.borumjot.android.server.RegisterUser;
 import com.boruminc.borumjot.android.validation.RegistrationValidation;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -48,23 +47,23 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void validateRegistration(View view) {
-        loadingSpinner.setVisibility(View.VISIBLE);
+        if (!((CheckedTextView) findViewById(R.id.confirm_priv_polic)).isChecked()) {
+            Toast.makeText(this, "You must check the Privacy Policy checkbox to register", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         RegistrationValidation validation = new RegistrationValidation(
+                this,
                 ((TextView) findViewById(R.id.first_name)).getText().toString(),
                 ((TextView) findViewById(R.id.last_name)).getText().toString(),
                 ((TextView) findViewById(R.id.email)).getText().toString(),
                 ((TextView) findViewById(R.id.password)).getText().toString(),
                 ((TextView) findViewById(R.id.confirm_password)).getText().toString()
         );
-        String result = validation.validate();
 
-        Log.d("Toast Text", result);
-        if (!result.equals(RegistrationValidation.SUCCESS)) { // If registration not successful
-            Toast.makeText(this, result, Toast.LENGTH_LONG).show(); // Display error message
-        } else {
-            startActivity(new Intent(this, HomeActivity.class));
-        }
-        loadingSpinner.setVisibility(View.GONE);
+        String result = validation.validate();
+        if (result.equals(RegistrationValidation.SUCCESS)) validation.checkRegistration(this);
+        else Toast.makeText(this, result, Toast.LENGTH_LONG).show();
     }
 
     private void navToPrivacyPolicy() {
@@ -90,11 +89,5 @@ public class RegisterActivity extends AppCompatActivity {
         ((CheckedTextView) view).toggle();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Cancel running task(s) to avoid memory leaks
-        if (RegistrationValidation.registerTask != null)
-            RegistrationValidation.registerTask.cancel(true);
-    }
+
 }

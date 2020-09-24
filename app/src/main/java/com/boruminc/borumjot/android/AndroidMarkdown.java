@@ -8,20 +8,18 @@ import android.widget.TextView;
 import android.text.style.StyleSpan;
 import android.graphics.Typeface;
 
-public final class AndroidMarkdown {
-    private TextView richView;
+final class AndroidMarkdown {
     private SpannableStringBuilder spannableStringBuilder;
 
-    public AndroidMarkdown(TextView r) {
-        richView = r;
-        spannableStringBuilder = new SpannableStringBuilder(richView.getText().toString());
+    AndroidMarkdown(TextView r) {
+        spannableStringBuilder = new SpannableStringBuilder(r.getText().toString());
     }
 
     private String getMarkdown() {
         return spannableStringBuilder.toString();
     }
 
-    public SpannableStringBuilder formatRichTextView() {
+    SpannableStringBuilder formatRichTextView() {
         setFontSpannables("**", Typeface.BOLD); // Sets the bold spannables
         setFontSpannables("__", Typeface.ITALIC); // Sets the italic spannables
         setHeadingSpannables(); // Sets the heading spannables (changes font size)
@@ -32,6 +30,7 @@ public final class AndroidMarkdown {
      * Sets heading 1
      */
     private void setHeadingSpannables() {
+        // TODO Heading spannable
         new AbsoluteSizeSpan(25);
     }
 

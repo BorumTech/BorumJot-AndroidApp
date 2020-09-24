@@ -14,11 +14,15 @@ public class RegisterUnitTest {
      */
     @Test
     public void registerMatchingPasswordValidation_isCorrect() {
-        boolean resultWithMatch = RegistrationValidation.isPasswordConfirmed("pass", "pass");
+        RegistrationValidation registrationValidation = new RegistrationValidation("", "", "", "pass", "pass");
+        boolean resultWithMatch = registrationValidation.isPasswordConfirmed();
         assertTrue(resultWithMatch);
+    }
 
-        boolean resultWithoutMatch = RegistrationValidation.isPasswordConfirmed( "pass1", "pass2");
+    @Test
+    public void nonMatchingPasswordValidation_isCorrect() {
+        RegistrationValidation registrationValidation = new RegistrationValidation("", "", "", "pass1", "pass2");
+        boolean resultWithoutMatch = registrationValidation.isPasswordConfirmed();
         assertFalse(resultWithoutMatch);
-
     }
 }
