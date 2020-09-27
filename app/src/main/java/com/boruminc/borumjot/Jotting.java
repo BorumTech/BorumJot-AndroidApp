@@ -2,6 +2,8 @@ package com.boruminc.borumjot;
 
 import androidx.annotation.NonNull;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public abstract class Jotting {
@@ -9,8 +11,13 @@ public abstract class Jotting {
     private String name;
 
     Jotting(String n) {
-        labels = new ArrayList<Label>();
         name = n;
+        labels = new ArrayList<Label>();
+    }
+
+    Jotting(String n, ArrayList<Label> l) {
+        name = n;
+        labels = l;
     }
 
     public ArrayList<Label> getLabels() {

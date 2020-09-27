@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -22,35 +23,92 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.boruminc.borumjot.Jotting;
+import com.boruminc.borumjot.Task;
+import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.TaskRunner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeActivity extends AppCompatActivity {
+    private static final String JOTTINGS_ERROR = "The jottings could not be fetched at this time.";
+
+    RecyclerView recyclerView;
+    JottingsListAdapter jottingsListAdapter;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         setSupportActionBar(findViewById(R.id.my_toolbar));
 
-        RecyclerView recyclerView = findViewById(R.id.home_jottings_list);
+        recyclerView = findViewById(R.id.home_jottings_list);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
+        // Improve performance because changes in content do not change the layout size of the RecyclerView
         recyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
+        // Use a linear layout manager
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        // specify an adapter (see also next example)
-        JottingsListAdapter mAdapter = new JottingsListAdapter(new String[] {"Sample Task", "Sample Note", "Sample Note"}, this);
-        recyclerView.setAdapter(mAdapter);
-
-        Log.d("Adapter: ", String.valueOf(mAdapter.getItemCount()));
+        // Specify an adapter (see also next example)
+        jottingsListAdapter = new JottingsListAdapter(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ProgressBar progressBar = findViewById(R.id.progressPanel);
+        progressBar.setVisibility(View.VISIBLE);
+        new TaskRunner().executeAsync(new ApiRequestExecutor() {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("GET");
+                addRequestHeader("Authorization", "Basic ".concat(Objects.requireNonNull(getIntent().getStringExtra("apiKey"))));
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeUrl("tasks", "app_api_key=a9sd8a9d8as09da8s9d", "type=tasks"));
+            }
+        }, data -> {
+            progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
+            try {
+                if (data != null) {
+                    if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
+                        ArrayList<Jotting> userJottings = new ArrayList<Jotting>(data.getInt("rowCount"));
+                        JSONArray jottingsData = data.getJSONArray("data");
+                        for (int i = 0; i < jottingsData.length(); i++) {
+                            JSONObject row = jottingsData.getJSONObject(i);
+                            userJottings.add(new Task(row.getString("task_name")));
+                        }
+
+                        jottingsListAdapter.setDataset(userJottings);
+                        recyclerView.setAdapter(jottingsListAdapter);
+                        return;
+                    } else if (data.has("error") && data.getJSONObject("error").has("message")) {
+                        Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
+                    }
+                }
+                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
@@ -144,4 +202,6 @@ public class HomeActivity extends AppCompatActivity {
         });
 
     }
+
+
 }

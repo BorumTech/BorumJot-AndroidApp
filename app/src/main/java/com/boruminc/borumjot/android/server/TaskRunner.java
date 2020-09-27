@@ -1,14 +1,22 @@
 package com.boruminc.borumjot.android.server;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
+import android.widget.Toast;
+
+import com.boruminc.borumjot.android.HomeActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class TaskRunner {
-    private final Executor executor = Executors.newSingleThreadExecutor(); // change according to your requirements
+    private final Executor executor = Executors.newSingleThreadExecutor();
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     /**
@@ -31,4 +39,5 @@ public class TaskRunner {
             }
         });
     }
+
 }

@@ -8,13 +8,11 @@ import android.widget.Toast;
 
 import com.boruminc.borumjot.android.HomeActivity;
 import com.boruminc.borumjot.android.R;
-import com.boruminc.borumjot.android.server.LoginUser;
+import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 
 public final class LoginValidation extends Validation {
     private Activity context;
@@ -39,13 +37,26 @@ public final class LoginValidation extends Validation {
     public void checkLogin() {
         new TaskRunner()
                 .executeAsync(
-                        new LoginUser(getEmail(), getPassword()),
+                        new ApiRequestExecutor(getEmail(), getPassword()) {
+                            protected void initialize() {
+                                super.initialize();
+                                setQuery(this.encodePostQuery("email=%s&password=%s"));
+                                setRequestMethod("POST");
+                            }
+                            @Override
+                            public JSONObject call() {
+                                super.call();
+                                return this.connectToApi(encodeUrl("login", "app_api_key=9ds89d8as9das9"));
+                            }
+                        },
                         (data) -> {
                             progressBar.setVisibility(View.GONE); // Remove progress bar to indicate request is complete
                             try {
                                 if (data != null) {
                                     if (data.isNull("error") && data.getInt("statusCode") == 200) {
-                                        context.startActivity(new Intent(context, HomeActivity.class));
+                                        Intent homeIntent = new Intent(context, HomeActivity.class);
+                                        homeIntent.putExtra("apiKey", data.getJSONObject("data").getString("api_key"));
+                                        context.startActivity(homeIntent);
                                     } else if (data.getJSONObject("error").has("message")) {
                                         Toast.makeText(context, (String) ((JSONObject) data.get("error")).get("message"), Toast.LENGTH_LONG).show();
                                     }

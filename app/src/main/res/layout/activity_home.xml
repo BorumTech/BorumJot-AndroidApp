@@ -65,6 +65,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <ProgressBar
+        android:id="@+id/progressPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_below="@id/jot_filter_btns_layout"
+        android:layout_centerHorizontal="true"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_jotting_btn_home"
         android:src="@android:drawable/ic_input_add"

@@ -10,17 +10,22 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import androidx.core.content.ContextCompat;
 import com.boruminc.borumjot.*;
 
+import java.util.ArrayList;
+
 public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsListAdapter.MyViewHolder> {
-    private String[] mDataset;
+    private ArrayList<Jotting> mDataset;
     private Context context;
 
+    public void setDataset(ArrayList<Jotting> dataset) {
+        mDataset = dataset;
+    }
+
     static class MyViewHolder extends RecyclerView.ViewHolder {
+
         TextView textView;
         private Context context;
-
         MyViewHolder(View v, Context c) {
             super(v);
             context = c;
@@ -28,7 +33,10 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
             textView = v.findViewById(R.id.jotting_name);
             textView.setOnClickListener(this::navToJot);
             textView.setTextColor(Color.BLACK);
-            textView.setPadding((int) context.getResources().getDimension(R.dimen.activity_horizontal_margin), 0, 0, 0);
+
+            // Surround each Jottings List item view with padding on all except the right side
+            int padding = (int) context.getResources().getDimension(R.dimen.activity_horizontal_margin);
+            textView.setPadding(padding, padding, 0, padding);
         }
 
         void bindView(String string) {
@@ -38,16 +46,21 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
         void navToJot(View v) {
             context.startActivity(new Intent(context, NoteActivity.class));
         }
+
+    }
+    JottingsListAdapter(Context c) {
+        context = c;
+        mDataset = new ArrayList<Jotting>();
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    JottingsListAdapter(String[] myDataset, Context c) {
-        mDataset = myDataset;
-        context = c;
-        new Label();
-    }
 
+    JottingsListAdapter(ArrayList<Jotting> myDataset, Context c) {
+        context = c;
+        mDataset = myDataset;
+    }
     // Create new views (invoked by the layout manager)
+
     @Override
     public JottingsListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
                                                      int viewType) {
@@ -65,13 +78,13 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
     */
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.bindView(mDataset[position]);
+        holder.bindView(mDataset.get(position).getName());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return mDataset.size();
     }
 
 }

@@ -24,7 +24,7 @@ public class LoginUnitTest {
      */
 
     public void loginCredentialValidation_isCorrect() {
-        LoginValidation loginValidation = new LoginValidation("armageddon@gmail.com","pass");
+        LoginValidation loginValidation = new LoginValidation(mMockContext, "armageddon@gmail.com","pass");
         String resultWithInvalidCredentials = loginValidation.validate();
         assertEquals(resultWithInvalidCredentials, LoginValidation.SUCCESS);
     }
