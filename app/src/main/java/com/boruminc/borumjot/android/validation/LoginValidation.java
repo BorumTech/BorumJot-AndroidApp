@@ -1,7 +1,11 @@
 package com.boruminc.borumjot.android.validation;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -55,7 +59,14 @@ public final class LoginValidation extends Validation {
                                 if (data != null) {
                                     if (data.isNull("error") && data.getInt("statusCode") == 200) {
                                         Intent homeIntent = new Intent(context, HomeActivity.class);
-                                        homeIntent.putExtra("apiKey", data.getJSONObject("data").getString("api_key"));
+                                        String userApiKey = data.getJSONObject("data").getString("api_key");
+
+                                        // Set the API key in internal, private, app-specific storage (Shared Preferences)
+                                        context.getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                                                .edit()
+                                                .putString("apiKey", userApiKey)
+                                                .apply();
+
                                         context.startActivity(homeIntent);
                                     } else if (data.getJSONObject("error").has("message")) {
                                         Toast.makeText(context, (String) ((JSONObject) data.get("error")).get("message"), Toast.LENGTH_LONG).show();

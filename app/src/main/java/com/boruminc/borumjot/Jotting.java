@@ -1,12 +1,15 @@
 package com.boruminc.borumjot;
 
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Jotting {
+public abstract class Jotting implements Serializable {
     ArrayList<Label> labels;
     private String name;
 

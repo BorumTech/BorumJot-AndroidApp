@@ -3,29 +3,33 @@ package com.boruminc.borumjot.android;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.boruminc.borumjot.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsListAdapter.MyViewHolder> {
     private ArrayList<Jotting> mDataset;
     private Context context;
 
-    public void setDataset(ArrayList<Jotting> dataset) {
+    void setDataset(ArrayList<Jotting> dataset) {
         mDataset = dataset;
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
-
-        TextView textView;
+        private TextView textView;
         private Context context;
+
         MyViewHolder(View v, Context c) {
             super(v);
             context = c;
@@ -39,12 +43,25 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
             textView.setPadding(padding, padding, 0, padding);
         }
 
-        void bindView(String string) {
-            textView.setText(string);
+        void bindView(Jotting jottingInst) {
+            textView.setText(jottingInst.getName());
+            textView.setTag(jottingInst);
         }
 
         void navToJot(View v) {
-            context.startActivity(new Intent(context, NoteActivity.class));
+            try {
+                // Creates intent to the activity that starts with the name of the tag instance's class
+                Intent jottingIntent = new Intent(context, Class.forName(
+                        "com.boruminc.borumjot.android." +
+                        v.getTag().getClass().getSimpleName() +
+                        "Activity"
+                ));
+                jottingIntent.putExtra("data", (Serializable) v.getTag());
+                context.startActivity(jottingIntent);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(context, "An error occurred in viewing your jotting", Toast.LENGTH_LONG).show();
+            }
         }
 
     }
@@ -73,12 +90,12 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
 
     /*
      * Replace the contents of a view (invoked by the layout manager)
-     * Get element from your dataset at this position
+     * Get element from the dataset at this position
      * Replace the contents of the view with that element
     */
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.bindView(mDataset.get(position).getName());
+        holder.bindView(mDataset.get(position));
     }
 
     // Return the size of your dataset (invoked by the layout manager)

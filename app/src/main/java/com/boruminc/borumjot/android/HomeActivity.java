@@ -1,18 +1,14 @@
 package com.boruminc.borumjot.android;
 
 import android.app.SearchManager;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -33,8 +29,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeActivity extends AppCompatActivity {
@@ -76,7 +70,10 @@ public class HomeActivity extends AppCompatActivity {
             protected void initialize() {
                 super.initialize();
                 setRequestMethod("GET");
-                addRequestHeader("Authorization", "Basic ".concat(Objects.requireNonNull(getIntent().getStringExtra("apiKey"))));
+                addRequestHeader("Authorization", "Basic " +
+                        getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                            .getString("apiKey", "")
+                );
             }
 
             @Override

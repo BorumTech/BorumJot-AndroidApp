@@ -28,6 +28,10 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
     private Map<String, String> requestHeaders;
     private String requestMethod;
 
+    /**
+     * Constructor for ApiRequestExecutor
+     * @param p The POST parameters
+     */
     protected ApiRequestExecutor(String... p) {
         params = p;
         requestHeaders = new HashMap<>();
@@ -78,7 +82,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
     /**
      * Encodes a url
      * @param path The name of the file and any subsequent "/" parameters
-     * @param urlParams The parameter
+     * @param urlParams The query string parameters (GET)
      * @return The encoded url
      */
     protected String encodeUrl(String path, String... urlParams) {
@@ -186,7 +190,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
         return null;
     }
 
-    private Map<String, String> getRequestHeaders() {
+    protected Map<String, String> getRequestHeaders() {
         return requestHeaders;
     }
 
