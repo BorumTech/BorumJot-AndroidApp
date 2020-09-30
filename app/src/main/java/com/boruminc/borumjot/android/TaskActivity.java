@@ -172,15 +172,20 @@ public class TaskActivity extends FragmentActivity {
         view.setLayoutParams(layoutParams);
     }
 
+    public void onDeleteClick(View view) {
+        android.app.AlertDialog.Builder deleteDialog = new android.app.AlertDialog.Builder(this);
+        deleteDialog
+                .setTitle("Delete Task")
+                .setMessage("Are you sure you would like to delete this task?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    new TaskRunner().executeAsync(
+                            new ApiRequestExecutor((String.valueOf(taskData.getId()))) {
                                 @Override
                                 protected void initialize() {
                                     super.initialize();
-                                    setQuery(this.encodePostQuery("name=%s"));
-                                    setRequestMethod("POST");
-
-                                    // Set the user's api key or an empty string in the Authentication request header
-                                    String apiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
-                                    addRequestHeader("Authorization", "Basic " + apiKey);
+                                    setRequestMethod("DELETE");
+                                    addRequestHeader("Authorization", "Basic " + userApiKey);
+                                    setQuery(encodePostQuery("id=%s"));
                                 }
 
                                 @Override
@@ -188,21 +193,28 @@ public class TaskActivity extends FragmentActivity {
                                     super.call();
                                     return this.connectToApi(encodeUrl("task"));
                                 }
-                            }, data -> {
+                            },
+                            data -> {
                                 try {
                                     if (data != null) {
-                                        if (data.has("error") && data.getJSONObject("error").has("message")) {
-                                            Toast.makeText(TaskActivity.this, "The task could not be created at this time. ",
-                                                    Toast.LENGTH_SHORT).show();
+                                        if (data.has("error") || data.getInt("statusCode") == 500) {
+                                            Toast.makeText(this, "The task could not be deleted due to a system error", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            startActivity(new Intent(this, HomeActivity.class));
+                                            Toast.makeText(this, "The task was deleted", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
+                                    Toast.makeText(this, "The task could not be deleted due to a system error", Toast.LENGTH_LONG).show();
                                 }
                             }
                     );
 
-        }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
 
+                });
+        deleteDialog.create().show();
     }
 }
