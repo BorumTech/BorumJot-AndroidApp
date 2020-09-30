@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.boruminc.borumjot.Jotting;
+import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
@@ -90,7 +91,13 @@ public class HomeActivity extends AppCompatActivity {
                         JSONArray jottingsData = data.getJSONArray("data");
                         for (int i = 0; i < jottingsData.length(); i++) {
                             JSONObject row = jottingsData.getJSONObject(i);
-                            userJottings.add(new Task(row.getString("task_name")));
+                            Task task = new Task(
+                                    row.getString("task_name"),
+                                    row.getString("task_details"),
+                                    new ArrayList<Label>()
+                            );
+                            task.setId(row.getInt("task_id"));
+                            userJottings.add(task);
                         }
 
                         jottingsListAdapter.setDataset(userJottings);

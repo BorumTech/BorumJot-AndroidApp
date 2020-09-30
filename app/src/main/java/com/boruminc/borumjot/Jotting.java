@@ -1,10 +1,6 @@
 package com.boruminc.borumjot;
 
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
-
-import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,14 +8,27 @@ import java.util.ArrayList;
 public abstract class Jotting implements Serializable {
     ArrayList<Label> labels;
     private String name;
+    private String body;
+    private int id;
 
+    /**
+     * Constructor for creating a new task
+     * @param n The name
+     */
     Jotting(String n) {
         name = n;
         labels = new ArrayList<Label>();
     }
 
-    Jotting(String n, ArrayList<Label> l) {
+    /**
+     * Constructor for initializing an existing task
+     * @param n The name
+     * @param b The body
+     * @param l The labels
+     */
+    Jotting(String n, String b, ArrayList<Label> l) {
         name = n;
+        body = b;
         labels = l;
     }
 
@@ -52,6 +61,22 @@ public abstract class Jotting implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String newBody) {
+        body = newBody;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**

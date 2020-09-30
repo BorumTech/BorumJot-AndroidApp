@@ -2,40 +2,21 @@ package com.boruminc.borumjot;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.sql.Date;
+import java.util.ArrayList;
 
 public class Task extends Jotting {
-  private int id;
   private int userId;
   private int status;
   private Date timeCreated;
 
-  public Task(JSONObject jsonObj) throws JSONException {
-    super(jsonObj.getString("name"));
-    id = jsonObj.getInt("id");
-    userId = jsonObj.getInt("user_id");
-    status = jsonObj.getInt("status");
-    timeCreated = Date.valueOf(jsonObj.getString("time_created"));
-  }
-
-  public Task(String n) {
-    super(n);
+  public Task(String n, String b, ArrayList<Label> labels) {
+    super(n, b, labels);
   }
 
   @NonNull
   public String toString() {
     return "Name: " + getName();
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
   }
 
   public int getUserId() {

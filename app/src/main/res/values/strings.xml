@@ -36,6 +36,9 @@
     <string name="action_change_sign_in">Change Sign-In</string>
     <string name="action_export_data">Export Data</string>
 
+    <!-- General action strings -->
+    <string name="action_save">Save</string>
+
     <!-- Labels -->
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>

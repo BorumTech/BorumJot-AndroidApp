@@ -34,9 +34,7 @@ public class NoteActivity extends FragmentActivity {
                     startActivity(new Intent(this, HomeActivity.class));
                     Toast.makeText(this, "The note was deleted", Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-
-                });
+                .setNegativeButton("Cancel", (dialog, which) -> {});
         deleteDialog.create().show();
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -30,17 +31,16 @@
             android:id="@+id/delete_task_btn"
             android:layout_height="match_parent"
             android:text="@string/prompt_task_delete"
+            android:onClick="onDeleteClick"
             style="@style/HeaderButton" />
     </LinearLayout>
 
-    <EditText
+    <com.boruminc.borumjot.android.customviews.EditTextV2
         android:id="@+id/task_description_box"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@id/header_btns"
         android:hint="@string/prompt_details_fill"
-        style="@style/NoteArea"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        style="@style/NoteArea" />
 
     <LinearLayout
         android:id="@+id/task_subtasks_box"

@@ -87,16 +87,19 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
      */
     protected String encodeUrl(String path, String... urlParams) {
         String versionNumber = "v1";
-        String safeUrl = "https://api.jot.bforborum.com/api/"
+        String safeUrl = "https://borum-jot-api-git-develop.varun-singh.vercel.app/api/"
                 .concat(versionNumber).concat("/")
                 .concat(path).concat(urlParams.length > 0 ? "?" : "");
 
-        // Loop through GET url query parameters, encode them, concat them to the url, and separate with "&"
-        for (String urlParam : urlParams) {
+        // Loop through url query parameters, encode them, concat them to the url, and separate with "&"
+        for (int i = 0; i < urlParams.length; i++) {
+            String urlParam = urlParams[i];
             safeUrl = safeUrl
+                    .concat(urlParam.substring(0, urlParam.indexOf("=") + 1))
                     .concat(Uri.encode(urlParam.substring(urlParam.indexOf("=") + 1))) // Exclude key, only get value
-                    .concat(urlParams.length > 1 ? "&" : ""); // Add "&" if there are more parameters
+                    .concat(i < urlParams.length - 1 ? "&" : ""); // Add "&" if there are more parameters
         }
+        Log.d("Safe url", safeUrl);
 
         return safeUrl;
     }
@@ -134,9 +137,9 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
                 Log.d(entry.getKey(), entry.getValue());
             }
 
-            if (!requestMethod.equals("GET")) {
+            ((HttpURLConnection) connection).setRequestMethod(requestMethod);
+            if (requestMethod.equals("POST") || requestMethod.equals("DELETE")) {
                 connection.setDoOutput(true);
-                ((HttpURLConnection) connection).setRequestMethod(requestMethod);
                 try (OutputStream output = connection.getOutputStream()) {
                     output.write(query.getBytes(getCharset()));
                 }

@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -17,6 +16,10 @@ public class Note extends Jotting {
 
     public Note(String n) {
         super(n);
+    }
+
+    public Note(String n, String body, ArrayList<Label> labels) {
+        super(n, body, labels);
         sharees = new HashSet<>();
     }
 

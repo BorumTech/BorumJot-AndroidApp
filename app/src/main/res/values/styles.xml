@@ -49,9 +49,10 @@
     <style name="NoteArea" parent="Widget.AppCompat.EditText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:background">@android:color/white</item>
         <item name="android:padding">12dp</item>
         <item name="android:textSize">20sp</item>
+        <item name="android:gravity">top</item>
     </style>
 
     <style name="Legal.PrivacyPolicy" parent="Widget.AppCompat.TextView">
