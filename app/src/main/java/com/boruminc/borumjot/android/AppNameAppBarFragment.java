@@ -1,5 +1,7 @@
 package com.boruminc.borumjot.android;
 
+import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,4 +31,18 @@ public class AppNameAppBarFragment extends Fragment {
         title.setText(titleTxt);
     }
 
+    /**
+     * Sets a strikethrough on the title by adding a background
+     * @param on Whether to strikethrough or remove strikethrough
+     */
+    void displayStrikethrough(boolean on) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (on)
+                // Add a strikethrough to the already existing paint flags using "|" bitwise operator
+                title.setPaintFlags(title.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            else
+                // Remove the strikethrough from the paint flags using "&" bitwise operator
+                title.setPaintFlags(title.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
+    }
 }

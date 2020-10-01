@@ -13,7 +13,7 @@
     <!-- String related to Jottings -->
     <string name="prompt_task_delete">Delete Task</string>
     <string name="prompt_note_delete">Delete Note</string>
-    <string name="prompt_task_complete">Mark as Complete</string>
+    <string name="prompt_task_complete">Complete</string>
     <string name="prompt_details_fill">Enter the task\'s details</string>
 
     <!-- Strings related to Options -->

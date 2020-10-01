@@ -97,6 +97,7 @@ public class HomeActivity extends AppCompatActivity {
                                     new ArrayList<Label>()
                             );
                             task.setId(row.getInt("task_id"));
+                            task.setCompleted(row.getString("task_completed").equals("1"));
                             userJottings.add(task);
                         }
 

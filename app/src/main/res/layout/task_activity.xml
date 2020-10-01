@@ -22,10 +22,11 @@
         android:layout_below="@id/appbar"
         android:gravity="center_horizontal"
         app:layout_constraintTop_toTopOf="parent">
-        <Button
+        <CheckBox
             android:id="@+id/complete_task_btn"
             android:layout_height="match_parent"
             android:text="@string/prompt_task_complete"
+            android:onClick="onCompleteClick"
             style="@style/HeaderButton" />
         <Button
             android:id="@+id/delete_task_btn"

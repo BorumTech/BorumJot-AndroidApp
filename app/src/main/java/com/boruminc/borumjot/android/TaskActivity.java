@@ -1,24 +1,20 @@
 package com.boruminc.borumjot.android;
 
-import androidx.appcompat.app.AlertDialog;
-
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
-import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
@@ -26,14 +22,14 @@ import com.boruminc.borumjot.android.server.TaskRunner;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Objects;
-
 public class TaskActivity extends FragmentActivity {
     private String userApiKey;
     private Task taskData;
 
     /* Views */
+    private AppNameAppBarFragment appBarFrag;
     private EditText taskDescriptionBox;
+    private CheckBox taskCompletionBox;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +37,8 @@ public class TaskActivity extends FragmentActivity {
         setContentView(R.layout.task_activity);
 
         taskDescriptionBox = findViewById(R.id.task_description_box);
+        appBarFrag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        taskCompletionBox = findViewById(R.id.complete_task_btn);
 
         // Set the userApiKey for class use
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -53,6 +51,7 @@ public class TaskActivity extends FragmentActivity {
             assert taskData != null;
             setTaskName(taskData.getName());
             setTaskDetails(taskData.getBody());
+            setTaskStatus(taskData.isCompleted());
         }
 
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
@@ -110,17 +109,12 @@ public class TaskActivity extends FragmentActivity {
         }
     }
 
-    private String getTaskName() {
-        return ((TextView) findViewById(R.id.appbar_title)).getText().toString();
-    }
-
     /**
      * Updates the UI of the appbar to display the passed in text
      * @param name The new name of the task
      */
     private void setTaskName(String name) {
-        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
-        if (frag != null) frag.passTitle(name);
+        if (appBarFrag != null) appBarFrag.passTitle(name);
     }
 
     private String getTaskDetails() {
@@ -129,6 +123,11 @@ public class TaskActivity extends FragmentActivity {
 
     private void setTaskDetails(String body) {
         taskDescriptionBox.setText(body);
+    }
+
+    private void setTaskStatus(boolean on) {
+        appBarFrag.displayStrikethrough(on);
+        taskCompletionBox.setChecked(on);
     }
 
     private void onDetailsBoxFocus(View view, boolean isFocused) {
@@ -212,9 +211,42 @@ public class TaskActivity extends FragmentActivity {
                     );
 
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-
-                });
+                .setNegativeButton("Cancel", (dialog, which) -> {});
         deleteDialog.create().show();
+    }
+
+    public void onCompleteClick(View view) {
+        int completed = ((CheckBox) view).isChecked() ? 1 : 0;
+        new TaskRunner().executeAsync(
+                new ApiRequestExecutor() {
+                    @Override
+                    protected void initialize() {
+                        super.initialize();
+                        setRequestMethod("PUT");
+                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                    }
+
+                    @Override
+                    public JSONObject call() {
+                        super.call();
+                        return this.connectToApi(encodeUrl("task", "completed=" + completed, "id=" + taskData.getId()));
+                    }
+                },
+                data -> {
+                    try {
+                        if (data != null) {
+                            if (data.has("error") || data.getInt("statusCode") != 200) {
+                                Toast.makeText(this, "An error occurred and the task could not be marked as "
+                                        + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
+                            } else {
+                                appBarFrag.displayStrikethrough(completed == 1);
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "A server error occurred. The task was not updated", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 }

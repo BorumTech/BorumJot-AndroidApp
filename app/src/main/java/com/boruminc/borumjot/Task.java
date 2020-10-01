@@ -9,6 +9,7 @@ public class Task extends Jotting {
   private int userId;
   private int status;
   private Date timeCreated;
+  private boolean completed;
 
   public Task(String n, String b, ArrayList<Label> labels) {
     super(n, b, labels);
@@ -41,5 +42,13 @@ public class Task extends Jotting {
 
   public void setTimeCreated(Date timeCreated) {
     this.timeCreated = timeCreated;
+  }
+
+  public boolean isCompleted() {
+    return completed;
+  }
+
+  public void setCompleted(boolean isCompleted) {
+    completed = isCompleted;
   }
 }
