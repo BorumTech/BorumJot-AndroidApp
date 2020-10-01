@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
+import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
@@ -33,7 +34,8 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeActivity extends AppCompatActivity {
-    private static final String JOTTINGS_ERROR = "The jottings could not be fetched at this time.";
+    private static final String TASK_ERROR = "The tasks could not be fetched at this time.";
+    private static final String NOTE_ERROR = "The notes could not be fetched at this time.";
 
     RecyclerView recyclerView;
     JottingsListAdapter jottingsListAdapter;
@@ -108,12 +110,55 @@ public class HomeActivity extends AppCompatActivity {
                         Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
                     }
                 }
-                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, TASK_ERROR, Toast.LENGTH_LONG).show();
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, TASK_ERROR, Toast.LENGTH_LONG).show();
             }
         });
+        new TaskRunner().executeAsync(
+            new ApiRequestExecutor() {
+                @Override
+                protected void initialize() {
+                    super.initialize();
+                    setRequestMethod("GET");
+                    addRequestHeader("Authorization", "Basic " +
+                            getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""));
+                }
+
+                @Override
+                public JSONObject call() {
+                    super.call();
+                    return this.connectToApi(encodeUrl("notes"));
+                }
+            }, data -> {
+                progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
+                try {
+                    if (data != null) {
+                        if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
+                            ArrayList<Jotting> userJottings = new ArrayList<Jotting>(data.getInt("rowCount"));
+                            JSONArray jottingsData = data.getJSONArray("data");
+                            for (int i = 0; i < jottingsData.length(); i++) {
+                                JSONObject row = jottingsData.getJSONObject(i);
+                                Note note = new Note(row.getString("name"));
+                                note.setId(row.getInt("id"));
+                                userJottings.add(note);
+                            }
+
+                            jottingsListAdapter.setDataset(userJottings);
+                            recyclerView.setAdapter(jottingsListAdapter);
+                            return;
+                        } else if (data.has("error") && data.getJSONObject("error").has("message")) {
+                            Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
+                        }
+                    }
+                    Toast.makeText(this, NOTE_ERROR, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, NOTE_ERROR, Toast.LENGTH_LONG).show();
+                }
+            }
+        );
     }
 
     @Override

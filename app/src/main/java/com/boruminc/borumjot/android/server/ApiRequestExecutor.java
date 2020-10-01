@@ -87,7 +87,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
      */
     protected String encodeUrl(String path, String... urlParams) {
         String versionNumber = "v1";
-        String safeUrl = "https://borum-jot-api-git-develop.varun-singh.vercel.app/api/"
+        String safeUrl = "https://api.jot.bforborum.com/api/"
                 .concat(versionNumber).concat("/")
                 .concat(path).concat(urlParams.length > 0 ? "?" : "");
 
