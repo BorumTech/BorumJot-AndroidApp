@@ -1,5 +1,6 @@
 package com.boruminc.borumjot.android;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.boruminc.borumjot.android.validation.LoginValidation;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class LoginUnitTest {
     @Mock
-    Context mMockContext;
+    Activity mMockContext;
 
     /**
      * Tests if login credential validation is correct for valid login credentials
@@ -34,7 +35,7 @@ public class LoginUnitTest {
      */
 
     public void invalidLoginCredentialValidation_isCorrect() {
-        LoginValidation loginValidation = new LoginValidation("armageddon@gmail.com", "pass123!");
+        LoginValidation loginValidation = new LoginValidation(mMockContext, "armageddon@gmail.com", "pass123!");
         String resultWithValidCredentials = loginValidation.validate();
         assertNotEquals(resultWithValidCredentials, LoginValidation.SUCCESS);
     }
@@ -45,7 +46,7 @@ public class LoginUnitTest {
      */
     @Test
     public void loginEmailValidation_isCorrect() {
-        LoginValidation loginValidation = new LoginValidation("arigergage@gmail.com", "");
+        LoginValidation loginValidation = new LoginValidation(mMockContext, "arigergage@gmail.com", "");
         boolean resultWithValidEmail = loginValidation.isEmailValid();
         assertTrue(resultWithValidEmail);
     }
@@ -56,7 +57,7 @@ public class LoginUnitTest {
      */
     @Test
     public void invalidEmailValidation_isCorrect() {
-        LoginValidation loginValidation = new LoginValidation("arifsid", "");
+        LoginValidation loginValidation = new LoginValidation(mMockContext, "arifsid", "");
         boolean resultWithInvalidEmail = loginValidation.isEmailValid();
         assertFalse(resultWithInvalidEmail);
     }

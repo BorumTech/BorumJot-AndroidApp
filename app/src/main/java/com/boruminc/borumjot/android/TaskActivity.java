@@ -57,6 +57,9 @@ public class TaskActivity extends FragmentActivity {
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
     }
 
+    /**
+     * Displays the rename and name dialog in an <code>AlertDialog.Builder</code>
+     */
     private void displayRenameDialog() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);

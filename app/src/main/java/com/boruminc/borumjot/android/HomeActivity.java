@@ -31,14 +31,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeActivity extends AppCompatActivity {
-    private static final String TASK_ERROR = "The tasks could not be fetched at this time.";
-    private static final String NOTE_ERROR = "The notes could not be fetched at this time.";
+    private static final String JOTTINGS_ERROR = "The tasks and notes could not fetched at this time";
 
     RecyclerView recyclerView;
     JottingsListAdapter jottingsListAdapter;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +57,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Specify an adapter (see also next example)
         jottingsListAdapter = new JottingsListAdapter(this);
+        recyclerView.setAdapter(jottingsListAdapter);
     }
 
     @Override
@@ -68,97 +70,65 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         ProgressBar progressBar = findViewById(R.id.progressPanel);
         progressBar.setVisibility(View.VISIBLE);
-        new TaskRunner().executeAsync(new ApiRequestExecutor() {
+        Callable<JSONObject> jottingsRequest = new ApiRequestExecutor() {
             @Override
             protected void initialize() {
                 super.initialize();
                 setRequestMethod("GET");
                 addRequestHeader("Authorization", "Basic " +
                         getSharedPreferences("user identification", Context.MODE_PRIVATE)
-                            .getString("apiKey", "")
+                                .getString("apiKey", "")
                 );
             }
 
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeUrl("tasks", "app_api_key=a9sd8a9d8as09da8s9d", "type=tasks"));
+                return this.connectToApi(encodeUrl("jottings"));
             }
-        }, data -> {
+        };
+        TaskRunner.Callback<JSONObject> jottingsResponse = data -> {
             progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
             try {
                 if (data != null) {
                     if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
-                        ArrayList<Jotting> userJottings = new ArrayList<Jotting>(data.getInt("rowCount"));
                         JSONArray jottingsData = data.getJSONArray("data");
+
                         for (int i = 0; i < jottingsData.length(); i++) {
                             JSONObject row = jottingsData.getJSONObject(i);
-                            Task task = new Task(
-                                    row.getString("task_name"),
-                                    row.getString("task_details"),
-                                    new ArrayList<Label>()
-                            );
-                            task.setId(row.getInt("task_id"));
-                            task.setCompleted(row.getString("task_completed").equals("1"));
-                            userJottings.add(task);
+                            Jotting jotting = null;
+
+                            if (row.getString("source").equals("note")) {
+                                jotting = new Note(row.getString("title"));
+                                jotting.setId(row.getInt("id"));
+                            } else if (row.getString("source").equals("task")) {
+                                jotting = new Task(
+                                        row.getString("title"),
+                                        row.getString("body"),
+                                        new ArrayList<Label>()
+                                );
+                                jotting.setId(row.getInt("id"));
+                                ((Task) jotting).setCompleted(row.getString("completed").equals("1"));
+                            }
+
+                            if (jotting != null && !jottingsListAdapter.getDataset().contains(jotting))
+                                jottingsListAdapter.addItem(jotting);
+
                         }
 
-                        jottingsListAdapter.setDataset(userJottings);
-                        recyclerView.setAdapter(jottingsListAdapter);
+                        jottingsListAdapter.notifyDataSetChanged();
                         return;
                     } else if (data.has("error") && data.getJSONObject("error").has("message")) {
                         Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
                     }
                 }
-                Toast.makeText(this, TASK_ERROR, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(this, TASK_ERROR, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
             }
-        });
-        new TaskRunner().executeAsync(
-            new ApiRequestExecutor() {
-                @Override
-                protected void initialize() {
-                    super.initialize();
-                    setRequestMethod("GET");
-                    addRequestHeader("Authorization", "Basic " +
-                            getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""));
-                }
-
-                @Override
-                public JSONObject call() {
-                    super.call();
-                    return this.connectToApi(encodeUrl("notes"));
-                }
-            }, data -> {
-                progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
-                try {
-                    if (data != null) {
-                        if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
-                            ArrayList<Jotting> userJottings = new ArrayList<Jotting>(data.getInt("rowCount"));
-                            JSONArray jottingsData = data.getJSONArray("data");
-                            for (int i = 0; i < jottingsData.length(); i++) {
-                                JSONObject row = jottingsData.getJSONObject(i);
-                                Note note = new Note(row.getString("name"));
-                                note.setId(row.getInt("id"));
-                                userJottings.add(note);
-                            }
-
-                            jottingsListAdapter.setDataset(userJottings);
-                            recyclerView.setAdapter(jottingsListAdapter);
-                            return;
-                        } else if (data.has("error") && data.getJSONObject("error").has("message")) {
-                            Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
-                        }
-                    }
-                    Toast.makeText(this, NOTE_ERROR, Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, NOTE_ERROR, Toast.LENGTH_LONG).show();
-                }
-            }
-        );
+        };
+        new TaskRunner().executeAsync(jottingsRequest, jottingsResponse);
     }
 
     @Override
