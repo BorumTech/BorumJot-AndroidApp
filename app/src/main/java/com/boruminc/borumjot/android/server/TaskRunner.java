@@ -3,13 +3,15 @@ package com.boruminc.borumjot.android.server;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.core.os.HandlerCompat;
+
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TaskRunner {
-    private final Executor executor = Executors.newSingleThreadExecutor();
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
 
     /**
      * Interface for methods that are called only when the task is complete
@@ -20,7 +22,7 @@ public class TaskRunner {
     }
 
     public <R> void executeAsync(Callable<R> callable, Callback<R> callback) {
-        executor.execute(() -> {
+        executor.execute(() -> { // Executes a Runnable that runs in a background thread
             try {
                 final R result = callable.call();
                 handler.post(() -> {
@@ -31,5 +33,4 @@ public class TaskRunner {
             }
         });
     }
-
 }

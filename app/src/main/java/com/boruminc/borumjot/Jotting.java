@@ -1,6 +1,7 @@
 package com.boruminc.borumjot;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -86,4 +87,9 @@ public abstract class Jotting implements Serializable {
     @Override
     @NonNull
     public abstract String toString();
+
+    @Override
+    public boolean equals(Object jotting) {
+        return super.equals(jotting) || (id == ((Jotting) jotting).id && this.getClass().equals(jotting.getClass()));
+    }
 }

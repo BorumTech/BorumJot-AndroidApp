@@ -17,13 +17,18 @@ import com.boruminc.borumjot.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsListAdapter.MyViewHolder> {
     private ArrayList<Jotting> mDataset;
     private Context context;
 
-    void setDataset(ArrayList<Jotting> dataset) {
-        mDataset = dataset;
+    ArrayList<Jotting> getDataset() {
+        return mDataset;
+    }
+
+    void addItem(Jotting newJotting) {
+        mDataset.add(newJotting);
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -48,36 +53,37 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
             textView.setTag(jottingInst);
         }
 
+        /**
+         * UNDYNAMICALLY navigate to the right "Jotting" type activity.
+         * Cannot be dynamic because AAB changes class names
+         * @param v
+         */
         void navToJot(View v) {
-            try {
-                // Creates intent to the activity that starts with the name of the tag instance's class
-                Intent jottingIntent = new Intent(context, Class.forName(
-                        "com.boruminc.borumjot.android." +
-                        v.getTag().getClass().getSimpleName() +
-                        "Activity"
-                ));
-                jottingIntent.putExtra("data", (Serializable) v.getTag());
-                context.startActivity(jottingIntent);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(context, "An error occurred in viewing your jotting", Toast.LENGTH_LONG).show();
-            }
-        }
+            // Create empty intent to the activity
+            Intent jottingIntent = new Intent();
 
+            // Set data and Class<?> destination for intent
+            if (v.getTag() instanceof Task) {
+                jottingIntent.setClass(context, TaskActivity.class);
+                jottingIntent.putExtra("data", (Task) v.getTag());
+            } else if (v.getTag() instanceof Note) {
+                jottingIntent.setClass(context, NoteActivity.class);
+                jottingIntent.putExtra("data", (Note) v.getTag());
+            }
+
+            // Navigate to the proper Jotting type activity if data exists, otherwise, display error
+            if (jottingIntent.hasExtra("data")) context.startActivity(jottingIntent);
+            else Toast.makeText(context, "An error occurred in viewing your jotting", Toast.LENGTH_SHORT).show();
+        }
     }
+
+    // Provide a suitable constructor (depends on the kind of dataset)
     JottingsListAdapter(Context c) {
         context = c;
         mDataset = new ArrayList<Jotting>();
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-
-    JottingsListAdapter(ArrayList<Jotting> myDataset, Context c) {
-        context = c;
-        mDataset = myDataset;
-    }
     // Create new views (invoked by the layout manager)
-
     @Override
     public JottingsListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
                                                      int viewType) {
