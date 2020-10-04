@@ -35,6 +35,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
     protected ApiRequestExecutor(String... p) {
         params = p;
         requestHeaders = new HashMap<>();
+        query = "";
     }
 
     protected void setQuery(String newQuery) {
@@ -88,7 +89,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
     protected String encodeUrl(String path, String... urlParams) {
         String versionNumber = "v1";
 
-        String safeUrl = "https://borum-jot-api-git-develop.varun-singh.vercel.app/api/"
+        String safeUrl = "https://api.jot.bforborum.com/api/"
                 .concat(versionNumber).concat("/")
                 .concat(path).concat(urlParams.length > 0 ? "?" : "");
 
@@ -139,7 +140,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
             }
 
             ((HttpURLConnection) connection).setRequestMethod(requestMethod);
-            if (requestMethod.equals("POST") || requestMethod.equals("DELETE")) {
+            if (query.contains("=")) {
                 connection.setDoOutput(true);
                 try (OutputStream output = connection.getOutputStream()) {
                     output.write(query.getBytes(getCharset()));

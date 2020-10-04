@@ -1,6 +1,7 @@
 package com.boruminc.borumjot.android;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -17,6 +19,7 @@ import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
+import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,6 +101,12 @@ public class NoteActivity extends FragmentActivity {
         );
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0, 0);
+    }
+
     public void navigateToShare(View view) {
         startActivity(new Intent(this, ShareActivity.class));
     }
@@ -106,11 +115,22 @@ public class NoteActivity extends FragmentActivity {
         AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
         deleteDialog
                 .setTitle("Delete Note")
-                .setMessage("Are you sure you would like to delete this note?")
+                .setMessage("Are you sure you would like to delete this note? All sharees will lose access as well")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    // TODO Delete
-                    startActivity(new Intent(this, HomeActivity.class));
-                    Toast.makeText(this, "The note was deleted", Toast.LENGTH_SHORT).show();
+                    new TaskRunner().executeAsync(
+                        new DeleteJottingRequest(noteData.getId(), userApiKey, "note"),
+                        data -> {
+                            if (data != null) {
+                                if (data.isNull("error") && data.optInt("statusCode") == 200) {
+                                    startActivity(new Intent(this, HomeActivity.class));
+                                    Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(this, "An error occurred and the note could not be deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    );
+
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {});
         deleteDialog.create().show();

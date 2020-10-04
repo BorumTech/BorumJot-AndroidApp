@@ -4,10 +4,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,9 +21,12 @@ import androidx.fragment.app.FragmentActivity;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
+import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Array;
 
 public class TaskActivity extends FragmentActivity {
     private String userApiKey;
@@ -55,6 +61,15 @@ public class TaskActivity extends FragmentActivity {
         }
 
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
+
+        Spinner priorityDropdown = findViewById(R.id.task_priority_drpdwn);
+        priorityDropdown.setAdapter(
+                new ArrayAdapter<String>(
+                        this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        new String[] {"Top", "Mid", "Low"}
+                )
+        );
     }
 
     /**
@@ -143,23 +158,19 @@ public class TaskActivity extends FragmentActivity {
 
             if (!taskData.getBody().equals(getTaskDetails())) {
                 new TaskRunner().executeAsync(
-                        new ApiRequestExecutor() {
+                        new ApiRequestExecutor(getTaskDetails()) {
                             @Override
                             protected void initialize() {
                                 super.initialize();
                                 setRequestMethod("PUT");
                                 addRequestHeader("Authorization", "Basic " + userApiKey);
+                                setQuery(encodePostQuery("body=%s"));
                             }
 
                             @Override
                             public JSONObject call() {
                                 super.call();
-                                return this.connectToApi(
-                                        encodeUrl("task",
-                                                "body=" + getTaskDetails(),
-                                                "id=" + taskData.getId()
-                                        )
-                                );
+                                return this.connectToApi(encodeUrl("task", "id=" + taskData.getId()));
                             }
                         }, data -> {
                             if (data != null) {
@@ -181,21 +192,7 @@ public class TaskActivity extends FragmentActivity {
                 .setMessage("Are you sure you would like to delete this task?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     new TaskRunner().executeAsync(
-                            new ApiRequestExecutor((String.valueOf(taskData.getId()))) {
-                                @Override
-                                protected void initialize() {
-                                    super.initialize();
-                                    setRequestMethod("DELETE");
-                                    addRequestHeader("Authorization", "Basic " + userApiKey);
-                                    setQuery(encodePostQuery("id=%s"));
-                                }
-
-                                @Override
-                                public JSONObject call() {
-                                    super.call();
-                                    return this.connectToApi(encodeUrl("task"));
-                                }
-                            },
+                            new DeleteJottingRequest(taskData.getId(), userApiKey, "task"),
                             data -> {
                                 try {
                                     if (data != null) {
@@ -203,7 +200,7 @@ public class TaskActivity extends FragmentActivity {
                                             Toast.makeText(this, "The task could not be deleted due to a system error", Toast.LENGTH_SHORT).show();
                                         } else {
                                             startActivity(new Intent(this, HomeActivity.class));
-                                            Toast.makeText(this, "The task was deleted", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 } catch (JSONException e) {
@@ -251,5 +248,14 @@ public class TaskActivity extends FragmentActivity {
                     }
                 }
         );
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(0, 0);
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 }
