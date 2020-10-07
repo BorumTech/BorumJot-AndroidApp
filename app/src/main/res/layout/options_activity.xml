@@ -80,4 +80,11 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/action_export_data" />
 
+    <Button
+        android:id="@+id/logout_btn"
+        android:text="@string/action_logout"
+        style="@style/OneSelectButtonGradient"
+        android:onClick="onLogoutClick"
+        />
+
 </LinearLayout>

@@ -134,7 +134,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        overridePendingTransition(0, 0);
+
     }
 
     @Override
@@ -228,6 +228,4 @@ public class HomeActivity extends AppCompatActivity {
         });
 
     }
-
-
 }

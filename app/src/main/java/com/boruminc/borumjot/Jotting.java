@@ -19,6 +19,7 @@ public abstract class Jotting implements Serializable {
     Jotting(String n) {
         name = n;
         labels = new ArrayList<Label>();
+        body = "";
     }
 
     /**

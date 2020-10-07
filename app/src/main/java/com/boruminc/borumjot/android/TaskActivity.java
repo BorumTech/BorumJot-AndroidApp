@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -25,8 +24,6 @@ import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.lang.reflect.Array;
 
 public class TaskActivity extends FragmentActivity {
     private String userApiKey;
@@ -79,12 +76,12 @@ public class TaskActivity extends FragmentActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
             renameBuilder
-                    .setView(getLayoutInflater().inflate(R.layout.rename_task_dialog, null))
+                    .setView(getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null))
                     .setTitle("Task Name")
                     .setCancelable(true)
                     .setOnCancelListener(dialog -> finish())
                     .setPositiveButton("Save", (dialog, which) -> {
-                        TextView titleTextView = ((Dialog) dialog).findViewById(R.id.task_name_edit);
+                        TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
 
                         if (titleTextView == null) { // Display error and exit if appbar title could not be found
                             Toast.makeText(this, "An error occurred and you cannot name the task at this time. ", Toast.LENGTH_LONG).show();

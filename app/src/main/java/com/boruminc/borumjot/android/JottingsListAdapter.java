@@ -1,5 +1,6 @@
 package com.boruminc.borumjot.android;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -71,8 +72,10 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
                 jottingIntent.putExtra("data", (Note) v.getTag());
             }
 
-            // Navigate to the proper Jotting type activity if data exists, otherwise, display error
-            if (jottingIntent.hasExtra("data")) context.startActivity(jottingIntent);
+            if (jottingIntent.hasExtra("data")) {
+                context.startActivity(jottingIntent);
+                ((Activity) context).overridePendingTransition(0, 0);
+            } // Navigate to the proper Jotting type activity if data exists, otherwise, display error
             else Toast.makeText(context, "An error occurred in viewing your jotting", Toast.LENGTH_SHORT).show();
         }
     }

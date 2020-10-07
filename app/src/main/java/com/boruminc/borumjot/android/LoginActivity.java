@@ -1,5 +1,6 @@
 package com.boruminc.borumjot.android;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -17,6 +18,19 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // If the user is already logged in, immediately redirect to HomeActivity and erase this from backstack
+        if (!getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                .getString("apiKey", "")
+                .equals("")
+        ) {
+            finish();
+            Intent homeIntent = new Intent(this, HomeActivity.class);
+            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(homeIntent);
+            return;
+        }
+
         setContentView(R.layout.activity_login);
         setSupportActionBar(findViewById(R.id.my_toolbar));
 

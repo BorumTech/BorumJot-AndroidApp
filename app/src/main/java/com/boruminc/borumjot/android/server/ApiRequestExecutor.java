@@ -149,7 +149,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
 
             int status = ((HttpURLConnection) connection).getResponseCode();
             InputStream response;
-            if (status == 200) response = connection.getInputStream();
+            if (status >= 200 && status < 300) response = connection.getInputStream();
             else response = ((HttpURLConnection) connection).getErrorStream();
 
             String contentType = connection.getHeaderField("Content-Type");
