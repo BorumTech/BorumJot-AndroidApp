@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,15 +22,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsListAdapter.MyViewHolder> {
+
     private ArrayList<Jotting> mDataset;
     private Context context;
 
     ArrayList<Jotting> getDataset() {
         return mDataset;
-    }
-
-    void addItem(Jotting newJotting) {
-        mDataset.add(newJotting);
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {

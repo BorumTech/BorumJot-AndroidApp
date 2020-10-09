@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".HomeActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -49,14 +50,16 @@
 
         <Button
             android:id="@+id/home_notes_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/notes_title" />
+            android:text="@string/notes_title"
+            android:onClick="onToggleNotesFilter"
+            android:tag="on"
+            style="@style/FilterButton" />
         <Button
             android:id="@+id/home_tasks_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tasks_title" />
+            android:text="@string/tasks_title"
+            android:onClick="onToggleTasksFilter"
+            style="@style/FilterButton"
+            android:tag="on" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -73,16 +76,9 @@
         android:layout_below="@id/jot_filter_btns_layout"
         android:layout_centerHorizontal="true"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageView
         android:id="@+id/add_jotting_btn_home"
-        android:src="@android:drawable/ic_input_add"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="onFloatingActionBtnClick"/>
+        android:src="@drawable/floating_action_btn"
+        android:onClick="onFloatingActionBtnClick"
+        style="@style/PlusFloatingActionBtn"/>
 </RelativeLayout>

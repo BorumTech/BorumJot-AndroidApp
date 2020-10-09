@@ -12,4 +12,7 @@
 
     <dimen name="formcontrol_txtSize">25sp</dimen>
     <dimen name="chkbox_txtSize">15sp</dimen>
+
+    <dimen name="action_btn_margin">20dp</dimen>
+    <dimen name="floating_action_btn_size">96dp</dimen>
 </resources>

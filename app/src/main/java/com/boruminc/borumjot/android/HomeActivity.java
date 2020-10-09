@@ -3,12 +3,17 @@ package com.boruminc.borumjot.android;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -30,7 +35,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,6 +46,11 @@ public class HomeActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     JottingsListAdapter jottingsListAdapter;
+    ArrayList<Jotting> originalDataset;
+
+    /* Views */
+    Button filterTasksBtn;
+    Button filterNotesBtn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +59,8 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.my_toolbar));
 
         recyclerView = findViewById(R.id.home_jottings_list);
+        filterNotesBtn = findViewById(R.id.home_notes_toggle);
+        filterTasksBtn = findViewById(R.id.home_tasks_toggle);
 
         // Improve performance because changes in content do not change the layout size of the RecyclerView
         recyclerView.setHasFixedSize(true);
@@ -61,13 +75,12 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
+
+        toggleFilter(filterTasksBtn, true);
+        toggleFilter(filterNotesBtn, true);
+
         ProgressBar progressBar = findViewById(R.id.progressPanel);
         progressBar.setVisibility(View.VISIBLE);
         Callable<JSONObject> jottingsRequest = new ApiRequestExecutor() {
@@ -93,6 +106,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (data != null) {
                     if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
                         JSONArray jottingsData = data.getJSONArray("data");
+                        ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
 
                         for (int i = 0; i < jottingsData.length(); i++) {
                             JSONObject row = jottingsData.getJSONObject(i);
@@ -112,10 +126,10 @@ public class HomeActivity extends AppCompatActivity {
                             }
 
                             if (jotting != null && !jottingsListAdapter.getDataset().contains(jotting))
-                                jottingsListAdapter.addItem(jotting);
-
+                                dataset.add(jotting);
                         }
 
+                        originalDataset = new ArrayList<Jotting>(jottingsListAdapter.getDataset());
                         jottingsListAdapter.notifyDataSetChanged();
                         return;
                     } else if (data.has("error") && data.getJSONObject("error").has("message")) {
@@ -227,5 +241,87 @@ public class HomeActivity extends AppCompatActivity {
             jotTypeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         });
 
+    }
+
+    /**
+     * Toggles the display of notes.
+     * Toggles the border,
+     * toggles whether the user's notes are shown,
+     * toggles the tag of the button (on or off)
+     * @param view The button that is used to toggle the filtration of notes from the list
+     */
+    public void onToggleNotesFilter(View view) {
+        final ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
+
+        toggleFilter(view);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (view.getTag().equals("off")) // Filter OUT
+                dataset.removeIf(jotting -> jotting instanceof Note);
+            else if (view.getTag().equals("on")) { // Add BACK
+                for (Jotting jotting : originalDataset) {
+                    if (jotting instanceof Note) {
+                        dataset.add(jotting);
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(this, "Your device is too old to support jotting filtering", Toast.LENGTH_LONG).show();
+        }
+
+        jottingsListAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Displays or stops displaying the current tasks in the list.
+     * @param view The button that is used to toggle the filtration of tasks from the list
+     */
+    public void onToggleTasksFilter(View view) {
+        final ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
+
+        toggleFilter(view);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (view.getTag().equals("off")) // Filter OUT
+                dataset.removeIf(jotting -> jotting instanceof Task);
+            else if (view.getTag().equals("on")) { // Add BACK
+                for (Jotting jotting : originalDataset) {
+                    if (jotting instanceof Task) {
+                        dataset.add(jotting);
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(this, "Your device is too old to support jotting filtering", Toast.LENGTH_LONG).show();
+        }
+
+        jottingsListAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Sets or removes the border and resets the tag of the button
+     * @param view The view that is filtering the jotting type
+     */
+    public void toggleFilter(View view) {
+        GradientDrawable filterBtn = (GradientDrawable) view.getBackground();
+
+        TypedValue a = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorSecondary, a, true);
+
+        if (view.getTag().equals("on")) {
+            view.setTag("off");
+            filterBtn.setStroke(0, a.data);
+        } else {
+            view.setTag("on");
+            filterBtn.setStroke(10, a.data);
+        }
+    }
+
+    public void toggleFilter(View view, boolean flag) {
+        GradientDrawable filterBtn = (GradientDrawable) view.getBackground();
+
+        TypedValue a = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorSecondary, a, true);
+
+        view.setTag(flag ? "on" : "off");
+        filterBtn.setStroke(flag ? 10 : 0, a.data);
     }
 }
