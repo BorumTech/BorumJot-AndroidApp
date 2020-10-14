@@ -3,13 +3,21 @@ package com.boruminc.borumjot.android;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,12 +26,19 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.boruminc.borumjot.Task;
+import com.boruminc.borumjot.android.customviews.EditTextV2;
+import com.boruminc.borumjot.android.customviews.XButton;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TaskActivity extends FragmentActivity {
     private String userApiKey;
@@ -33,7 +48,9 @@ public class TaskActivity extends FragmentActivity {
     private AppNameAppBarFragment appBarFrag;
     private EditText taskDescriptionBox;
     private CheckBox taskCompletionBox;
+    private TableLayout subtaskList;
 
+    /* Overriding Callback Methods */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +59,7 @@ public class TaskActivity extends FragmentActivity {
         taskDescriptionBox = findViewById(R.id.task_description_box);
         appBarFrag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
+        subtaskList = findViewById(R.id.task_subtasks_box);
 
         // Set the userApiKey for class use
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -55,6 +73,7 @@ public class TaskActivity extends FragmentActivity {
             setTaskName(taskData.getName());
             setTaskDetails(taskData.getBody());
             setTaskStatus(taskData.isCompleted());
+            loadSubtasks(); // Set subtasks asynchronously
         }
 
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
@@ -67,6 +86,48 @@ public class TaskActivity extends FragmentActivity {
                         new String[] {"Top", "Mid", "Low"}
                 )
         );
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(0, 0);
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    /* Helper Methods */
+
+    private void loadSubtasks() {
+        new TaskRunner().executeAsync(
+                new ApiRequestExecutor() {
+                    @Override
+                    protected void initialize() {
+                        super.initialize();
+                        setRequestMethod("GET");
+                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                    }
+
+                    @Override
+                    public JSONObject call() {
+                        super.call();
+                        return this.connectToApi(encodeUrl("subtasks", "id=" + taskData.getId()));
+                    }
+                }, data -> {
+                    try {
+                        if (data != null && data.has("data") && data.getInt("statusCode") == 200) {
+                            ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
+                            setSubtasks(subtaskData);
+                            taskData.setSubtasks(subtaskData);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "The subtasks could not load", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
     }
 
     /**
@@ -124,6 +185,8 @@ public class TaskActivity extends FragmentActivity {
         }
     }
 
+    /* Getter and Setter Methods */
+
     /**
      * Updates the UI of the appbar to display the passed in text
      * @param name The new name of the task
@@ -144,6 +207,55 @@ public class TaskActivity extends FragmentActivity {
         appBarFrag.displayStrikethrough(on);
         taskCompletionBox.setChecked(on);
     }
+
+    private void setSubtasks(ArrayList<Task> subtasks) {
+        Log.d("SUBTASKS", String.valueOf(subtasks));
+        for (Iterator<Task> it = subtasks.iterator(); it.hasNext();) {
+            Task subtask = it.next();
+            Log.d("SUBTASK", subtask.toString());
+            LinearLayout horizLayout = new TableRow(this);
+            horizLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            EditTextV2 subtaskView = new EditTextV2(this);
+            subtaskView.setText(subtask.getName());
+            subtaskView.setTextSize(20f);
+            subtaskView.setTextColor(Color.RED);
+            TableRow.LayoutParams subtaskViewLayoutParams = new TableRow.LayoutParams(800, ViewGroup.LayoutParams.WRAP_CONTENT);
+            subtaskViewLayoutParams.setMargins(10, 0, 10, 0);
+            subtaskView.setLayoutParams(subtaskViewLayoutParams);
+
+            CheckBox checkBox = new CheckBox(this);
+            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            checkBox.setLayoutParams(layoutParams);
+
+            ImageButton deleteBtn = new XButton(this);
+            TableRow.LayoutParams deleteBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            deleteBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+            deleteBtn.setLayoutParams(deleteBtnLayoutParams);
+            deleteBtn.setBackground(null);
+
+            horizLayout.addView(checkBox);
+            horizLayout.addView(subtaskView);
+            horizLayout.addView(deleteBtn);
+
+            subtaskList.addView(horizLayout);
+        }
+
+        TableRow addSubtaskLayout = new TableRow(this);
+        addSubtaskLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        addSubtaskLayout.setGravity(Gravity.START);
+        ImageButton addSubtaskBtn = new ImageButton(this);
+        addSubtaskBtn.setBackgroundResource(R.drawable.floating_action_btn);
+        addSubtaskBtn.setOnClickListener(this::onAddSubtaskClick);
+        TableRow.LayoutParams addSubtaskBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        addSubtaskBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+        EditTextV2 newSubtaskField = new EditTextV2(this);
+        addSubtaskLayout.addView(addSubtaskBtn);
+        addSubtaskLayout.addView(newSubtaskField);
+        subtaskList.addView(addSubtaskLayout);
+    }
+
+    /* Event Handlers */
 
     private void onDetailsBoxFocus(View view, boolean isFocused) {
         RelativeLayout.LayoutParams layoutParams;
@@ -247,12 +359,34 @@ public class TaskActivity extends FragmentActivity {
         );
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-        overridePendingTransition(0, 0);
-        Intent intent = new Intent(this, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+    public void onAddSubtaskClick(View view) {
+        new TaskRunner().executeAsync(
+                new ApiRequestExecutor(String.valueOf(taskData.getId()), "My new subtask name") {
+                    @Override
+                    protected void initialize() {
+                        super.initialize();
+                        setRequestMethod("POST");
+                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                        setQuery(encodePostQuery("id=%s&name=%s"));
+                    }
+
+                    @Override
+                    public JSONObject call() {
+                        super.call();
+                        return this.connectToApi(this.encodeUrl("subtasks"));
+                    }
+                }, data -> {
+                    if (data != null) {
+                        try {
+                            if (data.has("data") && data.getInt("statusCode") == 200) {
+                                taskData.addSubtask(new Task("My new subtask name"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+        );
     }
+
 }

@@ -10,6 +10,11 @@ public class Task extends Jotting {
   private int status;
   private Date timeCreated;
   private boolean completed;
+  private ArrayList<Task> subtasks;
+
+  public Task(String n) {
+    super(n);
+  }
 
   public Task(String n, String b, ArrayList<Label> labels) {
     super(n, b, labels);
@@ -50,5 +55,17 @@ public class Task extends Jotting {
 
   public void setCompleted(boolean isCompleted) {
     completed = isCompleted;
+  }
+
+  public ArrayList<Task> getSubtasks() {
+    return subtasks;
+  }
+
+  public void setSubtasks(ArrayList<Task> newSubtasks) {
+    subtasks = newSubtasks;
+  }
+
+  public void addSubtask(Task newSubtask) {
+    subtasks.add(newSubtask);
   }
 }
