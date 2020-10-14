@@ -29,6 +29,7 @@ import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
 import org.json.JSONArray;
@@ -116,13 +117,7 @@ public class HomeActivity extends AppCompatActivity {
                                 jotting = new Note(row.getString("title"));
                                 jotting.setId(row.getInt("id"));
                             } else if (row.getString("source").equals("task")) {
-                                jotting = new Task(
-                                        row.getString("title"),
-                                        row.getString("body"),
-                                        new ArrayList<Label>()
-                                );
-                                jotting.setId(row.getInt("id"));
-                                ((Task) jotting).setCompleted(row.getString("completed").equals("1"));
+                                jotting = JSONToModel.convertJSONToTask(row);
                             }
 
                             if (jotting != null && !jottingsListAdapter.getDataset().contains(jotting))

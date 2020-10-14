@@ -38,7 +38,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TaskActivity extends FragmentActivity {
     private String userApiKey;
@@ -49,6 +48,7 @@ public class TaskActivity extends FragmentActivity {
     private EditText taskDescriptionBox;
     private CheckBox taskCompletionBox;
     private TableLayout subtaskList;
+    private EditTextV2 newSubtaskField;
 
     /* Overriding Callback Methods */
     @Override
@@ -209,20 +209,21 @@ public class TaskActivity extends FragmentActivity {
     }
 
     private void setSubtasks(ArrayList<Task> subtasks) {
-        Log.d("SUBTASKS", String.valueOf(subtasks));
+        TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(800, ViewGroup.LayoutParams.WRAP_CONTENT);
+        subtaskTitleColumnLayoutParams.setMargins(10, 0, 10, 0);
+
         for (Iterator<Task> it = subtasks.iterator(); it.hasNext();) {
             Task subtask = it.next();
             Log.d("SUBTASK", subtask.toString());
             LinearLayout horizLayout = new TableRow(this);
+            horizLayout.setTag(subtask.getId());
             horizLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             EditTextV2 subtaskView = new EditTextV2(this);
             subtaskView.setText(subtask.getName());
             subtaskView.setTextSize(20f);
             subtaskView.setTextColor(Color.RED);
-            TableRow.LayoutParams subtaskViewLayoutParams = new TableRow.LayoutParams(800, ViewGroup.LayoutParams.WRAP_CONTENT);
-            subtaskViewLayoutParams.setMargins(10, 0, 10, 0);
-            subtaskView.setLayoutParams(subtaskViewLayoutParams);
+            subtaskView.setLayoutParams(subtaskTitleColumnLayoutParams);
 
             CheckBox checkBox = new CheckBox(this);
             TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -233,6 +234,7 @@ public class TaskActivity extends FragmentActivity {
             deleteBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
             deleteBtn.setLayoutParams(deleteBtnLayoutParams);
             deleteBtn.setBackground(null);
+            deleteBtn.setOnClickListener(this::onDeleteSubtaskClick);
 
             horizLayout.addView(checkBox);
             horizLayout.addView(subtaskView);
@@ -249,7 +251,8 @@ public class TaskActivity extends FragmentActivity {
         addSubtaskBtn.setOnClickListener(this::onAddSubtaskClick);
         TableRow.LayoutParams addSubtaskBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addSubtaskBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-        EditTextV2 newSubtaskField = new EditTextV2(this);
+        newSubtaskField = new EditTextV2(this);
+        newSubtaskField.setLayoutParams(subtaskTitleColumnLayoutParams);
         addSubtaskLayout.addView(addSubtaskBtn);
         addSubtaskLayout.addView(newSubtaskField);
         subtaskList.addView(addSubtaskLayout);
@@ -360,8 +363,10 @@ public class TaskActivity extends FragmentActivity {
     }
 
     public void onAddSubtaskClick(View view) {
+        if (newSubtaskField.getText() == null) return;
+
         new TaskRunner().executeAsync(
-                new ApiRequestExecutor(String.valueOf(taskData.getId()), "My new subtask name") {
+                new ApiRequestExecutor(String.valueOf(taskData.getId()), newSubtaskField.getText().toString()) {
                     @Override
                     protected void initialize() {
                         super.initialize();
@@ -389,4 +394,17 @@ public class TaskActivity extends FragmentActivity {
         );
     }
 
+    public void onDeleteSubtaskClick(View view) {
+        TableRow subtaskRow = (TableRow) view.getParent();
+
+        new TaskRunner().executeAsync(
+                new DeleteJottingRequest((Integer) subtaskRow.getTag(), userApiKey, "task"), data -> {
+                if (data != null) {
+                    if (data.optInt("statusCode") == 200) {
+                        ((ViewGroup) subtaskRow.getParent()).removeView(subtaskRow);
+                    }
+                }
+            }
+        );
+    }
 }
