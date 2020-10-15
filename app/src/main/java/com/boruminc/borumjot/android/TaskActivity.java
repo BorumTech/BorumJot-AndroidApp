@@ -32,6 +32,7 @@ import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
+import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,6 +52,7 @@ public class TaskActivity extends FragmentActivity {
     private EditTextV2 newSubtaskField;
 
     /* Overriding Callback Methods */
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -224,6 +226,7 @@ public class TaskActivity extends FragmentActivity {
             subtaskView.setTextSize(20f);
             subtaskView.setTextColor(Color.RED);
             subtaskView.setLayoutParams(subtaskTitleColumnLayoutParams);
+            subtaskView.setOnFocusChangeListener(this::onSubtaskBoxFocus);
 
             CheckBox checkBox = new CheckBox(this);
             TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -264,27 +267,12 @@ public class TaskActivity extends FragmentActivity {
         RelativeLayout.LayoutParams layoutParams;
         if (isFocused) {
             layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.extended_txtbox_height));
-
         } else {
             layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
             if (!taskData.getBody().equals(getTaskDetails())) {
                 new TaskRunner().executeAsync(
-                        new ApiRequestExecutor(getTaskDetails()) {
-                            @Override
-                            protected void initialize() {
-                                super.initialize();
-                                setRequestMethod("PUT");
-                                addRequestHeader("Authorization", "Basic " + userApiKey);
-                                setQuery(encodePostQuery("body=%s"));
-                            }
-
-                            @Override
-                            public JSONObject call() {
-                                super.call();
-                                return this.connectToApi(encodeUrl("task", "id=" + taskData.getId()));
-                            }
-                        }, data -> {
+                        new UpdateTaskRequest(userApiKey, new String[] {"id=" + taskData.getId()}, new String[] {getTaskDetails()}), data -> {
                             if (data != null) {
                                 if (data.has("error"))
                                     Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
@@ -295,6 +283,23 @@ public class TaskActivity extends FragmentActivity {
         }
         layoutParams.addRule(RelativeLayout.BELOW, R.id.header_btns);
         view.setLayoutParams(layoutParams);
+    }
+
+    private void onSubtaskBoxFocus(View view, boolean isFocused) {
+        ViewGroup subtaskRow = (TableRow) view.getParent();
+        ViewGroup subtasksBox = (TableLayout) subtaskRow.getParent();
+
+        int id = (int) subtaskRow.getTag();
+        String contents = ((EditText) view).getText().toString();
+        String originalContents = taskData.getSubtasks().get(subtasksBox.indexOfChild(subtaskRow)).getName();
+
+        if (isFocused || contents.equals(originalContents)) return;
+
+        new TaskRunner().executeAsync(new UpdateTaskRequest(userApiKey, new String[] {"id=" + id, "name=" + contents}, null), data -> {
+            if (data == null || data.has("error")) {
+                Toast.makeText(this, "A system error occurred and the subtask could not update", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     public void onDeleteClick(View view) {
