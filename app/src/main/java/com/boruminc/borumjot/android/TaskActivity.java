@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -250,10 +251,15 @@ public class TaskActivity extends FragmentActivity {
         subtaskView.setTextColor(Color.RED);
         subtaskView.setLayoutParams(subtaskTitleColumnLayoutParams);
         subtaskView.setOnFocusChangeListener(this::onSubtaskBoxFocus);
+        // Display strikethrough if the subtask is marked as complete
+        if (subtask.isCompleted())
+            subtaskView.setPaintFlags(subtaskView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
         CheckBox checkBox = new CheckBox(this);
         TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         checkBox.setLayoutParams(layoutParams);
+        checkBox.setOnClickListener(this::onCompleteSubtaskClick);
+        checkBox.setChecked(subtask.isCompleted());
 
         ImageButton deleteBtn = new XButton(this);
         TableRow.LayoutParams deleteBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -427,6 +433,57 @@ public class TaskActivity extends FragmentActivity {
                     }
                 }
             }
+        );
+    }
+
+    public void onCompleteSubtaskClick(View view) {
+        TableRow subtaskRow = (TableRow) view.getParent();
+        int completed = ((CheckBox) view).isChecked() ? 1 : 0;
+        new TaskRunner().executeAsync(
+                new ApiRequestExecutor() {
+                    @Override
+                    protected void initialize() {
+                        super.initialize();
+                        setRequestMethod("PUT");
+                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                    }
+
+                    @Override
+                    public JSONObject call() {
+                        super.call();
+                        return this.connectToApi(
+                                encodeUrl(
+                                        "task",
+                                        "completed=" + completed,
+                                        "id=" + subtaskRow.getTag()
+                                )
+                        );
+                    }
+                },
+                data -> {
+                    try {
+                        if (data != null) {
+                            if (data.has("error") || data.getInt("statusCode") != 200) {
+                                Toast.makeText(this, "An error occurred and the task could not be marked as "
+                                        + (completed == 1 ? "complete" : "incomplete"), Toast.LENGTH_LONG).show();
+                            } else {
+                                EditText subtaskTxt = (EditText) subtaskRow.getChildAt(1);
+                                // TODO Move into new class/fragment? because same code as in AppNameAppBarFragment
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    if (completed == 1)
+                                        // Add a strikethrough to the already existing paint flags using "|" bitwise operator
+                                        subtaskTxt.setPaintFlags(subtaskTxt.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                                    else
+                                        // Remove the strikethrough from the paint flags using "&" bitwise operator
+                                        subtaskTxt.setPaintFlags(subtaskTxt.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                                }
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "A server error occurred. The task was not updated", Toast.LENGTH_SHORT).show();
+                    }
+                }
         );
     }
 }
