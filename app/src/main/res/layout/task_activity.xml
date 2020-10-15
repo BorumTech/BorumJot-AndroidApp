@@ -36,55 +36,65 @@
             style="@style/HeaderButton" />
     </LinearLayout>
 
-    <com.boruminc.borumjot.android.customviews.EditTextV2
-        android:id="@+id/task_description_box"
+    <ScrollView
         android:layout_below="@id/header_btns"
-        android:hint="@string/prompt_details_fill"
-        android:inputType="textMultiLine"
-        style="@style/NoteArea" />
-
-    <TableLayout
-        android:id="@+id/task_subtasks_box"
-        android:layout_below="@id/task_description_box"
-        android:shrinkColumns="0,1"
-        style="@style/SubtaskList" />
-
-    <Spinner
-        android:id="@+id/task_priority_drpdwn"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/task_subtasks_box" />
-
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/task_labels_box"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/task_priority_drpdwn"
-        android:theme="@style/FlexibleListBox">
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <Button
-            android:text="L1"
-            style="@style/FlexibleListItem"/>
+            <com.boruminc.borumjot.android.customviews.EditTextV2
+                android:id="@+id/task_description_box"
+                android:layout_below="@id/header_btns"
+                android:hint="@string/prompt_details_fill"
+                android:inputType="textMultiLine"
+                style="@style/NoteArea" />
 
-        <Button
-            android:text="L2"
-            style="@style/FlexibleListItem"/>
+            <TableLayout
+                android:id="@+id/task_subtasks_box"
+                android:stretchColumns="1"
+                style="@style/SubtaskList" />
 
-        <Button
-            android:text="L3"
-            style="@style/FlexibleListItem"/>
+            <Spinner
+                android:id="@+id/task_priority_drpdwn"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/>
 
-        <Button
-            android:text="L4"
-            style="@style/FlexibleListItem"/>
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/task_labels_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/FlexibleListBox">
 
-        <Button
-            android:text="L5"
-            style="@style/FlexibleListItem"/>
+                <Button
+                    android:text="L1"
+                    style="@style/FlexibleListItem"/>
 
-        <Button
-            android:text="L6"
-            style="@style/FlexibleListItem"/>
-    </com.google.android.flexbox.FlexboxLayout>
+                <Button
+                    android:text="L2"
+                    style="@style/FlexibleListItem"/>
+
+                <Button
+                    android:text="L3"
+                    style="@style/FlexibleListItem"/>
+
+                <Button
+                    android:text="L4"
+                    style="@style/FlexibleListItem"/>
+
+                <Button
+                    android:text="L5"
+                    style="@style/FlexibleListItem"/>
+
+                <Button
+                    android:text="L6"
+                    style="@style/FlexibleListItem"/>
+            </com.google.android.flexbox.FlexboxLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
 </RelativeLayout>

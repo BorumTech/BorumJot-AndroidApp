@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,6 +22,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
@@ -211,39 +213,11 @@ public class TaskActivity extends FragmentActivity {
     }
 
     private void setSubtasks(ArrayList<Task> subtasks) {
-        TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(800, ViewGroup.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subtaskTitleColumnLayoutParams.setMargins(10, 0, 10, 0);
 
         for (Iterator<Task> it = subtasks.iterator(); it.hasNext();) {
-            Task subtask = it.next();
-            Log.d("SUBTASK", subtask.toString());
-            LinearLayout horizLayout = new TableRow(this);
-            horizLayout.setTag(subtask.getId());
-            horizLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            EditTextV2 subtaskView = new EditTextV2(this);
-            subtaskView.setText(subtask.getName());
-            subtaskView.setTextSize(20f);
-            subtaskView.setTextColor(Color.RED);
-            subtaskView.setLayoutParams(subtaskTitleColumnLayoutParams);
-            subtaskView.setOnFocusChangeListener(this::onSubtaskBoxFocus);
-
-            CheckBox checkBox = new CheckBox(this);
-            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            checkBox.setLayoutParams(layoutParams);
-
-            ImageButton deleteBtn = new XButton(this);
-            TableRow.LayoutParams deleteBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            deleteBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-            deleteBtn.setLayoutParams(deleteBtnLayoutParams);
-            deleteBtn.setBackground(null);
-            deleteBtn.setOnClickListener(this::onDeleteSubtaskClick);
-
-            horizLayout.addView(checkBox);
-            horizLayout.addView(subtaskView);
-            horizLayout.addView(deleteBtn);
-
-            subtaskList.addView(horizLayout);
+            addSubtask(it.next(), subtaskList.getChildCount());
         }
 
         TableRow addSubtaskLayout = new TableRow(this);
@@ -256,9 +230,43 @@ public class TaskActivity extends FragmentActivity {
         addSubtaskBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
         newSubtaskField = new EditTextV2(this);
         newSubtaskField.setLayoutParams(subtaskTitleColumnLayoutParams);
+        newSubtaskField.setId(R.id.newSubtaskFieldId);
+
         addSubtaskLayout.addView(addSubtaskBtn);
         addSubtaskLayout.addView(newSubtaskField);
         subtaskList.addView(addSubtaskLayout);
+    }
+
+    private void addSubtask(Task subtask, int index) {
+        TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        LinearLayout horizLayout = new TableRow(this);
+        horizLayout.setTag(subtask.getId());
+        horizLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        EditTextV2 subtaskView = new EditTextV2(this);
+        subtaskView.setText(subtask.getName());
+        subtaskView.setTextSize(20f);
+        subtaskView.setTextColor(Color.RED);
+        subtaskView.setLayoutParams(subtaskTitleColumnLayoutParams);
+        subtaskView.setOnFocusChangeListener(this::onSubtaskBoxFocus);
+
+        CheckBox checkBox = new CheckBox(this);
+        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        checkBox.setLayoutParams(layoutParams);
+
+        ImageButton deleteBtn = new XButton(this);
+        TableRow.LayoutParams deleteBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        deleteBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+        deleteBtn.setLayoutParams(deleteBtnLayoutParams);
+        deleteBtn.setBackground(null);
+        deleteBtn.setOnClickListener(this::onDeleteSubtaskClick);
+
+        horizLayout.addView(checkBox);
+        horizLayout.addView(subtaskView);
+        horizLayout.addView(deleteBtn);
+
+        subtaskList.addView(horizLayout, index);
     }
 
     /* Event Handlers */
@@ -368,7 +376,14 @@ public class TaskActivity extends FragmentActivity {
     }
 
     public void onAddSubtaskClick(View view) {
-        if (newSubtaskField.getText() == null) return;
+        // Exit early if the field unexpectedly doesn't exist
+        if (newSubtaskField == null || newSubtaskField.getText() == null) return;
+
+        // Exit early and display error when newSubtaskField is empty
+        if (newSubtaskField.getText().toString().equals("")) {
+            Toast.makeText(this, "The new subtask can't be empty", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         new TaskRunner().executeAsync(
                 new ApiRequestExecutor(String.valueOf(taskData.getId()), newSubtaskField.getText().toString()) {
@@ -388,8 +403,10 @@ public class TaskActivity extends FragmentActivity {
                 }, data -> {
                     if (data != null) {
                         try {
-                            if (data.has("data") && data.getInt("statusCode") == 200) {
-                                taskData.addSubtask(new Task("My new subtask name"));
+                            if (data.getInt("statusCode") == 200) {
+                                Task subtask = new Task(newSubtaskField.getText().toString());
+                                addSubtask(subtask, taskData.getSubtasks().size());
+                                ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
