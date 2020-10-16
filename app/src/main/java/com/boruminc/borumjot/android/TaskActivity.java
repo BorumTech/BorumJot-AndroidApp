@@ -9,47 +9,24 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.FragmentActivity;
 
 import com.boruminc.borumjot.Task;
-import com.boruminc.borumjot.android.customviews.EditTextV2;
-import com.boruminc.borumjot.android.customviews.XButton;
-import com.boruminc.borumjot.android.server.ApiRequestExecutor;
-import com.boruminc.borumjot.android.server.JSONToModel;
-import com.boruminc.borumjot.android.server.TaskRunner;
+import com.boruminc.borumjot.android.customviews.*;
+import com.boruminc.borumjot.android.server.*;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class TaskActivity extends FragmentActivity {
-    private String userApiKey;
-    private Task taskData;
-
+public class TaskActivity extends JottingActivity {
     /* Views */
     private AppNameAppBarFragment appBarFrag;
     private EditText taskDescriptionBox;
@@ -58,7 +35,6 @@ public class TaskActivity extends FragmentActivity {
     private EditTextV2 newSubtaskField;
 
     /* Overriding Callback Methods */
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,9 +47,10 @@ public class TaskActivity extends FragmentActivity {
 
         // Set the userApiKey for class use
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
-            userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
+            setUserApiKey(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""));
         }
 
+        setJottingType("Task");
         if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog((dialog, which) -> {
             TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
 
@@ -82,7 +59,7 @@ public class TaskActivity extends FragmentActivity {
                 return;
             }
 
-            setTaskName(titleTextView.getText().toString());
+            setJottingName(titleTextView.getText().toString());
             new TaskRunner().executeAsync(new ApiRequestExecutor(titleTextView.getText().toString()) {
                 @Override
                 protected void initialize() {
@@ -91,7 +68,7 @@ public class TaskActivity extends FragmentActivity {
                     setRequestMethod("POST");
 
                     // Set the user's api key or an empty string in the Authentication request header
-                    addRequestHeader("Authorization", "Basic " + userApiKey);
+                    addRequestHeader("Authorization", "Basic " + getUserApiKey());
                 }
 
                 @Override
@@ -113,16 +90,16 @@ public class TaskActivity extends FragmentActivity {
             });
         });
         else if (getIntent().hasExtra("data")) {
-            taskData = (Task) getIntent().getSerializableExtra("data");
-            assert taskData != null;
-            setTaskName(taskData.getName());
-            setTaskDetails(taskData.getBody());
-            setTaskStatus(taskData.isCompleted());
+            setJottingData((Task) getIntent().getSerializableExtra("data"));
+            assert getJottingData() != null;
+            setJottingName(getJottingData().getName());
+            setTaskDetails(getJottingData().getBody());
+            setTaskStatus(getTaskData().isCompleted());
             loadSubtasks(); // Set subtasks asynchronously
         }
 
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
-        findViewById(R.id.appbar).setOnLongClickListener(this::onRenameTask);
+        findViewById(R.id.appbar).setOnLongClickListener(this::onRenameJotting);
 
         Spinner priorityDropdown = findViewById(R.id.task_priority_drpdwn);
         priorityDropdown.setAdapter(
@@ -144,7 +121,6 @@ public class TaskActivity extends FragmentActivity {
     }
 
     /* Helper Methods */
-
     private void loadSubtasks() {
         new TaskRunner().executeAsync(
                 new ApiRequestExecutor() {
@@ -152,20 +128,20 @@ public class TaskActivity extends FragmentActivity {
                     protected void initialize() {
                         super.initialize();
                         setRequestMethod("GET");
-                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
                     }
 
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("subtasks", "id=" + taskData.getId()));
+                        return this.connectToApi(encodeUrl("subtasks", "id=" + getJottingData().getId()));
                     }
                 }, data -> {
                     try {
                         if (data != null && data.has("data") && data.getInt("statusCode") == 200) {
                             ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
                             setSubtasks(subtaskData);
-                            taskData.setSubtasks(subtaskData);
+                            getTaskData().setSubtasks(subtaskData);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -177,31 +153,29 @@ public class TaskActivity extends FragmentActivity {
     }
 
     /**
-     * Displays the rename and name dialog in an <code>AlertDialog.Builder</code>
+     * Calls {@link JottingActivity#displayRenameDialog(DialogInterface.OnClickListener)}
+     * with "Task" as the second parameter
      */
-    private void displayRenameDialog(DialogInterface.OnClickListener onPositiveButtonClick) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
-            renameBuilder
-                    .setView(getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null))
-                    .setTitle("Task Name")
-                    .setCancelable(true)
-                    .setOnCancelListener(dialog -> finish())
-                    .setPositiveButton("Save", onPositiveButtonClick);
-            renameBuilder.create().show();
-        } else {
-            Toast.makeText(this, "Your phone is too old to name or rename the task. You can only rename on the website", Toast.LENGTH_LONG).show();
-        }
+    protected void displayRenameDialog(DialogInterface.OnClickListener onPositiveButtonClick) {
+        super.displayRenameDialog(onPositiveButtonClick);
     }
 
     /* Getter and Setter Methods */
 
     /**
-     * Updates the UI of the appbar to display the passed in text
-     * @param name The new name of the task
+     * Implements {@link JottingActivity#setJottingName(String)}
+     * @param name The new name of the jotting
      */
-    private void setTaskName(String name) {
+    protected void setJottingName(String name) {
         if (appBarFrag != null) appBarFrag.passTitle(name);
+    }
+
+    /**
+     * Convenience method for getting the jotting data with the Task type
+     * @return The jotting data as a Task object
+     */
+    private Task getTaskData() {
+        return (Task) getJottingData();
     }
 
     private String getTaskDetails() {
@@ -288,9 +262,9 @@ public class TaskActivity extends FragmentActivity {
         } else {
             layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-            if (!taskData.getBody().equals(getTaskDetails())) {
+            if (!getJottingData().getBody().equals(getTaskDetails())) {
                 new TaskRunner().executeAsync(
-                        new UpdateTaskRequest(userApiKey, new String[] {"id=" + taskData.getId()}, new String[] {getTaskDetails()}), data -> {
+                        new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + getJottingData().getId()}, new String[] {getTaskDetails()}), data -> {
                             if (data != null) {
                                 if (data.has("error"))
                                     Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
@@ -308,11 +282,11 @@ public class TaskActivity extends FragmentActivity {
 
         int id = (int) subtaskRow.getTag();
         String contents = ((EditText) view).getText().toString();
-        String originalContents = taskData.getSubtasks().get(subtasksBox.indexOfChild(subtaskRow)).getName();
+        String originalContents = getTaskData().getSubtasks().get(subtasksBox.indexOfChild(subtaskRow)).getName();
 
         if (isFocused || contents.equals(originalContents)) return;
 
-        new TaskRunner().executeAsync(new UpdateTaskRequest(userApiKey, new String[] {"id=" + id, "name=" + contents}, null), data -> {
+        new TaskRunner().executeAsync(new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + id, "name=" + contents}, null), data -> {
             if (data == null || data.has("error")) {
                 Toast.makeText(this, "A system error occurred and the subtask could not update", Toast.LENGTH_LONG).show();
             }
@@ -326,7 +300,7 @@ public class TaskActivity extends FragmentActivity {
                 .setMessage("Are you sure you would like to delete this task?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     new TaskRunner().executeAsync(
-                            new DeleteJottingRequest(taskData.getId(), userApiKey, "task"),
+                            new DeleteJottingRequest(getTaskData().getId(), getUserApiKey(), "task"),
                             data -> {
                                 try {
                                     if (data != null) {
@@ -357,13 +331,13 @@ public class TaskActivity extends FragmentActivity {
                     protected void initialize() {
                         super.initialize();
                         setRequestMethod("PUT");
-                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
                     }
 
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("task", "completed=" + completed, "id=" + taskData.getId()));
+                        return this.connectToApi(encodeUrl("task", "completed=" + completed, "id=" + getTaskData().getId()));
                     }
                 },
                 data -> {
@@ -384,47 +358,6 @@ public class TaskActivity extends FragmentActivity {
         );
     }
 
-    public boolean onRenameTask(View view) {
-        displayRenameDialog(((dialog, which) -> {
-            TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
-
-            if (titleTextView == null) { // Display error and exit if appbar title could not be found
-                Toast.makeText(this, "An error occurred and you cannot rename the task at this time. ", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            new TaskRunner().executeAsync(
-                    new ApiRequestExecutor() {
-                        @Override
-                        protected void initialize() {
-                            super.initialize();
-                            setRequestMethod("PUT");
-                            this.addRequestHeader("Authorization", "Basic " + userApiKey);
-                        }
-
-                        @Override
-                        public JSONObject call() {
-                            super.call();
-                            return this.connectToApi(encodeUrl(
-                                   "task",
-                                   "id=" + taskData.getId(),
-                                   "name=" + titleTextView.getText().toString()
-                            ));
-                        }
-                    }, data -> {
-                        if (data != null) {
-                            if (data.optInt("statusCode") == 200)
-                                setTaskName(titleTextView.getText().toString());
-                            else
-                                Toast.makeText(this, "The task could not be renamed due to a system error", Toast.LENGTH_LONG).show();
-                        }
-                    }
-            );
-        }));
-
-        return true;
-    }
-
     public void onAddSubtaskClick(View view) {
         // Exit early if the field unexpectedly doesn't exist
         if (newSubtaskField == null || newSubtaskField.getText() == null) return;
@@ -436,12 +369,12 @@ public class TaskActivity extends FragmentActivity {
         }
 
         new TaskRunner().executeAsync(
-                new ApiRequestExecutor(String.valueOf(taskData.getId()), newSubtaskField.getText().toString()) {
+                new ApiRequestExecutor(String.valueOf(getTaskData().getId()), newSubtaskField.getText().toString()) {
                     @Override
                     protected void initialize() {
                         super.initialize();
                         setRequestMethod("POST");
-                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
                         setQuery(encodePostQuery("id=%s&name=%s"));
                     }
 
@@ -455,7 +388,7 @@ public class TaskActivity extends FragmentActivity {
                         try {
                             if (data.getInt("statusCode") == 200) {
                                 Task subtask = new Task(newSubtaskField.getText().toString());
-                                addSubtask(subtask, taskData.getSubtasks().size());
+                                addSubtask(subtask, getTaskData().getSubtasks().size());
                                 ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
                         } catch (JSONException e) {
@@ -470,7 +403,7 @@ public class TaskActivity extends FragmentActivity {
         TableRow subtaskRow = (TableRow) view.getParent();
 
         new TaskRunner().executeAsync(
-                new DeleteJottingRequest((Integer) subtaskRow.getTag(), userApiKey, "task"), data -> {
+                new DeleteJottingRequest((Integer) subtaskRow.getTag(), getUserApiKey(), "task"), data -> {
                 if (data != null) {
                     if (data.optInt("statusCode") == 200) {
                         ((ViewGroup) subtaskRow.getParent()).removeView(subtaskRow);
@@ -489,7 +422,7 @@ public class TaskActivity extends FragmentActivity {
                     protected void initialize() {
                         super.initialize();
                         setRequestMethod("PUT");
-                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
                     }
 
                     @Override

@@ -9,15 +9,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 
 import com.boruminc.borumjot.Note;
-import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
@@ -25,17 +22,7 @@ import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class NoteActivity extends FragmentActivity {
-    private Note noteData;
-    private String userApiKey;
-
-    enum Mode {
-        RENAME,
-        VIEW
-    }
-
-    private Mode currentMode;
-
+public class NoteActivity extends JottingActivity {
     /* Views */
     private AppNameAppBarFragment appBarFrag;
     private EditText noteDescriptionBox;
@@ -52,35 +39,69 @@ public class NoteActivity extends FragmentActivity {
 
         // Set the userApiKey for use throughout the class
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
-            userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
+            setUserApiKey(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""));
         }
 
+        setJottingType("Note");
         if (getIntent().getBooleanExtra("Rename", false)) {
-            displayRenameDialog();
-            currentMode = Mode.RENAME;
+            displayRenameDialog((dialog, which) -> {
+                TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
+                setJottingName(titleTextView.getText().toString());
+                new TaskRunner().executeAsync(new ApiRequestExecutor(titleTextView.getText().toString()) {
+                    @Override
+                    protected void initialize() {
+                        super.initialize();
+                        setQuery(this.encodePostQuery("name=%s"));
+                        setRequestMethod("POST");
+
+                        // Set the user's api key or an empty string in the Authentication request header
+                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
+                    }
+
+                    @Override
+                    public JSONObject call() {
+                        super.call();
+                        return this.connectToApi(encodeUrl("note"));
+                    }
+                }, data -> {
+                    try {
+                        if (data != null) {
+                            if (data.has("error") && data.getJSONObject("error").has("message")) {
+                                Toast.makeText(NoteActivity.this, "The note could not be created at this time. ",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                });
+            });
         }
         else if (getIntent().hasExtra("data")) {
-            noteData = (Note) getIntent().getSerializableExtra("data");
-            assert noteData != null;
-            setNoteName(noteData.getName());
-            setNoteBody(noteData.getBody());
-
-            currentMode = Mode.VIEW;
+            setJottingData((Note) getIntent().getSerializableExtra("data"));
+            assert getNoteData() != null;
+            setJottingName(getNoteData().getName());
+            setNoteBody(getNoteData().getBody());
         }
 
         noteDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
+        findViewById(R.id.appbar).setOnLongClickListener(this::onRenameJotting);
     }
 
-    /**
-     * Updates the UI of the appbar to display the passed in text
-     * @param name The new name of the task
-     */
-    private void setNoteName(String name) {
+    protected void setJottingName(String name) {
         if (appBarFrag != null) appBarFrag.passTitle(name);
     }
 
     private void setNoteBody(String body) {
         noteDescriptionBox.setText(body == null || body.equals("null") ? "" : body);
+    }
+
+    /**
+     * Convenience method for {@link JottingActivity#getJottingData()} with type Note
+     * @return jottingData casted to a Note object
+     */
+    protected Note getNoteData() {
+        return (Note) getJottingData();
     }
 
     private String getNoteBody() {
@@ -90,7 +111,7 @@ public class NoteActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (currentMode == null || currentMode.equals(Mode.RENAME)) return;
+        if (getIntent().getBooleanExtra("Rename", false)) return;
 
         new TaskRunner().executeAsync(
                 new ApiRequestExecutor() {
@@ -98,13 +119,13 @@ public class NoteActivity extends FragmentActivity {
                     protected void initialize() {
                         super.initialize();
                         setRequestMethod("GET");
-                        addRequestHeader("Authorization", "Basic " + userApiKey);
+                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
                     }
 
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("note", "id=" + noteData.getId()));
+                        return this.connectToApi(encodeUrl("note", "id=" + getNoteData().getId()));
                     }
                 }, data -> {
                     try {
@@ -129,58 +150,11 @@ public class NoteActivity extends FragmentActivity {
     }
 
     /**
-     * Displays the rename and name dialog in an <code>AlertDialog.Builder</code>
+     * Calls {@link JottingActivity#displayRenameDialog(DialogInterface.OnClickListener)}
+     * with "Note" as the second parameter
      */
-    private void displayRenameDialog() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            androidx.appcompat.app.AlertDialog.Builder renameBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
-            renameBuilder
-                    .setView(getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null))
-                    .setTitle("Note Name")
-                    .setCancelable(true)
-                    .setOnCancelListener(dialog -> finish())
-                    .setPositiveButton("Save", (dialog, which) -> {
-                        TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
-
-                        if (titleTextView == null) { // Display error and exit if appbar title could not be found
-                            Toast.makeText(this, "An error occurred and you cannot name the note at this time. ", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                        setNoteName(titleTextView.getText().toString());
-                        new TaskRunner().executeAsync(new ApiRequestExecutor(titleTextView.getText().toString()) {
-                            @Override
-                            protected void initialize() {
-                                super.initialize();
-                                setQuery(this.encodePostQuery("name=%s"));
-                                setRequestMethod("POST");
-
-                                // Set the user's api key or an empty string in the Authentication request header
-                                addRequestHeader("Authorization", "Basic " + userApiKey);
-                            }
-
-                            @Override
-                            public JSONObject call() {
-                                super.call();
-                                return this.connectToApi(encodeUrl("note"));
-                            }
-                        }, data -> {
-                            try {
-                                if (data != null) {
-                                    if (data.has("error") && data.getJSONObject("error").has("message")) {
-                                        Toast.makeText(NoteActivity.this, "The note could not be created at this time. ",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    });
-            renameBuilder.create().show();
-        } else {
-            Toast.makeText(this, "Your phone is too old to name or rename the note. You can only rename on the website", Toast.LENGTH_LONG).show();
-        }
+    protected void displayRenameDialog(DialogInterface.OnClickListener onPositiveButtonClick) {
+        super.displayRenameDialog(onPositiveButtonClick);
     }
 
     public void navigateToShare(View view) {
@@ -194,7 +168,7 @@ public class NoteActivity extends FragmentActivity {
                 .setMessage("Are you sure you would like to delete this note? All sharees will lose access as well")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     new TaskRunner().executeAsync(
-                        new DeleteJottingRequest(noteData.getId(), userApiKey, "note"),
+                        new DeleteJottingRequest(getNoteData().getId(), getUserApiKey(), "note"),
                         data -> {
                             if (data != null) {
                                 if (data.isNull("error") && data.optInt("statusCode") == 200) {
@@ -216,21 +190,21 @@ public class NoteActivity extends FragmentActivity {
         Log.d("Focused", String.valueOf(isFocused));
         if (!isFocused) {
 
-            if (!noteData.getBody().equals(getNoteBody())) {
+            if (!getNoteData().getBody().equals(getNoteBody())) {
                 new TaskRunner().executeAsync(
                         new ApiRequestExecutor(getNoteBody()) {
                             @Override
                             protected void initialize() {
                                 super.initialize();
                                 setRequestMethod("PUT");
-                                addRequestHeader("Authorization", "Basic " + userApiKey);
+                                addRequestHeader("Authorization", "Basic " + getUserApiKey());
                                 setQuery(encodePostQuery("body=%s"));
                             }
 
                             @Override
                             public JSONObject call() {
                                 super.call();
-                                return this.connectToApi(encodeUrl("note", "id=" + noteData.getId()));
+                                return this.connectToApi(encodeUrl("note", "id=" + getNoteData().getId()));
                             }
                         }, data -> {
                             try {
