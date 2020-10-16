@@ -2,13 +2,16 @@ package com.boruminc.borumjot.android;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -23,7 +26,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
@@ -71,7 +74,44 @@ public class TaskActivity extends FragmentActivity {
             userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
         }
 
-        if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog();
+        if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog((dialog, which) -> {
+            TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
+
+            if (titleTextView == null) { // Display error and exit if appbar title could not be found
+                Toast.makeText(this, "An error occurred and you cannot name the task at this time. ", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            setTaskName(titleTextView.getText().toString());
+            new TaskRunner().executeAsync(new ApiRequestExecutor(titleTextView.getText().toString()) {
+                @Override
+                protected void initialize() {
+                    super.initialize();
+                    setQuery(this.encodePostQuery("name=%s"));
+                    setRequestMethod("POST");
+
+                    // Set the user's api key or an empty string in the Authentication request header
+                    addRequestHeader("Authorization", "Basic " + userApiKey);
+                }
+
+                @Override
+                public JSONObject call() {
+                    super.call();
+                    return this.connectToApi(encodeUrl("task"));
+                }
+            }, data -> {
+                try {
+                    if (data != null) {
+                        if (data.has("error") && data.getJSONObject("error").has("message")) {
+                            Toast.makeText(TaskActivity.this, "The task could not be created at this time. ",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            });
+        });
         else if (getIntent().hasExtra("data")) {
             taskData = (Task) getIntent().getSerializableExtra("data");
             assert taskData != null;
@@ -82,6 +122,7 @@ public class TaskActivity extends FragmentActivity {
         }
 
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
+        findViewById(R.id.appbar).setOnLongClickListener(this::onRenameTask);
 
         Spinner priorityDropdown = findViewById(R.id.task_priority_drpdwn);
         priorityDropdown.setAdapter(
@@ -138,7 +179,7 @@ public class TaskActivity extends FragmentActivity {
     /**
      * Displays the rename and name dialog in an <code>AlertDialog.Builder</code>
      */
-    private void displayRenameDialog() {
+    private void displayRenameDialog(DialogInterface.OnClickListener onPositiveButtonClick) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
             renameBuilder
@@ -146,44 +187,7 @@ public class TaskActivity extends FragmentActivity {
                     .setTitle("Task Name")
                     .setCancelable(true)
                     .setOnCancelListener(dialog -> finish())
-                    .setPositiveButton("Save", (dialog, which) -> {
-                        TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
-
-                        if (titleTextView == null) { // Display error and exit if appbar title could not be found
-                            Toast.makeText(this, "An error occurred and you cannot name the task at this time. ", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                        setTaskName(titleTextView.getText().toString());
-                        new TaskRunner().executeAsync(new ApiRequestExecutor(titleTextView.getText().toString()) {
-                            @Override
-                            protected void initialize() {
-                                super.initialize();
-                                setQuery(this.encodePostQuery("name=%s"));
-                                setRequestMethod("POST");
-
-                                // Set the user's api key or an empty string in the Authentication request header
-                                addRequestHeader("Authorization", "Basic " + userApiKey);
-                            }
-
-                            @Override
-                            public JSONObject call() {
-                                super.call();
-                                return this.connectToApi(encodeUrl("task"));
-                            }
-                        }, data -> {
-                            try {
-                                if (data != null) {
-                                    if (data.has("error") && data.getJSONObject("error").has("message")) {
-                                        Toast.makeText(TaskActivity.this, "The task could not be created at this time. ",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    });
+                    .setPositiveButton("Save", onPositiveButtonClick);
             renameBuilder.create().show();
         } else {
             Toast.makeText(this, "Your phone is too old to name or rename the task. You can only rename on the website", Toast.LENGTH_LONG).show();
@@ -278,11 +282,11 @@ public class TaskActivity extends FragmentActivity {
     /* Event Handlers */
 
     private void onDetailsBoxFocus(View view, boolean isFocused) {
-        RelativeLayout.LayoutParams layoutParams;
+        LinearLayout.LayoutParams layoutParams;
         if (isFocused) {
-            layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.extended_txtbox_height));
+            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.extended_txtbox_height));
         } else {
-            layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
             if (!taskData.getBody().equals(getTaskDetails())) {
                 new TaskRunner().executeAsync(
@@ -295,7 +299,6 @@ public class TaskActivity extends FragmentActivity {
                 );
             }
         }
-        layoutParams.addRule(RelativeLayout.BELOW, R.id.header_btns);
         view.setLayoutParams(layoutParams);
     }
 
@@ -379,6 +382,47 @@ public class TaskActivity extends FragmentActivity {
                     }
                 }
         );
+    }
+
+    public boolean onRenameTask(View view) {
+        displayRenameDialog(((dialog, which) -> {
+            TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
+
+            if (titleTextView == null) { // Display error and exit if appbar title could not be found
+                Toast.makeText(this, "An error occurred and you cannot rename the task at this time. ", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            new TaskRunner().executeAsync(
+                    new ApiRequestExecutor() {
+                        @Override
+                        protected void initialize() {
+                            super.initialize();
+                            setRequestMethod("PUT");
+                            this.addRequestHeader("Authorization", "Basic " + userApiKey);
+                        }
+
+                        @Override
+                        public JSONObject call() {
+                            super.call();
+                            return this.connectToApi(encodeUrl(
+                                   "task",
+                                   "id=" + taskData.getId(),
+                                   "name=" + titleTextView.getText().toString()
+                            ));
+                        }
+                    }, data -> {
+                        if (data != null) {
+                            if (data.optInt("statusCode") == 200)
+                                setTaskName(titleTextView.getText().toString());
+                            else
+                                Toast.makeText(this, "The task could not be renamed due to a system error", Toast.LENGTH_LONG).show();
+                        }
+                    }
+            );
+        }));
+
+        return true;
     }
 
     public void onAddSubtaskClick(View view) {

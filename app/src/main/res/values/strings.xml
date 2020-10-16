@@ -28,6 +28,7 @@
 
     <!-- Strings related to Jottings -->
     <string name="action_share">Share</string>
+    <string name="action_rename">Rename</string>
 
     <!-- Strings related to Options -->
     <string name="action_report_bug">Report Bug</string>
@@ -69,7 +70,7 @@
     <!-- Content Descriptions -->
     <string name="rating_contentdesc">Yellow star button</string>
     <string name="call_contentdesc">Call button</string>
-    
+
     <string name="privacy_policy_confirmation">I have read and agree to the Privacy Policy</string>
     <string name="sms_contentdesc" />
     <string name="prompt_use_as_guest">Use as Guest</string>

@@ -47,21 +47,17 @@
 
             <com.boruminc.borumjot.android.customviews.EditTextV2
                 android:id="@+id/task_description_box"
-                android:layout_below="@id/header_btns"
                 android:hint="@string/prompt_details_fill"
                 android:inputType="textMultiLine"
                 style="@style/NoteArea" />
 
             <TableLayout
                 android:id="@+id/task_subtasks_box"
-                android:stretchColumns="1"
                 style="@style/SubtaskList" />
 
             <Spinner
                 android:id="@+id/task_priority_drpdwn"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                style="@style/PrioritySpinner"/>
 
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/task_labels_box"

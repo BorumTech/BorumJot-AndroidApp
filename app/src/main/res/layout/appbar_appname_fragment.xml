@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.Toolbar android:id="@+id/my_toolbar"
+<androidx.appcompat.widget.Toolbar
+    android:id="@+id/my_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
@@ -23,4 +24,4 @@
                 android:textSize="20sp" />
         </RelativeLayout>
 
-    </androidx.appcompat.widget.Toolbar>
+</androidx.appcompat.widget.Toolbar>
