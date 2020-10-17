@@ -4,6 +4,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <com.boruminc.borumjot.android.OrangeGradientButton
+    <com.boruminc.borumjot.android.customviews.OrangeGradientButton
         style="@style/OneSelectButtonGradient"/>
 </LinearLayout>

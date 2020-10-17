@@ -90,7 +90,8 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
         String versionNumber = "v1";
 
         // Develop URL: https://borum-jot-api-git-develop.varun-singh.vercel.app/api/
-        String safeUrl = "https://api.jot.bforborum.com/api/"
+        // Production URL: https://api.jot.bforborum.com/api/
+        String safeUrl = "https://borum-jot-api-git-priority.varun-singh.vercel.app/api/"
                 .concat(versionNumber).concat("/")
                 .concat(path).concat(urlParams.length > 0 ? "?" : "");
 
@@ -203,5 +204,13 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
     protected void addRequestHeader(String name, String value) {
         if (!requestHeaders.containsKey(name))
             requestHeaders.put(name, value);
+    }
+
+    /**
+     * Convenience method for adding the Authorization header for api key
+     * @param userApiKey The value of the header, concatenated after "Basic "
+     */
+    protected void addAuthorizationHeader(String userApiKey) {
+        this.addRequestHeader("Authorization", "Basic " + userApiKey);
     }
 }

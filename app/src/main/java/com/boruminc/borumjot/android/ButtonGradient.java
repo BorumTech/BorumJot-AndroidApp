@@ -1,4 +1,4 @@
-package com.boruminc.borumjot;
+package com.boruminc.borumjot.android;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;

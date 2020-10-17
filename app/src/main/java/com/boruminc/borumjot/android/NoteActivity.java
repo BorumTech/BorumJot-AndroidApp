@@ -24,7 +24,7 @@ import org.json.JSONObject;
 
 public class NoteActivity extends JottingActivity {
     /* Views */
-    private AppNameAppBarFragment appBarFrag;
+    private AppBarFragment appBarFrag;
     private EditText noteDescriptionBox;
 
     @Override
@@ -35,7 +35,7 @@ public class NoteActivity extends JottingActivity {
         findViewById(R.id.nav_to_share_btn).setOnClickListener(this::navigateToShare);
         findViewById(R.id.delete_note_btn).setOnClickListener(this::showDeleteDialog);
         noteDescriptionBox = findViewById(R.id.note_content);
-        appBarFrag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
 
         // Set the userApiKey for use throughout the class
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {

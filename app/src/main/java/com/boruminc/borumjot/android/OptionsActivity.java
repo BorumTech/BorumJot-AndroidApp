@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 public class OptionsActivity extends OptionsMenuItemActivity {
 
@@ -16,7 +15,7 @@ public class OptionsActivity extends OptionsMenuItemActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.options_activity);
 
-        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        AppBarFragment frag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         if (frag != null) frag.passTitle("Options");
     }
 

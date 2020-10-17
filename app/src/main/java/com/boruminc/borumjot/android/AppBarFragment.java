@@ -12,7 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class AppNameAppBarFragment extends Fragment {
+public class AppBarFragment extends Fragment {
     private View root;
     private TextView title;
 

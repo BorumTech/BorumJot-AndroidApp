@@ -11,24 +11,36 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.boruminc.borumjot.Task;
-import com.boruminc.borumjot.android.customviews.*;
-import com.boruminc.borumjot.android.server.*;
+import com.boruminc.borumjot.android.customviews.EditTextV2;
+import com.boruminc.borumjot.android.customviews.XButton;
+import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.JSONToModel;
+import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
 
-import org.json.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class TaskActivity extends JottingActivity {
     /* Views */
-    private AppNameAppBarFragment appBarFrag;
+    private AppBarFragment appBarFrag;
     private EditText taskDescriptionBox;
     private CheckBox taskCompletionBox;
     private TableLayout subtaskList;
@@ -41,7 +53,7 @@ public class TaskActivity extends JottingActivity {
         setContentView(R.layout.task_activity);
 
         taskDescriptionBox = findViewById(R.id.task_description_box);
-        appBarFrag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
         subtaskList = findViewById(R.id.task_subtasks_box);
 
@@ -195,8 +207,8 @@ public class TaskActivity extends JottingActivity {
         TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subtaskTitleColumnLayoutParams.setMargins(10, 0, 10, 0);
 
-        for (Iterator<Task> it = subtasks.iterator(); it.hasNext();) {
-            addSubtask(it.next(), subtaskList.getChildCount());
+        for (Task subtask : subtasks) {
+            addSubtask(subtask, subtaskList.getChildCount());
         }
 
         TableRow addSubtaskLayout = new TableRow(this);
@@ -462,5 +474,9 @@ public class TaskActivity extends JottingActivity {
                     }
                 }
         );
+    }
+
+    public void onPriorityChange(View view) {
+
     }
 }

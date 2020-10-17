@@ -18,6 +18,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeActivity extends AppCompatActivity {
@@ -48,16 +48,21 @@ public class HomeActivity extends AppCompatActivity {
     /* Views */
     Button filterTasksBtn;
     Button filterNotesBtn;
+    ProgressBar progressBar;
+
+    /* Overriding Callback Methods */
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         setSupportActionBar(findViewById(R.id.my_toolbar));
+        findViewById(R.id.jotting_options_toolbar).setVisibility(View.INVISIBLE);
 
         recyclerView = findViewById(R.id.home_jottings_list);
         filterNotesBtn = findViewById(R.id.home_notes_toggle);
         filterTasksBtn = findViewById(R.id.home_tasks_toggle);
+        progressBar = findViewById(R.id.progressPanel);
 
         // Improve performance because changes in content do not change the layout size of the RecyclerView
         recyclerView.setHasFixedSize(true);
@@ -78,62 +83,9 @@ public class HomeActivity extends AppCompatActivity {
         toggleFilter(filterTasksBtn, true);
         toggleFilter(filterNotesBtn, true);
 
-        ProgressBar progressBar = findViewById(R.id.progressPanel);
         progressBar.setVisibility(View.VISIBLE);
-        Callable<JSONObject> jottingsRequest = new ApiRequestExecutor() {
-            @Override
-            protected void initialize() {
-                super.initialize();
-                setRequestMethod("GET");
-                addRequestHeader("Authorization", "Basic " +
-                        getSharedPreferences("user identification", Context.MODE_PRIVATE)
-                                .getString("apiKey", "")
-                );
-            }
 
-            @Override
-            public JSONObject call() {
-                super.call();
-                return this.connectToApi(encodeUrl("jottings"));
-            }
-        };
-        TaskRunner.Callback<JSONObject> jottingsResponse = data -> {
-            progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
-            try {
-                if (data != null) {
-                    if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
-                        JSONArray jottingsData = data.getJSONArray("data");
-                        ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
-
-                        for (int i = 0; i < jottingsData.length(); i++) {
-                            JSONObject row = jottingsData.getJSONObject(i);
-                            Jotting jotting = null;
-
-                            if (row.getString("source").equals("note")) {
-                                jotting = new Note(row.getString("title"));
-                                jotting.setId(row.getInt("id"));
-                            } else if (row.getString("source").equals("task")) {
-                                jotting = JSONToModel.convertJSONToTask(row);
-                            }
-
-                            if (jotting != null && !jottingsListAdapter.getDataset().contains(jotting))
-                                dataset.add(jotting);
-                        }
-
-                        originalDataset = new ArrayList<Jotting>(jottingsListAdapter.getDataset());
-                        jottingsListAdapter.notifyDataSetChanged();
-                        return;
-                    } else if (data.has("error") && data.getJSONObject("error").has("message")) {
-                        Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
-                    }
-                }
-                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
-            }
-        };
-        new TaskRunner().executeAsync(jottingsRequest, jottingsResponse);
+        new TaskRunner().executeAsync(getJottingsRequest(), this::handleJottingsResponse);
     }
 
     @Override
@@ -145,15 +97,17 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        if (findViewById(R.id.my_toolbar).getVisibility() == View.VISIBLE) { // If regular toolbar is active
+            inflater.inflate(R.menu.options_menu, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+            // Associate searchable configuration with the SearchView
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
-        // Starts SearchResultsActivity when
-        assert searchManager != null;
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            // Starts SearchResultsActivity when
+            assert searchManager != null;
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        }
 
         return true;
     }
@@ -185,6 +139,67 @@ public class HomeActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         return true;
     }
+
+    /* Helper Methods */
+
+    private ApiRequestExecutor getJottingsRequest() {
+        return new ApiRequestExecutor() {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("GET");
+                addRequestHeader("Authorization", "Basic " +
+                        getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                                .getString("apiKey", "")
+                );
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeUrl("jottings"));
+            }
+        };
+    }
+
+    private void handleJottingsResponse(JSONObject data) {
+        progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
+        try {
+            if (data != null) {
+                if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
+                    JSONArray jottingsData = data.getJSONArray("data");
+                    ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
+
+                    for (int i = 0; i < jottingsData.length(); i++) {
+                        JSONObject row = jottingsData.getJSONObject(i);
+                        Jotting jotting = null;
+
+                        if (row.getString("source").equals("note")) {
+                            jotting = new Note(row.getString("title"));
+                            jotting.setId(row.getInt("id"));
+                        } else if (row.getString("source").equals("task")) {
+                            jotting = JSONToModel.convertJSONToTask(row);
+                        }
+
+                        if (jotting != null && !jottingsListAdapter.getDataset().contains(jotting))
+                            dataset.add(jotting);
+                    }
+
+                    originalDataset = new ArrayList<Jotting>(jottingsListAdapter.getDataset());
+                    jottingsListAdapter.notifyDataSetChanged();
+                    return;
+                } else if (data.has("error") && data.getJSONObject("error").has("message")) {
+                    Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
+                }
+            }
+            Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /* Event Handlers */
 
     /**
      * Event handler for when the floating action button is clicked;
@@ -314,5 +329,9 @@ public class HomeActivity extends AppCompatActivity {
 
         view.setTag(flag ? "on" : "off");
         filterBtn.setStroke(flag ? 10 : 0, a.data);
+    }
+
+    public boolean onJottingLongClick(View view) {
+        return true;
     }
 }

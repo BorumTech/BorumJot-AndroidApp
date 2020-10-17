@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.boruminc.borumjot.ButtonGradient;
 import com.boruminc.borumjot.android.validation.LoginValidation;
 
 public class LoginActivity extends AppCompatActivity {
@@ -35,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.my_toolbar));
 
         // Set the title of the app bar
-        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        AppBarFragment frag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         if (frag != null) frag.passTitle("Login");
     }
 

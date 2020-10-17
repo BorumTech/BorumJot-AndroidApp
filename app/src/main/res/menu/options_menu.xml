@@ -7,7 +7,6 @@
         app:showAsAction="ifRoom|withText"
         app:actionViewClass="android.widget.SearchView" />
 
-
     <item android:id="@+id/options_btn"
         android:title="@string/options_link_title"
         app:showAsAction="collapseActionView" />

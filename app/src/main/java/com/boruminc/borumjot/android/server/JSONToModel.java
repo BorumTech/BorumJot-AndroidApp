@@ -30,6 +30,7 @@ public class JSONToModel {
         Task task = new Task(row.getString("title"), row.optString("body"), new ArrayList<Label>());
         task.setId(row.getInt("id"));
         task.setCompleted(row.optString("completed").equals("1"));
+        task.setPriority(row.optInt("priority"));
 
         return task;
     }

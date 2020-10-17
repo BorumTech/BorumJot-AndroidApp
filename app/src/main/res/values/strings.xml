@@ -75,4 +75,7 @@
     <string name="sms_contentdesc" />
     <string name="prompt_use_as_guest">Use as Guest</string>
     <string name="my_jottings_title">My Jottings</string>
+    <string name="action_pin">Pin</string>
+    <string name="action_close">Close</string>
+    <string name="pin_content_desc">A pin icon</string>
 </resources>

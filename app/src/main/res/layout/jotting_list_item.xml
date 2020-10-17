@@ -1,0 +1,23 @@
+<com.google.android.flexbox.FlexboxLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:background="?attr/colorSecondary"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:padding="3dp" >
+    <TextView
+        android:id="@+id/jotting_name"
+        android:layout_width="0dp"
+        app:layout_flexBasisPercent="90%"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/formcontrol_txtSize" />
+
+    <ImageView
+        android:id="@+id/pin_icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_flexBasisPercent="10%"
+        android:src="@drawable/ic_pin"
+        android:contentDescription="@string/pin_content_desc" />
+</com.google.android.flexbox.FlexboxLayout>

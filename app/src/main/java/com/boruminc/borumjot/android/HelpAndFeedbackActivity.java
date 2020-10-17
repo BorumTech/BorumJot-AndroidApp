@@ -1,13 +1,9 @@
 package com.boruminc.borumjot.android;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 
 public class HelpAndFeedbackActivity extends OptionsMenuItemActivity {
 
@@ -30,7 +26,7 @@ public class HelpAndFeedbackActivity extends OptionsMenuItemActivity {
         }
 
         // Set the title of the app bar
-        AppNameAppBarFragment frag = (AppNameAppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+        AppBarFragment frag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         if (frag != null) frag.passTitle("Support");
     }
 }

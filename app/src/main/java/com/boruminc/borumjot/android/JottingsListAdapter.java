@@ -5,21 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.boruminc.borumjot.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsListAdapter.MyViewHolder> {
 
@@ -30,13 +30,17 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
         return mDataset;
     }
 
-    static class MyViewHolder extends RecyclerView.ViewHolder {
+    static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
         private TextView textView;
+        private ImageView pinIcon;
         private Context context;
 
         MyViewHolder(View v, Context c) {
             super(v);
             context = c;
+
+            v.setOnLongClickListener(this);
+            pinIcon = v.findViewById(R.id.pin_icon);
 
             textView = v.findViewById(R.id.jotting_name);
             textView.setOnClickListener(this::navToJot);
@@ -50,6 +54,7 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
         void bindView(Jotting jottingInst) {
             textView.setText(jottingInst.getName());
             textView.setTag(jottingInst);
+            pinIcon.setVisibility(jottingInst.getPriority() > 0 ? View.VISIBLE : View.INVISIBLE);
         }
 
         /**
@@ -76,6 +81,25 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
             } // Navigate to the proper Jotting type activity if data exists, otherwise, display error
             else Toast.makeText(context, "An error occurred in viewing your jotting", Toast.LENGTH_SHORT).show();
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            AppCompatActivity currentActivity = (AppCompatActivity) context;
+            Toolbar temporaryAppBar = currentActivity.findViewById(R.id.jotting_options_toolbar);
+
+            // Set activity to properly display new action bar
+            currentActivity.setSupportActionBar(temporaryAppBar);
+            currentActivity.findViewById(R.id.my_toolbar).setVisibility(View.INVISIBLE);
+
+            // Make visible and set data to jotting options toolbar
+            temporaryAppBar.setVisibility(View.VISIBLE);
+
+            Bundle bundle = new Bundle();
+            ((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.jotting_options_toolbar).setArguments(bundle);
+            bundle.putSerializable("data", (Serializable) v.getTag());
+
+            return true;
+        }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -90,7 +114,7 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
                                                      int viewType) {
         // Create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.my_text_view, parent, false);
+                .inflate(R.layout.jotting_list_item, parent, false);
 
         return new MyViewHolder(v, context);
     }

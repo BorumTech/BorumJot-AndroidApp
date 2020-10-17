@@ -11,6 +11,7 @@ public abstract class Jotting implements Serializable {
     private String name;
     private String body;
     private int id;
+    private int priority;
 
     /**
      * Constructor for creating a new task
@@ -92,5 +93,13 @@ public abstract class Jotting implements Serializable {
     @Override
     public boolean equals(Object jotting) {
         return super.equals(jotting) || (id == ((Jotting) jotting).id && this.getClass().equals(jotting.getClass()));
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int newPriority) {
+        priority = newPriority;
     }
 }
