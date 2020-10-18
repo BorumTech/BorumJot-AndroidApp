@@ -34,4 +34,13 @@ public class JSONToModel {
 
         return task;
     }
+
+    public static Note convertJSONToNote(JSONObject row) throws JSONException {
+        // Set note information
+        Note note = new Note(row.getString("title"));
+        note.setId(row.getInt("id"));
+        note.setPriority(row.optInt("priority"));
+
+        return note;
+    }
 }

@@ -174,12 +174,11 @@ public class HomeActivity extends AppCompatActivity {
                         JSONObject row = jottingsData.getJSONObject(i);
                         Jotting jotting = null;
 
-                        if (row.getString("source").equals("note")) {
-                            jotting = new Note(row.getString("title"));
-                            jotting.setId(row.getInt("id"));
-                        } else if (row.getString("source").equals("task")) {
+                        if (row.getString("source").equals("note"))
+                            jotting = JSONToModel.convertJSONToNote(row);
+                        else if (row.getString("source").equals("task"))
                             jotting = JSONToModel.convertJSONToTask(row);
-                        }
+
 
                         if (jotting != null && !jottingsListAdapter.getDataset().contains(jotting))
                             dataset.add(jotting);

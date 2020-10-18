@@ -48,7 +48,9 @@ abstract class JottingActivity extends FragmentActivity {
     protected void displayRenameDialog(DialogInterface.OnClickListener onPositiveButtonClick) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             View renameJottingDialog = getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null);
-            ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText(getJottingData().getName());
+
+            if (getJottingData() != null) // If dialog if for renaming and not naming
+                ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText(getJottingData().getName());
 
             AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
             renameBuilder

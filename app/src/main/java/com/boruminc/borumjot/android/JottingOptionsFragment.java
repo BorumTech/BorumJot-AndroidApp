@@ -64,7 +64,7 @@ public class JottingOptionsFragment extends Fragment {
             case R.id.exit_jotting_options_btn:
                 Toolbar normalToolbar = requireActivity().findViewById(R.id.my_toolbar);
                 ((AppCompatActivity) requireActivity()).setSupportActionBar(normalToolbar);
-                Log.d("ROOT", String.valueOf(root));
+
                 if (normalToolbar != null) {
                     root.setVisibility(View.GONE);
                     normalToolbar.setVisibility(View.VISIBLE);

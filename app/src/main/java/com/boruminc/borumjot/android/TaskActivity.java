@@ -476,7 +476,4 @@ public class TaskActivity extends JottingActivity {
         );
     }
 
-    public void onPriorityChange(View view) {
-
-    }
 }
