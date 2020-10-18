@@ -2,6 +2,7 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,11 +12,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.Note;
+import com.boruminc.borumjot.android.customviews.SerializableImage;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
@@ -24,7 +27,6 @@ import org.json.JSONObject;
 public class JottingOptionsFragment extends Fragment {
     private View root;
     private String userApiKey;
-    private Jotting jotData;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,12 +53,22 @@ public class JottingOptionsFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pin_btn:
-                new TaskRunner().executeAsync(getPinRequest(), data -> {});
+                new TaskRunner().executeAsync(getPinRequest(), data -> {
+                    if (data != null && data.optInt("statusCode") == 200) {
+                        View pin = (SerializableImage) requireArguments().getSerializable("view");
+                        assert pin != null;
+                        pin.setVisibility(View.VISIBLE);
+                    }
+                });
             break;
             case R.id.exit_jotting_options_btn:
-                ((AppCompatActivity) requireActivity()).setSupportActionBar(root.findViewById(R.id.my_toolbar));
-                root.findViewById(R.id.my_toolbar).setVisibility(View.VISIBLE);
-                root.findViewById(R.id.jotting_options_toolbar).setVisibility(View.GONE);
+                Toolbar normalToolbar = requireActivity().findViewById(R.id.my_toolbar);
+                ((AppCompatActivity) requireActivity()).setSupportActionBar(normalToolbar);
+                Log.d("ROOT", String.valueOf(root));
+                if (normalToolbar != null) {
+                    root.setVisibility(View.GONE);
+                    normalToolbar.setVisibility(View.VISIBLE);
+                }
             break;
         }
         return super.onOptionsItemSelected(item);

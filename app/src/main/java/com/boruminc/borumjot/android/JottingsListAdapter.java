@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.boruminc.borumjot.*;
+import com.boruminc.borumjot.android.customviews.SerializableImage;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,19 +34,23 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
 
     static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
         private TextView textView;
-        private ImageView pinIcon;
+        private SerializableImage pinIcon;
         private Context context;
 
         MyViewHolder(View v, Context c) {
             super(v);
             context = c;
 
-            v.setOnLongClickListener(this);
             pinIcon = v.findViewById(R.id.pin_icon);
+            pinIcon.setLongClickable(false);
 
             textView = v.findViewById(R.id.jotting_name);
             textView.setOnClickListener(this::navToJot);
             textView.setTextColor(Color.BLACK);
+
+            pinIcon.setOnLongClickListener(this);
+            textView.setOnLongClickListener(this);
+            v.setOnLongClickListener(this);
 
             // Surround each Jottings List item view with padding on all except the right side
             int padding = (int) context.getResources().getDimension(R.dimen.activity_horizontal_margin);
@@ -84,6 +90,7 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
 
         @Override
         public boolean onLongClick(View v) {
+            Log.d("Status", "Long clicked");
             AppCompatActivity currentActivity = (AppCompatActivity) context;
             Toolbar temporaryAppBar = currentActivity.findViewById(R.id.jotting_options_toolbar);
 
@@ -95,8 +102,10 @@ public final class JottingsListAdapter extends RecyclerView.Adapter<JottingsList
             temporaryAppBar.setVisibility(View.VISIBLE);
 
             Bundle bundle = new Bundle();
-            ((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.jotting_options_toolbar).setArguments(bundle);
             bundle.putSerializable("data", (Serializable) v.getTag());
+            bundle.putSerializable("view", pinIcon);
+
+            ((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.jotting_options_toolbar).setArguments(bundle);
 
             return true;
         }

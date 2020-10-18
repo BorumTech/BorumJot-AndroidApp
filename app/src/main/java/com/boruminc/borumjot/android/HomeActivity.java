@@ -330,8 +330,4 @@ public class HomeActivity extends AppCompatActivity {
         view.setTag(flag ? "on" : "off");
         filterBtn.setStroke(flag ? 10 : 0, a.data);
     }
-
-    public boolean onJottingLongClick(View view) {
-        return true;
-    }
 }

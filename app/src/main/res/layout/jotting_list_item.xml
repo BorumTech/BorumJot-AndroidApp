@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/formcontrol_txtSize" />
 
-    <ImageView
+    <com.boruminc.borumjot.android.customviews.SerializableImage
         android:id="@+id/pin_icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
