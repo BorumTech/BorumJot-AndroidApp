@@ -55,9 +55,13 @@ public class JottingOptionsFragment extends Fragment {
             case R.id.pin_btn:
                 new TaskRunner().executeAsync(getPinRequest(), data -> {
                     if (data != null && data.optInt("statusCode") == 200) {
+                        // Set priority to new value
+                        getJotData().setPriority(getJotData().getPriority() >= 1 ? 0 : 1);
+
                         View pin = (SerializableImage) requireArguments().getSerializable("view");
                         assert pin != null;
-                        pin.setVisibility(View.VISIBLE);
+                        // Reverse visibility of the pin
+                        pin.setVisibility(getJotData().getPriority() == 1 ? View.INVISIBLE : View.VISIBLE);
                     }
                 });
             break;
@@ -93,7 +97,7 @@ public class JottingOptionsFragment extends Fragment {
 
                 String[] params = new String[2];
                 params[0] = "id=" + getJotData().getId();
-                params[1] = "priority=1";
+                params[1] = "priority=" + (getJotData().getPriority() == 0 ? 1 : 0);
 
                 if (getJotData() instanceof Task) {
                     return this.connectToApi(this.encodeUrl("task", params));

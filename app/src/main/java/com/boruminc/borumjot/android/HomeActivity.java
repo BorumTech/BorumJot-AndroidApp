@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Note;
@@ -41,14 +42,15 @@ import java.util.concurrent.atomic.AtomicReference;
 public class HomeActivity extends AppCompatActivity {
     private static final String JOTTINGS_ERROR = "The tasks and notes could not fetched at this time";
 
-    RecyclerView recyclerView;
     JottingsListAdapter jottingsListAdapter;
     ArrayList<Jotting> originalDataset;
 
     /* Views */
+    RecyclerView recyclerView;
     Button filterTasksBtn;
     Button filterNotesBtn;
     ProgressBar progressBar;
+    SwipeRefreshLayout jottingsListRefresh;
 
     /* Overriding Callback Methods */
 
@@ -74,6 +76,10 @@ public class HomeActivity extends AppCompatActivity {
         // Specify an adapter (see also next example)
         jottingsListAdapter = new JottingsListAdapter(this);
         recyclerView.setAdapter(jottingsListAdapter);
+
+        // Set the refresh listener
+        jottingsListRefresh = findViewById(R.id.refreshable_jottings_list);
+        jottingsListRefresh.setOnRefreshListener(this::onJottingsListRefresh);
     }
 
     @Override
@@ -199,6 +205,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /* Event Handlers */
+
+    public void onJottingsListRefresh() {
+        new TaskRunner().executeAsync(getJottingsRequest(), data -> {
+            handleJottingsResponse(data);
+            jottingsListRefresh.setRefreshing(false);
+        });
+    }
 
     /**
      * Event handler for when the floating action button is clicked;
