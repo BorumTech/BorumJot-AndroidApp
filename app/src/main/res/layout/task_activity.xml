@@ -63,32 +63,7 @@
                 android:id="@+id/task_labels_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/FlexibleListBox">
-
-                <Button
-                    android:text="L1"
-                    style="@style/FlexibleListItem"/>
-
-                <Button
-                    android:text="L2"
-                    style="@style/FlexibleListItem"/>
-
-                <Button
-                    android:text="L3"
-                    style="@style/FlexibleListItem"/>
-
-                <Button
-                    android:text="L4"
-                    style="@style/FlexibleListItem"/>
-
-                <Button
-                    android:text="L5"
-                    style="@style/FlexibleListItem"/>
-
-                <Button
-                    android:text="L6"
-                    style="@style/FlexibleListItem"/>
-            </com.google.android.flexbox.FlexboxLayout>
+                android:theme="@style/FlexibleListBox" />
         </LinearLayout>
 
     </ScrollView>

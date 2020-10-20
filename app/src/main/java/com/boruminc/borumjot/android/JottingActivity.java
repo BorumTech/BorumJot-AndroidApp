@@ -11,15 +11,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.boruminc.borumjot.Jotting;
+import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 abstract class JottingActivity extends FragmentActivity {
     private String jottingType;
     private String userApiKey;
     private Jotting jottingData;
+
+    /* Getters and Setters */
 
     public void setJottingType(String jottingType) {
         this.jottingType = jottingType;
@@ -40,6 +45,8 @@ abstract class JottingActivity extends FragmentActivity {
     public void setJottingData(Jotting jottingData) {
         this.jottingData = jottingData;
     }
+
+    /* Helper Methods */
 
     /**
      * @param onPositiveButtonClick The event handler to call when the user presses the Save button
@@ -65,6 +72,25 @@ abstract class JottingActivity extends FragmentActivity {
             Toast.makeText(this, "Your phone is too old to name or rename the " + jottingType.toLowerCase() + ". You can only rename on the website", Toast.LENGTH_LONG).show();
         }
     }
+
+    protected ApiRequestExecutor getJottingLabels() {
+        return new ApiRequestExecutor() {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("GET");
+                addAuthorizationHeader(getUserApiKey());
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeUrl(jottingType.toLowerCase() + "/labels", "id=" + getJottingData().getId()));
+            }
+        };
+    }
+
+    /* Event Handlers */
 
     protected boolean onRenameJotting(View view) {
         displayRenameDialog(((dialog, which) -> {
@@ -107,9 +133,13 @@ abstract class JottingActivity extends FragmentActivity {
         return true;
     }
 
+    /* Abstract Methods */
+
     /**
      * Updates the UI of the appbar to display the passed in text
      * @param name The new name of the jotting
      */
     abstract void setJottingName(String name);
+
+    abstract void setLabels(ArrayList<Label> labels);
 }

@@ -19,7 +19,6 @@
     <style name="FlexibleListBox">
         <item name="android:layout_marginHorizontal">10dp</item>
         <item name="flexWrap">wrap</item>
-        <item name="android:buttonStyle">@style/FlexibleListItem</item>
     </style>
 
     <style name="Legal.PrivacyPolicy.CheckedTextView">

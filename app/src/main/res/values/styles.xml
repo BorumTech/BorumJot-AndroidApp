@@ -114,15 +114,6 @@
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:layout_marginRight">10dp</item>
         <item name="flexWrap">wrap</item>
-        <item name="android:buttonStyle">@style/FlexibleListItem</item>
-    </style>
-
-    <style name="FlexibleListItem" parent="android:style/Widget.Button">
-        <item name="android:layout_marginRight">15dp</item>
-        <item name="android:layout_width">@dimen/label_btn_width</item>
-        <item name="android:layout_height">@dimen/label_btn_height</item>
-        <item name="android:background">@android:drawable/arrow_up_float</item>
-        <item name="borderWidth">1dp</item>
     </style>
 
     <style name="Legal.PrivacyPolicy.CheckedTextView">

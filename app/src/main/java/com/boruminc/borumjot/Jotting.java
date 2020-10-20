@@ -39,6 +39,10 @@ public abstract class Jotting implements Serializable {
         return labels;
     }
 
+    public void setLabels(ArrayList<Label> newLabels) {
+        labels = newLabels;
+    }
+
     /**
      * Adds nLabel to labels list, if it isn't already in the list
      * @param nLabel The label to be appended

@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
 import com.boruminc.borumjot.android.customviews.XButton;
@@ -32,6 +34,9 @@ import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
+import com.google.android.flexbox.FlexWrap;
+import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.flexbox.FlexboxLayoutManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -121,6 +126,8 @@ public class TaskActivity extends JottingActivity {
                         new String[] {"Top", "Mid", "Low"}
                 )
         );
+
+        new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
     }
 
     @Override
@@ -133,6 +140,10 @@ public class TaskActivity extends JottingActivity {
     }
 
     /* Helper Methods */
+
+    /**
+     * Loads the subtasks.
+     */
     private void loadSubtasks() {
         new TaskRunner().executeAsync(
                 new ApiRequestExecutor() {
@@ -165,6 +176,24 @@ public class TaskActivity extends JottingActivity {
     }
 
     /**
+     * Loads the labels
+     * @param data The label data as a JSONObject
+     */
+    private void loadLabels(JSONObject data) {
+        if (data != null) {
+            try {
+                if (data.optInt("statusCode") == 200 && data.has("data")) {
+                    ArrayList<Label> labels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"));
+                    setLabels(labels);
+                    getTaskData().setLabels(labels);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Calls {@link JottingActivity#displayRenameDialog(DialogInterface.OnClickListener)}
      * with "Task" as the second parameter
      */
@@ -180,6 +209,23 @@ public class TaskActivity extends JottingActivity {
      */
     protected void setJottingName(String name) {
         if (appBarFrag != null) appBarFrag.passTitle(name);
+    }
+
+    protected void setLabels(ArrayList<Label> labels) {
+        FlexboxLayout labelsList = findViewById(R.id.task_labels_box);
+
+        for (int i = 0; i < labels.size(); i++) {
+            Button labelButton = new Button(this);
+            labelButton.setText(labels.get(i).getName());
+            FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
+                    (int) getResources().getDimension(R.dimen.label_btn_width),
+                    (int) getResources().getDimension(R.dimen.label_btn_height)
+            );
+            layoutParams.setMargins(20, 0, 15, 0);
+            labelButton.setLayoutParams(layoutParams);
+
+            labelsList.addView(labelButton);
+        }
     }
 
     /**

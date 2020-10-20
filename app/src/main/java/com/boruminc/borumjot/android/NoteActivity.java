@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
@@ -21,6 +22,8 @@ import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class NoteActivity extends JottingActivity {
     /* Views */
@@ -94,6 +97,10 @@ public class NoteActivity extends JottingActivity {
 
     private void setNoteBody(String body) {
         noteDescriptionBox.setText(body == null || body.equals("null") ? "" : body);
+    }
+
+    protected void setLabels(ArrayList<Label> labels) {
+
     }
 
     /**
