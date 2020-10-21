@@ -11,7 +11,7 @@ import java.util.Set;
  * @author Varun Singh
  * @implSpec Can NOT send notifications about the content of the Note
  */
-public class Note extends Jotting {
+public class Note extends Jotting implements Comparable<Jotting> {
     private Set<String> sharees;
 
     public Note(String n) {
@@ -43,7 +43,12 @@ public class Note extends Jotting {
     @NonNull
     @Override
     public String toString() {
-        return "Name: " + getName()
+        return super.toString()
                 + "\nShared with: " + getSharees();
+    }
+
+    @Override
+    public int compareTo(Jotting o) {
+        return getPriority() - o.getPriority();
     }
 }

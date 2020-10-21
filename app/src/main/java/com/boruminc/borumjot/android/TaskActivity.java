@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
@@ -201,6 +202,12 @@ public class TaskActivity extends JottingActivity {
         super.displayRenameDialog(onPositiveButtonClick);
     }
 
+    private ImageButton generateCherryRasboraPlusButton() {
+        ImageButton imageBtn = new ImageButton(this);
+        imageBtn.setBackgroundResource(R.drawable.floating_action_btn);
+        return imageBtn;
+    }
+
     /* Getter and Setter Methods */
 
     /**
@@ -213,15 +220,26 @@ public class TaskActivity extends JottingActivity {
 
     protected void setLabels(ArrayList<Label> labels) {
         FlexboxLayout labelsList = findViewById(R.id.task_labels_box);
+        FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
+                (int) getResources().getDimension(R.dimen.label_btn_width),
+                (int) getResources().getDimension(R.dimen.label_btn_height)
+        );
+        layoutParams.setMargins(20, 0, 15, 0);
+
+        ImageButton labelControlsBtn = new ImageButton(this);
+        labelControlsBtn.setBackgroundResource(R.drawable.label);
+        FlexboxLayout.LayoutParams controlsLayoutParams = new FlexboxLayout.LayoutParams(
+                (int) getResources().getDimension(R.dimen.label_controls_btn_width),
+                (int) getResources().getDimension(R.dimen.label_btn_height)
+        );
+        controlsLayoutParams.setMargins(20, 0, 15, 0);
+        labelControlsBtn.setLayoutParams(controlsLayoutParams);
+        labelControlsBtn.setOnClickListener(this::onLabelControlsBtnClick);
+        labelsList.addView(labelControlsBtn);
 
         for (int i = 0; i < labels.size(); i++) {
             Button labelButton = new Button(this);
             labelButton.setText(labels.get(i).getName());
-            FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
-                    (int) getResources().getDimension(R.dimen.label_btn_width),
-                    (int) getResources().getDimension(R.dimen.label_btn_height)
-            );
-            layoutParams.setMargins(20, 0, 15, 0);
             labelButton.setLayoutParams(layoutParams);
 
             labelsList.addView(labelButton);
@@ -260,8 +278,7 @@ public class TaskActivity extends JottingActivity {
         TableRow addSubtaskLayout = new TableRow(this);
         addSubtaskLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         addSubtaskLayout.setGravity(Gravity.START);
-        ImageButton addSubtaskBtn = new ImageButton(this);
-        addSubtaskBtn.setBackgroundResource(R.drawable.floating_action_btn);
+        ImageButton addSubtaskBtn = generateCherryRasboraPlusButton();
         addSubtaskBtn.setOnClickListener(this::onAddSubtaskClick);
         TableRow.LayoutParams addSubtaskBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addSubtaskBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;

@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import java.sql.Date;
 import java.util.ArrayList;
 
-public class Task extends Jotting {
+public class Task extends Jotting implements Comparable<Jotting> {
   private int userId;
   private int status;
   private Date timeCreated;
@@ -22,7 +22,12 @@ public class Task extends Jotting {
 
   @NonNull
   public String toString() {
-    return "Name: " + getName();
+    return super.toString();
+  }
+
+  @Override
+  public int compareTo(Jotting o) {
+    return Integer.compare(getPriority(), o.getPriority());
   }
 
   public int getUserId() {

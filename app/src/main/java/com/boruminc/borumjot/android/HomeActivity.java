@@ -18,7 +18,6 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeActivity extends AppCompatActivity {
@@ -91,6 +91,7 @@ public class HomeActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
+        originalDataset = new ArrayList<Jotting>();
         new TaskRunner().executeAsync(getJottingsRequest(), this::handleJottingsResponse);
     }
 
@@ -174,24 +175,24 @@ public class HomeActivity extends AppCompatActivity {
             if (data != null) {
                 if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
                     JSONArray jottingsData = data.getJSONArray("data");
-                    ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
+                    originalDataset.clear();
 
                     for (int i = 0; i < jottingsData.length(); i++) {
                         JSONObject row = jottingsData.getJSONObject(i);
-                        Jotting jotting = null;
 
                         if (row.getString("source").equals("note"))
-                            jotting = JSONToModel.convertJSONToNote(row);
+                            originalDataset.add(JSONToModel.convertJSONToNote(row));
                         else if (row.getString("source").equals("task"))
-                            jotting = JSONToModel.convertJSONToTask(row);
-
-
-                        if (jotting != null && !jottingsListAdapter.getDataset().contains(jotting))
-                            dataset.add(jotting);
+                            originalDataset.add(JSONToModel.convertJSONToTask(row));
                     }
 
-                    originalDataset = new ArrayList<Jotting>(jottingsListAdapter.getDataset());
+                    jottingsListAdapter.getDataset().clear();
+                    jottingsListAdapter.getDataset().addAll(originalDataset);
                     jottingsListAdapter.notifyDataSetChanged();
+
+                    toggleFilter(filterTasksBtn, true);
+                    toggleFilter(filterNotesBtn, true);
+
                     return;
                 } else if (data.has("error") && data.getJSONObject("error").has("message")) {
                     Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
@@ -201,16 +202,15 @@ public class HomeActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+        } finally {
+            jottingsListRefresh.setRefreshing(false);
         }
     }
 
     /* Event Handlers */
 
     public void onJottingsListRefresh() {
-        new TaskRunner().executeAsync(getJottingsRequest(), data -> {
-            handleJottingsResponse(data);
-            jottingsListRefresh.setRefreshing(false);
-        });
+        new TaskRunner().executeAsync(getJottingsRequest(), this::handleJottingsResponse);
     }
 
     /**
@@ -274,7 +274,7 @@ public class HomeActivity extends AppCompatActivity {
         toggleFilter(view);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (view.getTag().equals("off")) // Filter OUT
-                dataset.removeIf(jotting -> jotting instanceof Note);
+                jottingsListAdapter.getDataset().removeIf(jotting -> jotting instanceof Note);
             else if (view.getTag().equals("on")) { // Add BACK
                 for (Jotting jotting : originalDataset) {
                     if (jotting instanceof Note) {

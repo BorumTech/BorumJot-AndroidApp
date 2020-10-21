@@ -61,7 +61,7 @@ public class JottingOptionsFragment extends Fragment {
                         View pin = (SerializableImage) requireArguments().getSerializable("view");
                         assert pin != null;
                         // Reverse visibility of the pin
-                        pin.setVisibility(getJotData().getPriority() == 1 ? View.INVISIBLE : View.VISIBLE);
+                        pin.setVisibility(getJotData().getPriority() == 1 ? View.VISIBLE : View.INVISIBLE);
                     }
                 });
             break;

@@ -6,8 +6,8 @@ import androidx.annotation.Nullable;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Jotting implements Serializable {
-    ArrayList<Label> labels;
+public abstract class Jotting implements Serializable, Comparable<Jotting> {
+    private ArrayList<Label> labels;
     private String name;
     private String body;
     private int id;
@@ -92,11 +92,23 @@ public abstract class Jotting implements Serializable {
      */
     @Override
     @NonNull
-    public abstract String toString();
+    public String toString() {
+        return "Name: " + getName() + "\n"
+                + "Priority: " + getPriority();
+    }
 
     @Override
     public boolean equals(Object jotting) {
-        return super.equals(jotting) || (id == ((Jotting) jotting).id && this.getClass().equals(jotting.getClass()));
+        return super.equals(jotting) ||
+                (id == ((Jotting) jotting).id
+                        && this.getClass().equals(jotting.getClass())
+                        && name.equals(((Jotting) jotting).getName())
+                );
+    }
+
+    @Override
+    public int compareTo(Jotting o) {
+        return Integer.compare(-getPriority(), -o.getPriority());
     }
 
     public int getPriority() {
