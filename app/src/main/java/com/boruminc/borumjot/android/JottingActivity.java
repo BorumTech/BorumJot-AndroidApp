@@ -2,6 +2,7 @@ package com.boruminc.borumjot.android;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -53,23 +54,32 @@ abstract class JottingActivity extends FragmentActivity {
      * Displays the rename and name dialog in an <code>AlertDialog.Builder</code>
      */
     protected void displayRenameDialog(DialogInterface.OnClickListener onPositiveButtonClick) {
+        displayEditTextDialog(
+                onPositiveButtonClick,
+                getJottingData() == null ? "" : getJottingData().getName(),
+                "Your phone is too old to name or rename the " + jottingType,
+                String.format("%s Name", jottingType)
+        );
+    }
+
+    protected void displayEditTextDialog(DialogInterface.OnClickListener onPositiveButtonClick, String initialText, String errorMessage, String title) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             View renameJottingDialog = getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null);
 
             if (getJottingData() != null) // If dialog if for renaming and not naming
-                ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText(getJottingData().getName());
+                ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText(initialText);
 
             AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
             renameBuilder
                     .setView(renameJottingDialog)
-                    .setTitle(String.format("%s Name", jottingType))
+                    .setTitle(title)
 
                     .setCancelable(true)
                     .setOnCancelListener(dialog -> finish())
                     .setPositiveButton("Save", onPositiveButtonClick);
             renameBuilder.create().show();
         } else {
-            Toast.makeText(this, "Your phone is too old to name or rename the " + jottingType.toLowerCase() + ". You can only rename on the website", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, errorMessage + ". Try on the web app", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -131,6 +141,49 @@ abstract class JottingActivity extends FragmentActivity {
         }));
 
         return true;
+    }
+
+    public void onNewLabelClick(View view) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            View renameJottingDialog = getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null);
+
+            ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText("");
+
+            AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
+            renameBuilder
+                    .setView(renameJottingDialog)
+                    .setTitle("Labels")
+                    .setCancelable(true)
+                    .setPositiveButton("Save", (dialog, which) -> {
+                        String newLabelName =
+                                ((EditText) ((Dialog) dialog).findViewById(R.id.jot_name_edit))
+                                        .getText()
+                                        .toString();
+
+                        new TaskRunner().executeAsync(
+                                new ApiRequestExecutor(newLabelName) {
+                                    @Override
+                                    protected void initialize() {
+                                        super.initialize();
+                                        setRequestMethod("POST");
+                                        addAuthorizationHeader(getUserApiKey());
+                                        setQuery(encodePostQuery("name=%s"));
+                                        Log.d("Name", newLabelName);
+                                    }
+
+                                    @Override
+                                    public JSONObject call() {
+                                        super.call();
+                                        return this.connectToApi(encodeUrl(jottingType.toLowerCase() + "/labels"));
+                                    }
+                                },
+                                data -> {}
+                        );
+                    });
+            renameBuilder.create().show();
+        } else {
+            Toast.makeText(this, "Your phone is too old to create a new label. Try on the web app", Toast.LENGTH_LONG).show();
+        }
     }
 
     /* Abstract Methods */

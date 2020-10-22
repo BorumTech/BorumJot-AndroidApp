@@ -91,7 +91,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
 
         // Develop URL: https://borum-jot-api-git-develop.varun-singh.vercel.app/api/
         // Production URL: https://api.jot.bforborum.com/api/
-        String safeUrl = "https://api.jot.bforborum.com/api/"
+        String safeUrl = "https://borum-jot-api-git-label-2.varun-singh.vercel.app/api/"
                 .concat(versionNumber).concat("/")
                 .concat(path).concat(urlParams.length > 0 ? "?" : "");
 

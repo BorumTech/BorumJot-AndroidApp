@@ -54,11 +54,21 @@ public class JSONToModel {
         return labels;
     }
 
+    public static ArrayList<Label> convertJSONToLabels(JSONArray data, boolean withAll) throws JSONException {
+        ArrayList<Label> labels = new ArrayList<Label>();
+
+        for (int i = 0; i < data.length(); i++) {
+            if (withAll || data.getJSONObject(i).getBoolean("task_under_label"))
+                labels.add(convertJSONToLabel(data.getJSONObject(i)));
+        }
+
+        return labels;
+    }
+
     public static Label convertJSONToLabel(JSONObject data) throws JSONException {
         return new Label(
                 data.getInt("label_id"),
-                data.getString("name"),
-                data.getInt("user_id")
+                data.getString("name")
         );
     }
 }

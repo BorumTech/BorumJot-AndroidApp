@@ -1,5 +1,7 @@
 package com.boruminc.borumjot;
 
+import androidx.annotation.Nullable;
+
 /**
  * The class that represents a label, which categorizes jottings (regardless of type) together
  * @author Varun Singh
@@ -14,10 +16,9 @@ public class Label {
      * @param n The name of the label
      * @param u The id of the user who made the label
      */
-    public Label(int id, String n, int u) {
+    public Label(int id, String n) {
         this.id = id;
         name = n;
-        userId = u;
     }
 
     public int getId() {
@@ -42,5 +43,10 @@ public class Label {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj) || getId() == ((Label) obj).getId();
     }
 }

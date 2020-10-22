@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class TaskActivity extends JottingActivity {
     /* Views */
@@ -51,6 +52,9 @@ public class TaskActivity extends JottingActivity {
     private CheckBox taskCompletionBox;
     private TableLayout subtaskList;
     private EditTextV2 newSubtaskField;
+    private FlexboxLayout labelsList;
+
+    private ArrayList<Label> allUserLabels;
 
     /* Overriding Callback Methods */
     @Override
@@ -62,6 +66,7 @@ public class TaskActivity extends JottingActivity {
         appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
         subtaskList = findViewById(R.id.task_subtasks_box);
+        labelsList = findViewById(R.id.task_labels_box);
 
         // Set the userApiKey for class use
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -132,6 +137,12 @@ public class TaskActivity extends JottingActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        showLabelImageBtn();
+    }
+
+    @Override
     public void onBackPressed() {
         finish();
         overridePendingTransition(0, 0);
@@ -141,6 +152,22 @@ public class TaskActivity extends JottingActivity {
     }
 
     /* Helper Methods */
+
+    private void showLabelImageBtn() {
+        ImageButton labelControlsBtn = new ImageButton(this);
+        labelControlsBtn.setBackgroundResource(R.drawable.label);
+        FlexboxLayout.LayoutParams controlsLayoutParams = new FlexboxLayout.LayoutParams(
+                (int) getResources().getDimension(R.dimen.label_controls_btn_width),
+                (int) getResources().getDimension(R.dimen.label_btn_height)
+        );
+
+        if (labelsList.getChildAt(0) != null && labelsList.getChildAt(0).getLayoutParams().width == controlsLayoutParams.width) return;
+
+        controlsLayoutParams.setMargins(20, 0, 15, 0);
+        labelControlsBtn.setLayoutParams(controlsLayoutParams);
+        labelControlsBtn.setOnClickListener(this::onLabelControlsBtnClick);
+        labelsList.addView(labelControlsBtn, 0);
+    }
 
     /**
      * Loads the subtasks.
@@ -184,9 +211,10 @@ public class TaskActivity extends JottingActivity {
         if (data != null) {
             try {
                 if (data.optInt("statusCode") == 200 && data.has("data")) {
-                    ArrayList<Label> labels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"));
-                    setLabels(labels);
-                    getTaskData().setLabels(labels);
+                    allUserLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), true);
+                    ArrayList<Label> taskLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), false);
+                    setLabels(taskLabels);
+                    getTaskData().setLabels(taskLabels);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -219,23 +247,11 @@ public class TaskActivity extends JottingActivity {
     }
 
     protected void setLabels(ArrayList<Label> labels) {
-        FlexboxLayout labelsList = findViewById(R.id.task_labels_box);
         FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
                 (int) getResources().getDimension(R.dimen.label_btn_width),
                 (int) getResources().getDimension(R.dimen.label_btn_height)
         );
         layoutParams.setMargins(20, 0, 15, 0);
-
-        ImageButton labelControlsBtn = new ImageButton(this);
-        labelControlsBtn.setBackgroundResource(R.drawable.label);
-        FlexboxLayout.LayoutParams controlsLayoutParams = new FlexboxLayout.LayoutParams(
-                (int) getResources().getDimension(R.dimen.label_controls_btn_width),
-                (int) getResources().getDimension(R.dimen.label_btn_height)
-        );
-        controlsLayoutParams.setMargins(20, 0, 15, 0);
-        labelControlsBtn.setLayoutParams(controlsLayoutParams);
-        labelControlsBtn.setOnClickListener(this::onLabelControlsBtnClick);
-        labelsList.addView(labelControlsBtn);
 
         for (int i = 0; i < labels.size(); i++) {
             Button labelButton = new Button(this);
@@ -329,44 +345,6 @@ public class TaskActivity extends JottingActivity {
     }
 
     /* Event Handlers */
-
-    private void onDetailsBoxFocus(View view, boolean isFocused) {
-        LinearLayout.LayoutParams layoutParams;
-        if (isFocused) {
-            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.extended_txtbox_height));
-        } else {
-            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            if (!getJottingData().getBody().equals(getTaskDetails())) {
-                new TaskRunner().executeAsync(
-                        new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + getJottingData().getId()}, new String[] {getTaskDetails()}), data -> {
-                            if (data != null) {
-                                if (data.has("error"))
-                                    Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                );
-            }
-        }
-        view.setLayoutParams(layoutParams);
-    }
-
-    private void onSubtaskBoxFocus(View view, boolean isFocused) {
-        ViewGroup subtaskRow = (TableRow) view.getParent();
-        ViewGroup subtasksBox = (TableLayout) subtaskRow.getParent();
-
-        int id = (int) subtaskRow.getTag();
-        String contents = ((EditText) view).getText().toString();
-        String originalContents = getTaskData().getSubtasks().get(subtasksBox.indexOfChild(subtaskRow)).getName();
-
-        if (isFocused || contents.equals(originalContents)) return;
-
-        new TaskRunner().executeAsync(new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + id, "name=" + contents}, null), data -> {
-            if (data == null || data.has("error")) {
-                Toast.makeText(this, "A system error occurred and the subtask could not update", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 
     public void onDeleteClick(View view) {
         android.app.AlertDialog.Builder deleteDialog = new android.app.AlertDialog.Builder(this);
@@ -539,4 +517,65 @@ public class TaskActivity extends JottingActivity {
         );
     }
 
+    private void onDetailsBoxFocus(View view, boolean isFocused) {
+        LinearLayout.LayoutParams layoutParams;
+        if (isFocused) {
+            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.extended_txtbox_height));
+        } else {
+            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            if (!getJottingData().getBody().equals(getTaskDetails())) {
+                new TaskRunner().executeAsync(
+                        new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + getJottingData().getId()}, new String[] {getTaskDetails()}), data -> {
+                            if (data != null) {
+                                if (data.has("error"))
+                                    Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                );
+            }
+        }
+        view.setLayoutParams(layoutParams);
+    }
+
+    private void onSubtaskBoxFocus(View view, boolean isFocused) {
+        ViewGroup subtaskRow = (TableRow) view.getParent();
+        ViewGroup subtasksBox = (TableLayout) subtaskRow.getParent();
+
+        int id = (int) subtaskRow.getTag();
+        String contents = ((EditText) view).getText().toString();
+        String originalContents = getTaskData().getSubtasks().get(subtasksBox.indexOfChild(subtaskRow)).getName();
+
+        if (isFocused || contents.equals(originalContents)) return;
+
+        new TaskRunner().executeAsync(new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + id, "name=" + contents}, null), data -> {
+            if (data == null || data.has("error")) {
+                Toast.makeText(this, "A system error occurred and the subtask could not update", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void onLabelControlsBtnClick(View view) {
+        CharSequence[] labelNames = new CharSequence[allUserLabels.size()];
+        boolean[] labelStatuses = new boolean[allUserLabels.size()];
+        for (int i = 0; i < labelNames.length; i++) {
+            labelNames[i] = allUserLabels.get(i).getName();
+            // Set to if the task has the current label
+            labelStatuses[i] = getJottingData().getLabels().contains(allUserLabels.get(i));
+        }
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        alertDialog
+            .setTitle("Labels")
+            .setMultiChoiceItems(
+                labelNames, labelStatuses, (dialog, which, isChecked) -> {
+
+                }
+            )
+            .setView(R.layout.label_controls_dialog)
+            .setCancelable(true)
+            .setPositiveButton("Save", (dialog, which) -> {});
+        alertDialog.create().show();
+    }
 }
