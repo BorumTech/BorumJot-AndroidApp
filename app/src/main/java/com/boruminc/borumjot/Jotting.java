@@ -47,7 +47,7 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
      * Adds nLabel to labels list, if it isn't already in the list
      * @param nLabel The label to be appended
      */
-    void addLabel(Label nLabel) {
+    public void addLabel(Label nLabel) {
         if (!labels.contains(nLabel)) {
             labels.add(nLabel);
         }

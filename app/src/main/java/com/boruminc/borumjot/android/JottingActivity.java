@@ -14,8 +14,10 @@ import androidx.fragment.app.FragmentActivity;
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ abstract class JottingActivity extends FragmentActivity {
     private String jottingType;
     private String userApiKey;
     private Jotting jottingData;
+    private ArrayList<Label> allUserLabels;
+    private AlertDialog.Builder alertDialog;
 
     /* Getters and Setters */
 
@@ -98,6 +102,25 @@ abstract class JottingActivity extends FragmentActivity {
                 return this.connectToApi(encodeUrl(jottingType.toLowerCase() + "/labels", "id=" + getJottingData().getId()));
             }
         };
+    }
+
+    /**
+     * Loads the labels
+     * @param data The label data as a JSONObject
+     */
+    protected void loadLabels(JSONObject data) {
+        if (data != null) {
+            try {
+                if (data.optInt("statusCode") == 200 && data.has("data")) {
+                    allUserLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), true);
+                    ArrayList<Label> taskLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), false);
+                    setLabels(taskLabels);
+                    getJottingData().setLabels(taskLabels);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /* Event Handlers */
@@ -177,13 +200,80 @@ abstract class JottingActivity extends FragmentActivity {
                                         return this.connectToApi(encodeUrl(jottingType.toLowerCase() + "/labels"));
                                     }
                                 },
-                                data -> {}
+                                data -> {
+                                    try {
+                                        if (data != null) {
+                                            if (data.optInt("statusCode") == 200) {
+                                                allUserLabels.add(new Label(data.getJSONObject("data").getInt("id"), newLabelName));
+
+                                                CharSequence[] labelNames = new CharSequence[allUserLabels.size()];
+                                                boolean[] labelStatuses = new boolean[allUserLabels.size()];
+                                                for (int i = 0; i < labelNames.length; i++) {
+                                                    labelNames[i] = allUserLabels.get(i).getName();
+                                                    // Set to if the task has the current label
+                                                    labelStatuses[i] = getJottingData().getLabels().contains(allUserLabels.get(i));
+                                                }
+                                                alertDialog.setMultiChoiceItems(labelNames, labelStatuses, (dialogInner, whichInner, isChecked) -> {
+
+                                                });
+                                                alertDialog.create().show();
+                                            } else {
+                                                Toast.makeText(this, "An error occurred and the label could not be created", Toast.LENGTH_LONG).show();
+                                                Log.e("API Request", data.getJSONObject("error").getString("message"));
+                                                Log.e("API Request", data.getJSONObject("error").getString("query"));
+                                            }
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                         );
                     });
             renameBuilder.create().show();
         } else {
             Toast.makeText(this, "Your phone is too old to create a new label. Try on the web app", Toast.LENGTH_LONG).show();
         }
+    }
+
+    protected void onLabelControlsBtnClick(View view) {
+        CharSequence[] labelNames = new CharSequence[allUserLabels.size()];
+        boolean[] labelStatuses = new boolean[allUserLabels.size()];
+        for (int i = 0; i < labelNames.length; i++) {
+            labelNames[i] = allUserLabels.get(i).getName();
+            // Set to if the task has the current label
+            labelStatuses[i] = getJottingData().getLabels().contains(allUserLabels.get(i));
+        }
+
+        alertDialog = new AlertDialog.Builder(this);
+
+        alertDialog
+                .setTitle("Labels")
+                .setMultiChoiceItems(
+                        labelNames, labelStatuses, (dialog, which, isChecked) -> {}
+                )
+                .setView(R.layout.label_controls_dialog)
+                .setCancelable(true)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    int labelId = allUserLabels.get(which).getId();
+                    new TaskRunner().executeAsync(
+                            new ApiRequestExecutor(String.valueOf(getJottingData().getId())) {
+                                @Override
+                                protected void initialize() {
+                                    super.initialize();
+                                    setRequestMethod("PUT");
+                                    setQuery("label_id=%s&jotting_id=%s");
+                                }
+
+                                @Override
+                                public JSONObject call() {
+                                    super.call();
+                                    return this.connectToApi(encodeUrl(jottingType + "/labels"));
+                                }
+                            }, data -> {}
+                    );
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {});
+        alertDialog.create().show();
     }
 
     /* Abstract Methods */

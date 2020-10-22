@@ -54,8 +54,6 @@ public class TaskActivity extends JottingActivity {
     private EditTextV2 newSubtaskField;
     private FlexboxLayout labelsList;
 
-    private ArrayList<Label> allUserLabels;
-
     /* Overriding Callback Methods */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -201,25 +199,6 @@ public class TaskActivity extends JottingActivity {
                 }
         );
 
-    }
-
-    /**
-     * Loads the labels
-     * @param data The label data as a JSONObject
-     */
-    private void loadLabels(JSONObject data) {
-        if (data != null) {
-            try {
-                if (data.optInt("statusCode") == 200 && data.has("data")) {
-                    allUserLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), true);
-                    ArrayList<Label> taskLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), false);
-                    setLabels(taskLabels);
-                    getTaskData().setLabels(taskLabels);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -555,27 +534,5 @@ public class TaskActivity extends JottingActivity {
         });
     }
 
-    private void onLabelControlsBtnClick(View view) {
-        CharSequence[] labelNames = new CharSequence[allUserLabels.size()];
-        boolean[] labelStatuses = new boolean[allUserLabels.size()];
-        for (int i = 0; i < labelNames.length; i++) {
-            labelNames[i] = allUserLabels.get(i).getName();
-            // Set to if the task has the current label
-            labelStatuses[i] = getJottingData().getLabels().contains(allUserLabels.get(i));
-        }
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-
-        alertDialog
-            .setTitle("Labels")
-            .setMultiChoiceItems(
-                labelNames, labelStatuses, (dialog, which, isChecked) -> {
-
-                }
-            )
-            .setView(R.layout.label_controls_dialog)
-            .setCancelable(true)
-            .setPositiveButton("Save", (dialog, which) -> {});
-        alertDialog.create().show();
-    }
 }
