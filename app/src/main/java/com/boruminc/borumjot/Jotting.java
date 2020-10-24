@@ -58,7 +58,7 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
      * @param oLabel The old label which already exists in the list
      * @return whether or not the label was removed
      */
-    boolean removeLabel(Label oLabel) {
+    public boolean removeLabel(Label oLabel) {
         return labels.remove(oLabel);
     }
 

@@ -80,6 +80,10 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
         return null;
     }
 
+    protected String formatPostQuery(String requestBody) {
+        return String.format(requestBody, (Object[]) params);
+    }
+
     /**
      * Encodes a url
      * @param path The name of the file and any subsequent "/" parameters
