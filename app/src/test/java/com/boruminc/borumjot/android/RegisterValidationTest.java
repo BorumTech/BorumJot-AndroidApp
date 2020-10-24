@@ -1,9 +1,7 @@
 package com.boruminc.borumjot.android;
 
 import android.app.Activity;
-import android.content.Context;
 
-import com.boruminc.borumjot.android.validation.LoginValidation;
 import com.boruminc.borumjot.android.validation.RegistrationValidation;
 
 import org.junit.Test;
@@ -12,7 +10,7 @@ import org.mockito.Mock;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class RegisterUnitTest {
+public class RegisterValidationTest {
     @Mock
     Activity mContext;
 

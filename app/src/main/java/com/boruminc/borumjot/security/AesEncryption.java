@@ -5,10 +5,13 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -17,14 +20,14 @@ import javax.crypto.spec.SecretKeySpec;
  * Class for encrypting text using the AES algorithm
  */
 @RequiresApi(api = Build.VERSION_CODES.O)
-public class AesEncryption {
+class AesEncryption {
     private String plaintext;
 
-    public AesEncryption(String pt) {
+    AesEncryption(String pt) {
         plaintext = pt;
     }
 
-    public String getPlaintext() {
+    String getPlaintext() {
         return plaintext;
     }
 
@@ -38,9 +41,9 @@ public class AesEncryption {
      * @param secretKey The secret key used to encrypt (and decrypt)
      * @param initVector The randomness added at the beginning as a byte[]
      * @return The cipher text
-     * @throws Exception A generic exception if something goes wrong
+     * @throws GeneralSecurityException if something unexpected occurs
      */
-    public String encrypt(SecretKey secretKey, byte[] initVector) throws Exception {
+    String encrypt(SecretKey secretKey, byte[] initVector) throws GeneralSecurityException {
         // Get Cipher instance that will use AES encryption algorithm in CBC mode with a PKCS5Padding padding scheme
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 

@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LoginUnitTest {
+public class LoginValidationTest {
     @Mock
     Activity mMockContext;
 
