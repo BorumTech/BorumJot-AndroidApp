@@ -1,7 +1,5 @@
 package com.boruminc.borumjot;
 
-import androidx.annotation.Nullable;
-
 /**
  * The class that represents a label, which categorizes jottings (regardless of type) together
  * @author Varun Singh
