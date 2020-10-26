@@ -131,7 +131,8 @@ public class TaskActivity extends JottingActivity {
                 )
         );
 
-        new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
+        if (getJottingData() != null)
+            new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
     }
 
     @Override

@@ -5,7 +5,11 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,32 +64,24 @@ abstract class JottingActivity extends FragmentActivity {
      * Displays the rename and name dialog in an <code>AlertDialog.Builder</code>
      */
     protected void displayRenameDialog(DialogInterface.OnClickListener onPositiveButtonClick) {
-        displayEditTextDialog(
-                onPositiveButtonClick,
-                getJottingData() == null ? "" : getJottingData().getName(),
-                "Your phone is too old to name or rename the " + jottingType,
-                String.format("%s Name", jottingType)
-        );
-    }
-
-    protected void displayEditTextDialog(DialogInterface.OnClickListener onPositiveButtonClick, String initialText, String errorMessage, String title) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             View renameJottingDialog = getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null);
 
             if (getJottingData() != null) // If dialog if for renaming and not naming
-                ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText(initialText);
+                ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText(getJottingData() == null ? "" : getJottingData().getName());
 
             AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
             renameBuilder
                     .setView(renameJottingDialog)
-                    .setTitle(title)
+                    .setTitle(String.format("%s Name", jottingType))
 
                     .setCancelable(true)
                     .setOnCancelListener(dialog -> finish())
-                    .setPositiveButton("Save", onPositiveButtonClick);
+                    .setPositiveButton("Save", onPositiveButtonClick)
+                    .setOnDismissListener(DialogInterface::dismiss);
             renameBuilder.create().show();
         } else {
-            Toast.makeText(this, errorMessage + ". Try on the web app", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Your phone is too old to name or rename the " + jottingType + ". Try on the web app", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -186,7 +182,7 @@ abstract class JottingActivity extends FragmentActivity {
     protected void loadNewLabels(JSONObject data, String newLabelName) {
         try {
             if (data != null) {
-                if (data.optInt("statusCode") == 204) {
+                if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
                     allUserLabels.add(new Label(data.getJSONObject("data").getInt("id"), newLabelName));
 
                     CharSequence[] labelNames = new CharSequence[allUserLabels.size()];
@@ -293,18 +289,19 @@ abstract class JottingActivity extends FragmentActivity {
         alertDialog = new AlertDialog.Builder(this);
 
         alertDialog
-                .setTitle("Labels")
-                .setMultiChoiceItems(labelNames, labelStatuses, this::onLabelsListChoiceClick)
-                .setView(R.layout.label_controls_dialog)
-                .setCancelable(true)
-                .setPositiveButton("Save", (dialog, which) -> {
-                    new TaskRunner().executeAsync(updateJottingLabels(), data -> {
-                        if (data == null || data.optInt("statusCode") != 200) {
-                            Toast.makeText(this, "A system error occurred", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> {});
+            .setTitle("Labels")
+            .setMultiChoiceItems(labelNames, labelStatuses, this::onLabelsListChoiceClick)
+            .setView(R.layout.label_controls_dialog)
+            .setCancelable(true)
+            .setPositiveButton("Save", (dialog, which) -> {
+                new TaskRunner().executeAsync(updateJottingLabels(), data -> {
+                    if (data == null || data.optInt("statusCode") != 200) {
+                        Toast.makeText(this, "A system error occurred", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            })
+            .setNegativeButton("Cancel", (dialog, which) -> {});
+
         alertDialog.create().show();
     }
 
@@ -325,5 +322,9 @@ abstract class JottingActivity extends FragmentActivity {
      */
     abstract void setJottingName(String name);
 
+    /**
+     * Replaces the current labels list views with the passed in ones
+     * @param labels The new labels list
+     */
     abstract void setLabels(ArrayList<Label> labels);
 }
