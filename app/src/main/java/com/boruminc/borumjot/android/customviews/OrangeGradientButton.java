@@ -12,14 +12,11 @@ import com.boruminc.borumjot.android.ButtonGradient;
 public class OrangeGradientButton extends AppCompatButton {
     public OrangeGradientButton(@NonNull Context context) {
         super(context);
+        setBackground(ButtonGradient.getOneSelectButtonGradient());
     }
 
     public OrangeGradientButton(Context context, AttributeSet attrs){
         super(context, attrs);
-    }
-
-    @Override
-    public Drawable getBackground() {
-        return ButtonGradient.getOneSelectButtonGradient();
+        setBackground(ButtonGradient.getOneSelectButtonGradient());
     }
 }

@@ -131,9 +131,6 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.options_btn:
                 startActivity(new Intent(this, OptionsActivity.class));
                 break;
-            case R.id.helpandfdbck_btn:
-                startActivity(new Intent(this, HelpAndFeedbackActivity.class));
-                break;
             case R.id.privacypolicy_btn:
                 startActivity(new Intent(this, PrivacyPolicyActivity.class));
                 break;

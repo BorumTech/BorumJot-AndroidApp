@@ -295,7 +295,7 @@ abstract class JottingActivity extends FragmentActivity {
             .setCancelable(true)
             .setPositiveButton("Save", (dialog, which) -> {
                 new TaskRunner().executeAsync(updateJottingLabels(), data -> {
-                    if (data == null || data.optInt("statusCode") != 200) {
+                    if (data == null || data.optInt("statusCode") < 200 || data.optInt("statusCode") >= 300) {
                         Toast.makeText(this, "A system error occurred", Toast.LENGTH_SHORT).show();
                     }
                 });

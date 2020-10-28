@@ -2,6 +2,7 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -28,5 +29,10 @@ public class OptionsActivity extends OptionsMenuItemActivity {
         getSharedPreferences("user identification", Context.MODE_PRIVATE).edit().clear().apply();
         startActivity(new Intent(this, LoginActivity.class));
         Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onForumClick(View view) {
+        Intent borumIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.forum_link)));
+        startActivity(borumIntent);
     }
 }

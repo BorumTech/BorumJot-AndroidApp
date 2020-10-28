@@ -11,14 +11,6 @@
         <item name="android:editTextStyle">@style/FormInputFields</item>
     </style>
 
-    <style name="GoldenToad" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/goldenToadPrimary</item>
-        <item name="colorSecondary">@color/goldenToadSecondary</item>
-        <item name="colorAccent">@color/goldenToadAccent</item>
-        <item name="colorSurface">@color/goldenToadBackgroundSurface</item>
-        <item name="colorPrimarySurface">@color/goldenToadPrimarySurface</item>
-    </style>
-
     <!-- Individual View styles -->
     <style name="FormInputFields" parent="Widget.AppCompat.EditText">
         <item name="android:textSize">@dimen/formcontrol_txtSize</item>
@@ -30,6 +22,7 @@
         <item name="android:layout_marginBottom">25dp</item>
         <item name="android:layout_width">@dimen/button_width</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:textColor">@color/cherryRasboraAccent</item>
     </style>
 
@@ -103,14 +96,13 @@
     </style>
 
     <style name="ColorThemeImage">
-        <item name="android:layout_width">wrap_content</item>0
-        <item name="android:layout_height">100dp</item>
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">200dp</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:layout_row">1</item>
-        <item name="android:src">@android:drawable/alert_light_frame</item>
     </style>
 
-    <style name="FlexibleListBox" parent="CherryRasbora">
+    <style name="FlexibleListBox" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:layout_marginRight">10dp</item>
         <item name="flexWrap">wrap</item>
@@ -130,7 +122,7 @@
         <item name="android:clickable">true</item>
     </style>
 
-    <style name="SupportTheme">
+    <style name="SupportTheme" parent="CherryRasbora">
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
@@ -151,7 +143,7 @@
         <item name="android:background">@drawable/header_filter_btn</item>
     </style>
 
-    <style name="SubtaskList" parent="CherryRasbora">
+    <style name="SubtaskList" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
         <item name="android:layout_marginLeft">10dp</item>

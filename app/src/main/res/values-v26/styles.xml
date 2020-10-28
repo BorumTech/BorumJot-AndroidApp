@@ -13,7 +13,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:paddingHorizontal">50dp</item>
-        <item name="android:background">@color/cherryRasboraPrimarySurface</item>
+        <item name="android:background">?attr/colorPrimarySurface</item>
     </style>
 
     <style name="FlexibleListBox">
@@ -34,7 +34,7 @@
         <item name="android:clickable">true</item>
     </style>
 
-    <style name="SubtaskList" parent="CherryRasbora">
+    <style name="SubtaskList" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>

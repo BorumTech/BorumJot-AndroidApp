@@ -6,11 +6,4 @@
   <color name="cherryRasboraAccent">#003049</color>
   <color name="cherryRasboraBackgroundSurface">#EAE2B7</color>
   <color name="cherryRasboraPrimarySurface">#FFFFFF</color>
-
-  <!-- Golden Toad Theme -->
-  <color name="goldenToadPrimary"></color>
-  <color name="goldenToadSecondary"></color>
-  <color name="goldenToadAccent"></color>
-  <color name="goldenToadBackgroundSurface"></color>
-  <color name="goldenToadPrimarySurface"></color>
 </resources>

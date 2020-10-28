@@ -14,77 +14,26 @@
         android:name="com.boruminc.borumjot.android.AppBarFragment"
         tools:layout="@layout/appbar_appname_fragment" />
 
-    <com.boruminc.borumjot.android.customviews.OrangeGradientButton
+    <Button
         style="@style/OneSelectButtonGradient"
         android:text="@string/action_change_sign_in"
         android:layout_gravity="center_horizontal"/>
 
-    <GridLayout
-        android:id="@+id/color_theme_grid"
-        style="@style/ColorThemeGrid">
-
-        <LinearLayout
-            android:layout_row="0"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cherry_rasbora_title" />
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/golden_toad_title"/>
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_row="1"
-            android:layout_column="0"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-            <ImageView
-                style="@style/ColorThemeImage"/>
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-            <ImageView
-                style="@style/ColorThemeImage"/>
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-    </GridLayout>
+    <Button
+        android:text="@string/action_export_data"
+        style="@style/OneSelectButtonGradient" />
 
     <Button
+        android:text="@string/action_forum"
         style="@style/OneSelectButtonGradient"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/action_export_data" />
+        android:onClick="onForumClick"/>
 
-    <Button
+    <com.boruminc.borumjot.android.customviews.OrangeGradientButton
         android:id="@+id/logout_btn"
         android:text="@string/action_logout"
-        style="@style/OneSelectButtonGradient"
         android:onClick="onLogoutClick"
+        android:layout_marginTop="120dp"
+        style="@style/OneSelectButtonGradient"
         />
 
 </LinearLayout>
