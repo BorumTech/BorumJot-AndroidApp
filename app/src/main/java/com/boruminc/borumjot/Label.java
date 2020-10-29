@@ -1,10 +1,12 @@
 package com.boruminc.borumjot;
 
+import java.io.Serializable;
+
 /**
  * The class that represents a label, which categorizes jottings (regardless of type) together
  * @author Varun Singh
  */
-public class Label {
+public class Label implements Serializable {
     private int id;
     private String name;
     private int userId;

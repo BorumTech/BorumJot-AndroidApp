@@ -42,6 +42,7 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -237,6 +238,7 @@ public class TaskActivity extends JottingActivity {
             Button labelButton = new Button(this);
             labelButton.setText(labels.get(i).getName());
             labelButton.setLayoutParams(layoutParams);
+            labelButton.setOnClickListener(this::onLabelClick);
 
             labelsList.addView(labelButton);
         }
@@ -535,5 +537,9 @@ public class TaskActivity extends JottingActivity {
         });
     }
 
-
+    private void onLabelClick(View view) {
+        Intent labelAct = new Intent(this, LabelActivity.class);
+        labelAct.putExtra("label", getJottingData().getLabels().get(labelsList.indexOfChild(view) - 1));
+        startActivity(labelAct);
+    }
 }
