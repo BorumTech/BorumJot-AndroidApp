@@ -82,6 +82,12 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        new TaskRunner().executeAsync(getJottingsRequest(), this::handleJottingsResponse);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -91,13 +97,7 @@ public class HomeActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
 
         originalDataset = new ArrayList<Jotting>();
-        new TaskRunner().executeAsync(getJottingsRequest(), this::handleJottingsResponse);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
+        onJottingsListRefresh();
     }
 
     @Override

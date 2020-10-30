@@ -80,4 +80,5 @@
     <string name="pin_content_desc">A pin icon</string>
     <string name="action_new_label">Create New Label</string>
     <string name="forum_link">http://meta.bforborum.com/Topics/Borum-Jot</string>
+    <string name="action_delete_label">Delete Label</string>
 </resources>

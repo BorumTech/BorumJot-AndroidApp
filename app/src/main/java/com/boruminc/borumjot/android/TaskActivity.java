@@ -31,6 +31,7 @@ import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
 import com.boruminc.borumjot.android.customviews.XButton;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
@@ -143,12 +144,9 @@ public class TaskActivity extends JottingActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        finish();
+    protected void onPause() {
+        super.onPause();
         overridePendingTransition(0, 0);
-        Intent intent = new Intent(this, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
     }
 
     /* Helper Methods */
@@ -375,19 +373,18 @@ public class TaskActivity extends JottingActivity {
                         return this.connectToApi(encodeUrl("task", "completed=" + completed, "id=" + getTaskData().getId()));
                     }
                 },
-                data -> {
-                    try {
+                new ApiResponseExecutor() {
+                    @Override
+                    public void onComplete(JSONObject data) {
+                        super.onComplete(data);
                         if (data != null) {
-                            if (data.has("error") || data.getInt("statusCode") != 200) {
-                                Toast.makeText(this, "An error occurred and the task could not be marked as "
-                                        + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
+                            if (data.has("error") || ranOk()) {
+                                Toast.makeText(getApplicationContext(), "An error occurred and the task could not be marked as "
+                                    + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
                             } else {
                                 appBarFrag.displayStrikethrough(completed == 1);
                             }
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(this, "A server error occurred. The task was not updated", Toast.LENGTH_SHORT).show();
                     }
                 }
         );

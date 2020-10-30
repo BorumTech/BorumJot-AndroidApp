@@ -13,14 +13,6 @@ public class TaskRunner {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
 
-    /**
-     * Interface for methods that are called only when the task is complete
-     * @param <R> The type of the result
-     */
-    public interface Callback<R> {
-        void onComplete(R result);
-    }
-
     public <R> void executeAsync(Callable<R> callable, Callback<R> callback) {
         executor.execute(() -> { // Executes a Runnable that runs in a background thread
             try {

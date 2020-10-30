@@ -1,9 +1,7 @@
 package com.boruminc.borumjot.android;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
 import org.json.JSONObject;
@@ -33,6 +32,7 @@ public class LabelActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_label);
+        setSupportActionBar(findViewById(R.id.my_toolbar));
 
         appBarFrag = ((AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar));
         appBar = findViewById(R.id.appbar);
@@ -93,5 +93,38 @@ public class LabelActivity extends AppCompatActivity {
 
         renameLabelBuilder.create().show();
         return true;
+    }
+
+    private ApiRequestExecutor deleteLabelRequest() {
+        return new ApiRequestExecutor(String.valueOf(currentLabel.getId())) {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                addAuthorizationHeader(userApiKey);
+                setRequestMethod("DELETE");
+                setQuery(encodePostQuery("id=%s"));
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeUrl("label"));
+            }
+        };
+    }
+
+    public void onDeleteLabelClick(View view) {
+        new TaskRunner().executeAsync(deleteLabelRequest(), new ApiResponseExecutor() {
+            @Override
+            public void onComplete(JSONObject result) {
+                super.onComplete(result);
+                if (result != null && ranOk()) {
+                    finish();
+                    Toast.makeText(getApplicationContext(), "Label successfully deleted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "The label could not be deleted due to a system error", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 }

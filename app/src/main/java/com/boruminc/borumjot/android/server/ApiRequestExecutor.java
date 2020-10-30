@@ -155,7 +155,10 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
 
             int status = ((HttpURLConnection) connection).getResponseCode();
             InputStream response;
+
+            // Get normal input stream if the request returns a successful status code
             if (status >= 200 && status < 300) response = connection.getInputStream();
+            // Get error stream if the request returns an error status code
             else response = ((HttpURLConnection) connection).getErrorStream();
 
             String contentType = connection.getHeaderField("Content-Type");
