@@ -38,6 +38,10 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
         query = "";
     }
 
+    protected String getQuery() {
+        return query;
+    }
+
     protected void setQuery(String newQuery) {
         query = newQuery;
     }

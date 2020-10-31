@@ -21,7 +21,8 @@
 
     <Button
         android:text="@string/action_export_data"
-        style="@style/OneSelectButtonGradient" />
+        style="@style/OneSelectButtonGradient"
+        android:onClick="onExportDataClick" />
 
     <Button
         android:text="@string/action_forum"

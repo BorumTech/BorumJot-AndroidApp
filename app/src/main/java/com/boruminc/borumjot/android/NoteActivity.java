@@ -139,6 +139,7 @@ public class NoteActivity extends JottingActivity {
                         if (data != null && data.has("data") && data.getInt("statusCode") >= 200 && data.getInt("statusCode") < 300) {
                             // If response ran okay
                             setNoteBody(data.getJSONObject("data").getString("body"));
+                            setNoteBody(getNoteBody().replace("\\n", "\n"));
                         } else {
                             Toast.makeText(this, "An error occurred and this note could not be fetched", Toast.LENGTH_SHORT).show();
                         }
@@ -218,6 +219,10 @@ public class NoteActivity extends JottingActivity {
                                 if (data != null) {
                                     if (data.has("error"))
                                         Toast.makeText(this, data.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
+                                    else {
+                                        getNoteData().setBody(getNoteBody());
+                                        Log.d("body", getNoteData().getBody());
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
