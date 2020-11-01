@@ -64,7 +64,7 @@ public class NoteActivity extends JottingActivity {
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("note"));
+                        return this.connectToApi(encodeQueryString("note"));
                     }
                 }, data -> {
                     try {
@@ -132,7 +132,7 @@ public class NoteActivity extends JottingActivity {
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("note", "id=" + getNoteData().getId()));
+                        return this.connectToApi(encodeQueryString("note", "id=" + getNoteData().getId()));
                     }
                 }, data -> {
                     try {
@@ -212,7 +212,7 @@ public class NoteActivity extends JottingActivity {
                             @Override
                             public JSONObject call() {
                                 super.call();
-                                return this.connectToApi(encodeUrl("note", "id=" + getNoteData().getId()));
+                                return this.connectToApi(encodeQueryString("note", "id=" + getNoteData().getId()));
                             }
                         }, data -> {
                             try {

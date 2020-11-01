@@ -1,6 +1,5 @@
 package com.boruminc.borumjot.android;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
@@ -14,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -65,6 +63,9 @@ public class HomeActivity extends AppCompatActivity {
         filterTasksBtn = findViewById(R.id.home_tasks_toggle);
         progressBar = findViewById(R.id.progressPanel);
 
+        AppBarFragment appBarFragment = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.my_toolbar);
+        if (appBarFragment != null) appBarFragment.passTitle("My Jottings");
+
         // Improve performance because changes in content do not change the layout size of the RecyclerView
         recyclerView.setHasFixedSize(true);
 
@@ -105,14 +106,6 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         if (findViewById(R.id.my_toolbar).getVisibility() == View.VISIBLE) { // If regular toolbar is active
             inflater.inflate(R.menu.options_menu, menu);
-
-            // Associate searchable configuration with the SearchView
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-
-            // Starts SearchResultsActivity when
-            assert searchManager != null;
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         }
 
         return true;
@@ -160,7 +153,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeUrl("jottings"));
+                return this.connectToApi(encodeQueryString("jottings"));
             }
         };
     }

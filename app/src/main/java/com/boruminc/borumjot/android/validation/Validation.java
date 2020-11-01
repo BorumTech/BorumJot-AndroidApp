@@ -16,23 +16,25 @@ public abstract class Validation {
         return email;
     }
 
-    public void setEmail(String newEmail) {
+    void setEmail(String newEmail) {
         email = newEmail;
     }
 
-    public String getPassword() {
+    String getPassword() {
         return password;
     }
 
-    public void setPassword(String newPassword) {
+    void setPassword(String newPassword) {
         password = newPassword;
     }
 
-    public boolean isMissingFields() {
+    boolean isMissingFields() {
         return email.isEmpty() || password.isEmpty();
     }
 
-    public boolean isEmailValid() {
-        return email.contains("@");
+    boolean isEmailNotValid() {
+        return !email.contains("@");
     }
+
+    abstract String validate();
 }

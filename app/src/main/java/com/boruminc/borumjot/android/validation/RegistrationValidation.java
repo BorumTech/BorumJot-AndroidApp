@@ -63,7 +63,7 @@ public class RegistrationValidation extends Validation {
                             @Override
                             public JSONObject call() {
                                 super.call();
-                                return this.connectToApi(encodeUrl("register", "app_api_key=9ds89d8as9das9"));
+                                return this.connectToApi(encodeQueryString("register", "app_api_key=9ds89d8as9das9"));
                             }
                         },
                         (data) -> {
@@ -91,7 +91,7 @@ public class RegistrationValidation extends Validation {
      */
     public String validate() {
         if (isMissingFields()) return CREDENTIALS_NOT_COMPLETE;
-        if (!isEmailValid()) return INVALID_EMAIL;
+        if (isEmailNotValid()) return INVALID_EMAIL;
         if (!isPasswordConfirmed()) return NO_PASSWORD_MATCH;
 
         progressBar.setVisibility(View.VISIBLE);

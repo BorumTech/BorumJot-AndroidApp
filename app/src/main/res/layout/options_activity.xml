@@ -17,7 +17,7 @@
     <Button
         style="@style/OneSelectButtonGradient"
         android:text="@string/action_change_sign_in"
-        android:layout_gravity="center_horizontal"/>
+        android:onClick="onChangeSignInClick"/>
 
     <Button
         android:text="@string/action_export_data"

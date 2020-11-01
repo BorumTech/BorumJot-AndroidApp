@@ -2,7 +2,6 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -100,9 +99,9 @@ public class JottingOptionsFragment extends Fragment {
                 params[1] = "priority=" + (getJotData().getPriority() == 0 ? 1 : 0);
 
                 if (getJotData() instanceof Task) {
-                    return this.connectToApi(this.encodeUrl("task", params));
+                    return this.connectToApi(this.encodeQueryString("task", params));
                 } else if (getJotData() instanceof Note) {
-                    return this.connectToApi(this.encodeUrl("note", params));
+                    return this.connectToApi(this.encodeQueryString("note", params));
                 }
 
                 return null;

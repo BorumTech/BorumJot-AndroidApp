@@ -1,6 +1,5 @@
 package com.boruminc.borumjot.android.server.requests;
 
-import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 
 import org.json.JSONObject;
@@ -26,6 +25,6 @@ public class DeleteJottingRequest extends ApiRequestExecutor {
     @Override
     public JSONObject call() {
         super.call();
-        return this.connectToApi(encodeUrl(jottingType));
+        return this.connectToApi(encodeQueryString(jottingType));
     }
 }

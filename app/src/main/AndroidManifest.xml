@@ -64,14 +64,9 @@
             android:name=".LabelActivity"
             android:label="Label" />
 
-        <activity
-            android:name=".SearchResultsActivity"
-            android:label="Search Results">
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".ChangeSignInActivity"
+            android:label="Change Sign In"
+            android:parentActivityName=".OptionsActivity"/>
 
         <provider
             android:authorities="com.boruminc.borumjot.android.TasksProvider"

@@ -33,6 +33,6 @@ public class UpdateTaskRequest extends ApiRequestExecutor {
     @Override
     public JSONObject call() {
         super.call();
-        return this.connectToApi(encodeUrl("task", getParameters));
+        return this.connectToApi(encodeQueryString("task", getParameters));
     }
 }

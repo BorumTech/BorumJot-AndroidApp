@@ -6,39 +6,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".HomeActivity">
 
-    <androidx.appcompat.widget.Toolbar
+    <fragment
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:contentInsetStart="0dp">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-<!--
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/search"
-                android:title="@string/search_title"
-                android:icon="@drawable/ic_search"
-                app:showAsAction="collapseActionView|ifRoom"
-                app:actionViewClass="android.widget.SearchView"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content" />-->
-
-            <TextView
-                style="@style/Widget.AppCompat.TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/my_jottings_title"
-                android:textColor="?attr/colorOnPrimarySurface"
-                android:textSize="20sp" />
-
-        </RelativeLayout>
-
-    </androidx.appcompat.widget.Toolbar>
+        android:layout_height="wrap_content"
+        android:name="com.boruminc.borumjot.android.AppBarFragment"
+        tools:layout="@layout/appbar_appname_fragment"/>
 
     <fragment
         android:id="@+id/jotting_options_toolbar"

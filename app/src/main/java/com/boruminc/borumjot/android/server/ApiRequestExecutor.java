@@ -27,6 +27,24 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
     private String query;
     private Map<String, String> requestHeaders;
     private String requestMethod;
+    private RequestUrl url;
+
+    public enum RequestUrl {
+        /**
+         * The url for the Borum Jot REST API for making requests specific to Borum Jot
+         * Develop URL: https://borum-jot-api-git-develop.varun-singh.vercel.app/api/
+         * Production URL: https://api.jot.bforborum.com/api/
+         */
+        BORUM_JOT_REQUEST_URL("https://api.jot.bforborum.com/api/v1"),
+
+        BORUM_REQUEST_URL("https://api.bforborum.com/api");
+
+        public final String url;
+
+        RequestUrl(String u) {
+            url = u;
+        }
+    }
 
     /**
      * Constructor for ApiRequestExecutor
@@ -36,6 +54,14 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
         params = p;
         requestHeaders = new HashMap<>();
         query = "";
+        url = RequestUrl.BORUM_JOT_REQUEST_URL;
+    }
+
+    protected ApiRequestExecutor(RequestUrl u, String... p) {
+        params = p;
+        requestHeaders = new HashMap<>();
+        query = "";
+        url = u;
     }
 
     protected String getQuery() {
@@ -94,14 +120,8 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
      * @param urlParams The query string parameters (GET)
      * @return The encoded url
      */
-    protected String encodeUrl(String path, String... urlParams) {
-        String versionNumber = "v1";
-
-        // Develop URL: https://borum-jot-api-git-develop.varun-singh.vercel.app/api/
-        // Production URL: https://api.jot.bforborum.com/api/
-        String safeUrl = "https://api.jot.bforborum.com/api/"
-                .concat(versionNumber).concat("/")
-                .concat(path).concat(urlParams.length > 0 ? "?" : "");
+    protected String encodeQueryString(String path, String... urlParams) {
+        String safeUrl = url.url + "/" + path + "?";
 
         // Loop through url query parameters, encode them, concat them to the url, and separate with "&"
         for (int i = 0; i < urlParams.length; i++) {
@@ -111,7 +131,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
                     .concat(Uri.encode(urlParam.substring(urlParam.indexOf("=") + 1))) // Exclude key, only get value
                     .concat(i < urlParams.length - 1 ? "&" : ""); // Add "&" if there are more parameters
         }
-        Log.d("Safe url", safeUrl);
+        Log.d("Safe Url", safeUrl);
 
         return safeUrl;
     }

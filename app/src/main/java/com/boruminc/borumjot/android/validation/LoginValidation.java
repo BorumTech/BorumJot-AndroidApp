@@ -47,7 +47,7 @@ public final class LoginValidation extends Validation {
                             @Override
                             public JSONObject call() {
                                 super.call();
-                                return this.connectToApi(encodeUrl("login", "app_api_key=9ds89d8as9das9"));
+                                return this.connectToApi(encodeQueryString("login", "app_api_key=9ds89d8as9das9"));
                             }
                         },
                         (data) -> {
@@ -62,6 +62,11 @@ public final class LoginValidation extends Validation {
                                         context.getSharedPreferences("user identification", Context.MODE_PRIVATE)
                                                 .edit()
                                                 .putString("apiKey", userApiKey)
+                                                .apply();
+
+                                        context.getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                                                .edit()
+                                                .putString("email", getEmail())
                                                 .apply();
 
                                         context.startActivity(homeIntent);
@@ -83,7 +88,7 @@ public final class LoginValidation extends Validation {
      */
     public String validate() {
         if (isMissingFields()) return CREDENTIALS_NOT_COMPLETE;
-        if (!isEmailValid()) return INVALID_EMAIL;
+        if (isEmailNotValid()) return INVALID_EMAIL;
 
         progressBar.setVisibility(View.VISIBLE);
         return SUCCESS;

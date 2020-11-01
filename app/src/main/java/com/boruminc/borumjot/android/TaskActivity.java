@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
@@ -36,16 +35,12 @@ import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
-import com.google.android.flexbox.FlexWrap;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.android.flexbox.FlexboxLayoutManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class TaskActivity extends JottingActivity {
     /* Views */
@@ -97,7 +92,7 @@ public class TaskActivity extends JottingActivity {
                 @Override
                 public JSONObject call() {
                     super.call();
-                    return this.connectToApi(encodeUrl("task"));
+                    return this.connectToApi(encodeQueryString("task"));
                 }
             }, data -> {
                 try {
@@ -183,7 +178,7 @@ public class TaskActivity extends JottingActivity {
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("subtasks", "id=" + getJottingData().getId()));
+                        return this.connectToApi(encodeQueryString("subtasks", "id=" + getJottingData().getId()));
                     }
                 }, data -> {
                     try {
@@ -370,7 +365,7 @@ public class TaskActivity extends JottingActivity {
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("task", "completed=" + completed, "id=" + getTaskData().getId()));
+                        return this.connectToApi(encodeQueryString("task", "completed=" + completed, "id=" + getTaskData().getId()));
                     }
                 },
                 new ApiResponseExecutor() {
@@ -413,7 +408,7 @@ public class TaskActivity extends JottingActivity {
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(this.encodeUrl("subtasks"));
+                        return this.connectToApi(this.encodeQueryString("subtasks"));
                     }
                 }, data -> {
                     if (data != null) {
@@ -461,7 +456,7 @@ public class TaskActivity extends JottingActivity {
                     public JSONObject call() {
                         super.call();
                         return this.connectToApi(
-                                encodeUrl(
+                                encodeQueryString(
                                         "task",
                                         "completed=" + completed,
                                         "id=" + subtaskRow.getTag()

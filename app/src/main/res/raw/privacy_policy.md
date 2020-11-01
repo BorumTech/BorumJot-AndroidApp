@@ -7,7 +7,7 @@ Consumer has the ability to export all data that Company collects on him or her.
 Notes and tasks written in App are encrypted. App complies with GDPR, COPPA, CCPA, and other privacy laws.
 
 **Connections**
-Data is sent to a database on GoDaddy's server. The bforborum.com domain currently uses an insecure (http) connection.
+Data is sent to a database on GoDaddy's server over a secure (https) connection, certified by Let's Encrypt
 
 **Analytics**
 Company does not track Consumers of App on any platform. Privacy policy changes are announced.

@@ -62,7 +62,7 @@ public class LabelActivity extends AppCompatActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeUrl("label"));
+                return this.connectToApi(encodeQueryString("label"));
             }
         };
     }
@@ -108,7 +108,7 @@ public class LabelActivity extends AppCompatActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeUrl("label"));
+                return this.connectToApi(encodeQueryString("label"));
             }
         };
     }

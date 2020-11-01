@@ -1,32 +1,22 @@
 package com.boruminc.borumjot.android;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.core.app.ActivityCompat;
 
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,12 +35,20 @@ public class OptionsActivity extends OptionsMenuItemActivity {
         userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
     }
 
+    /**
+     * Logs the user out
+     * @param view The button that triggered this click event
+     */
     public void onLogoutClick(View view) {
         getSharedPreferences("user identification", Context.MODE_PRIVATE).edit().clear().apply();
         startActivity(new Intent(this, LoginActivity.class));
         Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Opens the Meta Borum "Borum Jot" Topic page in user's browser
+     * @param view The button that triggered this click event
+     */
     public void onForumClick(View view) {
         Intent borumIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.forum_link)));
         startActivity(borumIntent);
@@ -73,7 +71,7 @@ public class OptionsActivity extends OptionsMenuItemActivity {
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeUrl("jottings"));
+                        return this.connectToApi(encodeQueryString("jottings"));
                     }
                 }, new ApiResponseExecutor() {
                     @Override
@@ -98,5 +96,13 @@ public class OptionsActivity extends OptionsMenuItemActivity {
                     }
                 }
         );
+    }
+
+    /**
+     * Changes the user's Borum account sign in
+     * @param view The button that triggered this click event
+     */
+    public void onChangeSignInClick(View view) {
+        startActivity(new Intent(this, ChangeSignInActivity.class));
     }
 }
