@@ -53,11 +53,7 @@
 
             <TableLayout
                 android:id="@+id/task_subtasks_box"
-                style="@style/SubtaskList" />
-
-            <Spinner
-                android:id="@+id/task_priority_drpdwn"
-                style="@style/PrioritySpinner"/>
+                style="@style/SubtaskList" />t
 
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/task_labels_box"

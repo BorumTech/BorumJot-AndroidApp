@@ -119,15 +119,6 @@ public class TaskActivity extends JottingActivity {
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
         findViewById(R.id.appbar).setOnLongClickListener(this::onRenameJotting);
 
-        Spinner priorityDropdown = findViewById(R.id.task_priority_drpdwn);
-        priorityDropdown.setAdapter(
-                new ArrayAdapter<String>(
-                        this,
-                        android.R.layout.simple_spinner_dropdown_item,
-                        new String[] {"Top", "Mid", "Low"}
-                )
-        );
-
         if (getJottingData() != null)
             new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
     }

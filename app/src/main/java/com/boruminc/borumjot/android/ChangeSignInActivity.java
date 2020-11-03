@@ -63,7 +63,7 @@ public class ChangeSignInActivity extends FragmentActivity {
             protected void initialize() {
                 super.initialize();
                 setRequestMethod("PUT");
-                setQuery("password=%s");
+                setQuery("new_password=%s");
                 addAuthorizationHeader(userApiKey);
             }
 

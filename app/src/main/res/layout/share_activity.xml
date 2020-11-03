@@ -13,10 +13,17 @@
         android:name="com.boruminc.borumjot.android.AppBarFragment"
         tools:layout="@layout/appbar_appname_fragment" />
 
-    <AutoCompleteTextView
+    <EditText
         android:id="@+id/share_email_field"
         android:layout_height="wrap_content"
         android:layout_below="@id/share_appbar"
         android:hint="@string/prompt_share"
         style="@style/ShareField"/>
+
+    <Button
+        android:id="@+id/share_btn"
+        android:text="@string/action_share"
+        android:layout_below="@id/share_email_field"
+        android:onClick="onShareClick"
+        style="@style/OneSelectButtonGradient" />
 </RelativeLayout>
