@@ -11,6 +11,8 @@ public abstract class ApiResponseExecutor implements Callback<JSONObject> {
     }
 
     protected final boolean ranOk() {
+        if (result == null) return false;
+
         int statusCode = result.optInt("statusCode");
         return statusCode >= 200 && statusCode < 300;
     }

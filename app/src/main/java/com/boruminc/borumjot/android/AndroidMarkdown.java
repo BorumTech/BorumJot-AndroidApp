@@ -1,12 +1,11 @@
 package com.boruminc.borumjot.android;
 
+import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
-import android.text.style.MetricAffectingSpan;
-import android.widget.TextView;
 import android.text.style.StyleSpan;
-import android.graphics.Typeface;
+import android.widget.TextView;
 
 final class AndroidMarkdown {
     private SpannableStringBuilder spannableStringBuilder;
@@ -15,7 +14,7 @@ final class AndroidMarkdown {
         spannableStringBuilder = new SpannableStringBuilder(r.getText().toString());
     }
 
-    private String getMarkdown() {
+    String getMarkdown() {
         return spannableStringBuilder.toString();
     }
 

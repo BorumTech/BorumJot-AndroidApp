@@ -39,13 +39,13 @@ public class ShareActivity extends FragmentActivity {
         overridePendingTransition(0, 0);
     }
 
-    private ApiRequestExecutor getShareRequest(String email) {
-        return new ApiRequestExecutor(email) {
+    private ApiRequestExecutor getShareRequest(int id, String email) {
+        return new ApiRequestExecutor(String.valueOf(id), email) {
             @Override
             protected void initialize() {
                 super.initialize();
                 setRequestMethod("POST");
-                setQuery(encodePostQuery("email=%s"));
+                setQuery(encodePostQuery("id=%s&email=%s"));
                 addAuthorizationHeader(userApiKey);
             }
 
@@ -65,6 +65,8 @@ public class ShareActivity extends FragmentActivity {
                 if (ranOk()) {
                     finish();
                     Toast.makeText(getApplicationContext(), "Note successfully shared!", Toast.LENGTH_SHORT).show();
+                } else if (result == null) {
+                    Toast.makeText(getApplicationContext(), "The note could not be shared because of an unknown server error", Toast.LENGTH_LONG).show();
                 } else {
                     String message = "";
                     try {
@@ -82,6 +84,12 @@ public class ShareActivity extends FragmentActivity {
 
     public void onShareClick(View view) {
         EditText emailView = findViewById(R.id.share_email_field);
-        new TaskRunner().executeAsync(getShareRequest(emailView.getText().toString()), getShareResponse());
+        new TaskRunner().executeAsync(
+                getShareRequest(
+                        getIntent().getIntExtra("id", 0),
+                        emailView.getText().toString()
+                ),
+                getShareResponse()
+        );
     }
 }

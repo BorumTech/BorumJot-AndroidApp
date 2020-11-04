@@ -166,7 +166,9 @@ public class NoteActivity extends JottingActivity {
     }
 
     public void navigateToShare(View view) {
-        startActivity(new Intent(this, ShareActivity.class));
+        Intent shareIntent = new Intent(this, ShareActivity.class);
+        shareIntent.putExtra("id", getNoteData().getId());
+        startActivity(shareIntent);
     }
 
     public void showDeleteDialog(View view) {

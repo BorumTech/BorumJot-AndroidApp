@@ -44,16 +44,6 @@ public class JSONToModel {
         return note;
     }
 
-    public static ArrayList<Label> convertJSONToLabels(JSONArray data) throws JSONException {
-        ArrayList<Label> labels = new ArrayList<Label>();
-
-        for (int i = 0; i < data.length(); i++) {
-            labels.add(convertJSONToLabel(data.getJSONObject(i)));
-        }
-
-        return labels;
-    }
-
     public static ArrayList<Label> convertJSONToLabels(JSONArray data, boolean withAll) throws JSONException {
         ArrayList<Label> labels = new ArrayList<Label>();
 

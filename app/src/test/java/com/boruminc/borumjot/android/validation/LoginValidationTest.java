@@ -1,4 +1,4 @@
-package com.boruminc.borumjot.android;
+package com.boruminc.borumjot.android.validation;
 
 import android.app.Activity;
 import android.content.Context;
@@ -45,10 +45,10 @@ public class LoginValidationTest {
      * by asserting that a valid email returns true
      */
     @Test
-    public void loginEmailValidation_isCorrect() {
+    public void validEmailValidation_isCorrect() {
         LoginValidation loginValidation = new LoginValidation(mMockContext, "arigergage@gmail.com", "");
-        boolean resultWithValidEmail = loginValidation.isEmailValid();
-        assertTrue(resultWithValidEmail);
+        boolean resultWithValidEmail = loginValidation.isEmailNotValid();
+        assertFalse(resultWithValidEmail);
     }
 
     /**
@@ -58,8 +58,8 @@ public class LoginValidationTest {
     @Test
     public void invalidEmailValidation_isCorrect() {
         LoginValidation loginValidation = new LoginValidation(mMockContext, "arifsid", "");
-        boolean resultWithInvalidEmail = loginValidation.isEmailValid();
-        assertFalse(resultWithInvalidEmail);
+        boolean resultWithInvalidEmail = loginValidation.isEmailNotValid();
+        assertTrue(resultWithInvalidEmail);
     }
 
 

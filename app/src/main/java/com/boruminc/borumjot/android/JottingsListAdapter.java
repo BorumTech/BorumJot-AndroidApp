@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.boruminc.borumjot.*;
+import com.boruminc.borumjot.Jotting;
+import com.boruminc.borumjot.Note;
+import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.SerializableImage;
 
 import java.io.Serializable;

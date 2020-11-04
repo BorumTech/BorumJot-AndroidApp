@@ -1,4 +1,4 @@
-package com.boruminc.borumjot.android;
+package com.boruminc.borumjot.android.validation;
 
 import android.app.Activity;
 
