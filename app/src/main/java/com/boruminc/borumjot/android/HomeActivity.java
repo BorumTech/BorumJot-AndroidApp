@@ -12,14 +12,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.boruminc.borumjot.Jotting;
@@ -34,20 +33,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String JOTTINGS_ERROR = "The tasks and notes could not fetched at this time";
 
-    JottingsListAdapter jottingsListAdapter;
+    ExpandableJottingsListAdapter jottingsListAdapter;
     ArrayList<Jotting> originalDataset;
+    HashMap<String, ArrayList<Jotting>> fullExpandableJottingMap;
 
     /* Views */
-    RecyclerView recyclerView;
     Button filterTasksBtn;
     Button filterNotesBtn;
     ProgressBar progressBar;
     SwipeRefreshLayout jottingsListRefresh;
+    ExpandableListView expandableListView;
 
     /* Overriding Callback Methods */
 
@@ -58,24 +59,30 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.my_toolbar));
         findViewById(R.id.jotting_options_toolbar).setVisibility(View.INVISIBLE);
 
-        recyclerView = findViewById(R.id.home_jottings_list);
         filterNotesBtn = findViewById(R.id.home_notes_toggle);
         filterTasksBtn = findViewById(R.id.home_tasks_toggle);
         progressBar = findViewById(R.id.progressPanel);
+        expandableListView = findViewById(R.id.home_jottings_list);
 
         AppBarFragment appBarFragment = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.my_toolbar);
         if (appBarFragment != null) appBarFragment.passTitle("My Jottings");
 
-        // Improve performance because changes in content do not change the layout size of the RecyclerView
-        recyclerView.setHasFixedSize(true);
-
-        // Use a linear layout manager
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
         // Specify an adapter (see also next example)
-        jottingsListAdapter = new JottingsListAdapter(this);
-        recyclerView.setAdapter(jottingsListAdapter);
+        jottingsListAdapter = new ExpandableJottingsListAdapter(this);
+        fullExpandableJottingMap = JottingsListDataPump.getData();
+        expandableListView.setAdapter(jottingsListAdapter);
+        expandableListView.setOnGroupExpandListener(groupPosition -> {
+
+        });
+
+        expandableListView.setOnGroupCollapseListener(groupPosition -> {
+
+        });
+
+        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+            //
+            return true;
+        });
 
         // Set the refresh listener
         jottingsListRefresh = findViewById(R.id.refreshable_jottings_list);
@@ -175,8 +182,10 @@ public class HomeActivity extends AppCompatActivity {
                             originalDataset.add(JSONToModel.convertJSONToTask(row));
                     }
 
-                    jottingsListAdapter.getDataset().clear();
-                    jottingsListAdapter.getDataset().addAll(originalDataset);
+                    ArrayList<Jotting> ownList = fullExpandableJottingMap.get("own");
+                    assert ownList != null;
+                    ownList.clear();
+                    ownList.addAll(originalDataset);
                     jottingsListAdapter.notifyDataSetChanged();
 
                     toggleFilter(filterTasksBtn, true);
