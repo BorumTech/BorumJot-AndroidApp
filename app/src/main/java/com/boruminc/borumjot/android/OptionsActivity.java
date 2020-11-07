@@ -1,11 +1,15 @@
 package com.boruminc.borumjot.android;
 
 import android.app.DownloadManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Toast;
 
@@ -77,21 +81,31 @@ public class OptionsActivity extends OptionsMenuItemActivity {
                     @Override
                     public void onComplete(JSONObject result) {
                         super.onComplete(result);
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                            File file = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "borumjotdata.txt");
-                            try (FileWriter fileWriter = new FileWriter(file)) {
-                                // Write JSONObject to file
-                                fileWriter.write(result.toString());
+                        File file = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "borumjotdata.txt");
+                        try (FileWriter fileWriter = new FileWriter(file)) {
+                            // Write JSONObject to file
+                            fileWriter.write(result.toString());
 
-                                // Use DownloadManager to add file to downloads
+                            ContentValues downloadInfo = getDownloadInfo(file);
+                            ContentResolver database = getContentResolver();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                database.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, downloadInfo);
+                            } else {
                                 DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                                assert downloadManager != null;
-                                downloadManager.addCompletedDownload(file.getName(), file.getName(), true, "text/plain", file.getAbsolutePath(),file.length(),true);
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                if (downloadManager != null) {
+                                    downloadManager.addCompletedDownload(
+                                            file.getName(),
+                                            file.getName(),
+                                            true,
+                                            "text/plain",
+                                            file.getAbsolutePath(),
+                                            file.length(),
+                                            true
+                                    );
+                                }
                             }
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Your phone is too old to export the data. Try on the web app. ", Toast.LENGTH_LONG).show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -104,5 +118,23 @@ public class OptionsActivity extends OptionsMenuItemActivity {
      */
     public void onChangeSignInClick(View view) {
         startActivity(new Intent(this, ChangeSignInActivity.class));
+    }
+
+    private ContentValues getDownloadInfo(File file) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.Downloads.TITLE, file.getName());
+        contentValues.put(MediaStore.Downloads.DISPLAY_NAME, file.getName());
+        contentValues.put(MediaStore.Downloads.MIME_TYPE, "text/plain");
+        contentValues.put(MediaStore.Downloads.SIZE, file.length());
+
+        // If the API is new enough, put in a folder. Otherwise, just put in Downloads directory
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentValues.put(
+                    MediaStore.Downloads.RELATIVE_PATH,
+                    Environment.DIRECTORY_DOWNLOADS + File.separator + "Borum Jot Exported Data"
+            );
+        }
+
+        return contentValues;
     }
 }
