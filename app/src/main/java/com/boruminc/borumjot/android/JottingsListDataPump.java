@@ -1,22 +1,56 @@
 package com.boruminc.borumjot.android;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.boruminc.borumjot.Jotting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-public class JottingsListDataPump {
-    public static HashMap<String, ArrayList<Jotting>> getData() {
-        HashMap<String, List<Jotting>> expandableListDetail = new HashMap<>();
+@RequiresApi(api = Build.VERSION_CODES.N)
+class JottingsListDataPump {
+    private HashMap<String, ArrayList<Jotting>> data;
 
-        List<Jotting> usersOwnJottings = new ArrayList<Jotting>();
+    JottingsListDataPump() {
+        data = loadData();
+    }
 
-        List<Jotting> sharedJottings = new ArrayList<Jotting>();
+    private HashMap<String, ArrayList<Jotting>> loadData() {
+        HashMap<String, ArrayList<Jotting>> data = new HashMap<>();
 
-        expandableListDetail.put("own", usersOwnJottings);
-        expandableListDetail.put("shared", sharedJottings);
+        for (String title : getKeys())
+            data.put(title, new ArrayList<>());
 
-        return expandableListDetail;
+        return data;
+    }
+
+    static ArrayList<String> getKeys() {
+        ArrayList<String> titles = new ArrayList<String>();
+        titles.add("own");
+        titles.add("shared");
+
+        return titles;
+    }
+
+    HashMap<String, ArrayList<Jotting>> getData() {
+        return data;
+    }
+
+    ArrayList<Jotting> getOwnData() {
+        return data.get("own");
+    }
+
+    void setOwnData(ArrayList<Jotting> newOwnData) {
+        data.replace("own", newOwnData);
+    }
+
+    ArrayList<Jotting> getSharedData() {
+        return data.get("shared");
+    }
+
+    void setSharedData(ArrayList<Jotting> newSharedData) {
+        data.replace("shared", newSharedData);
     }
 }

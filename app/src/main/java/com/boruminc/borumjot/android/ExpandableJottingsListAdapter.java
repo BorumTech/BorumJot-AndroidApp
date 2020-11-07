@@ -2,11 +2,14 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 
 import com.boruminc.borumjot.Jotting;
 
@@ -15,25 +18,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+@RequiresApi(api = Build.VERSION_CODES.N)
 public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> jottingsListTitles;
-    private HashMap<String, List<Jotting>> allJottingsLists;
+    private List<String> jottingsListKeys;
+    private HashMap<String, ArrayList<Jotting>> allJottingsLists;
 
     ExpandableJottingsListAdapter(Context c) {
         context = c;
-        jottingsListTitles = loadJottingsListTitles();
+        jottingsListKeys = JottingsListDataPump.getKeys();
+        jottingsListTitles = loadTitles();
     }
 
-    public void setAllJottingsLists(HashMap<String, List<Jotting>> allJottingsLists) {
+    private ArrayList<String> loadTitles() {
+        ArrayList<String> titles = new ArrayList<String>();
+        titles.add("My Jottings");
+        titles.add("Shared Jottings");
+        return titles;
+    }
+
+    void setAllJottingsLists(HashMap<String, ArrayList<Jotting>> allJottingsLists) {
         this.allJottingsLists = allJottingsLists;
-    }
-
-    private ArrayList<String> loadJottingsListTitles() {
-        ArrayList<String> jottingsListTitles = new ArrayList<String>();
-        jottingsListTitles.add("own");
-        jottingsListTitles.add("shared");
-        return jottingsListTitles;
     }
 
     @Override
@@ -43,7 +49,7 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return Objects.requireNonNull(this.allJottingsLists.get(this.jottingsListTitles.get(groupPosition))).size();
+        return Objects.requireNonNull(this.allJottingsLists.get(this.jottingsListKeys.get(groupPosition))).size();
     }
 
     @Override
@@ -53,7 +59,7 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        List<Jotting> currentJottingsListGroup = this.allJottingsLists.get(this.jottingsListTitles.get(groupPosition));
+        List<Jotting> currentJottingsListGroup = this.allJottingsLists.get(this.jottingsListKeys.get(groupPosition));
         if (currentJottingsListGroup != null)
             return currentJottingsListGroup.get(childPosition);
         else
@@ -77,17 +83,16 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        String listTitle = (String) getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert inflater != null;
             convertView = inflater.inflate(R.layout.list_group, null);
         }
 
-        TextView listTitleTextView = (TextView) convertView
-                .findViewById(R.id.jotting_name);
+        TextView listTitleTextView = convertView
+                .findViewById(R.id.list_group_header);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
-        listTitleTextView.setText(listTitle);
+        listTitleTextView.setText(jottingsListTitles.get(groupPosition));
         return convertView;
     }
 
@@ -100,7 +105,7 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.jotting_list_item, null);
         }
 
-        TextView expandedListTextView = (TextView) convertView.findViewById(R.id.jotting_name);
+        TextView expandedListTextView = convertView.findViewById(R.id.jotting_name);
         expandedListTextView.setText(expandedListText);
         return convertView;
     }

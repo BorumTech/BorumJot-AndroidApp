@@ -48,10 +48,13 @@
         android:layout_below="@id/jot_filter_btns_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <androidx.recyclerview.widget.RecyclerView
+        <ExpandableListView
             android:id="@+id/home_jottings_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="0.5dp"
             />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

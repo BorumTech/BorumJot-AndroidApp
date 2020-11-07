@@ -1,5 +1,6 @@
 package com.boruminc.borumjot.android;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
@@ -11,12 +12,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.BaseAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -25,10 +30,10 @@ import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,12 +41,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+@RequiresApi(api = Build.VERSION_CODES.N)
 public class HomeActivity extends AppCompatActivity {
     private static final String JOTTINGS_ERROR = "The tasks and notes could not fetched at this time";
 
-    ExpandableJottingsListAdapter jottingsListAdapter;
-    ArrayList<Jotting> originalDataset;
-    HashMap<String, ArrayList<Jotting>> fullExpandableJottingMap;
+    private ExpandableJottingsListAdapter jottingsListAdapter;
+    private ArrayList<Jotting> originalDataset;
+    private HashMap<String, ArrayList<Jotting>> fullExpandableJottingMap;
+    private JottingsListDataPump jotListData;
+    private String userApiKey;
 
     /* Views */
     Button filterTasksBtn;
@@ -64,12 +72,16 @@ public class HomeActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressPanel);
         expandableListView = findViewById(R.id.home_jottings_list);
 
+        userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
+
+        // Set appbar title
         AppBarFragment appBarFragment = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.my_toolbar);
         if (appBarFragment != null) appBarFragment.passTitle("My Jottings");
 
-        // Specify an adapter (see also next example)
+        // Set list adapter and related variables
         jottingsListAdapter = new ExpandableJottingsListAdapter(this);
-        fullExpandableJottingMap = JottingsListDataPump.getData();
+        jotListData = new JottingsListDataPump();
+        fullExpandableJottingMap = jotListData.getData();
         expandableListView.setAdapter(jottingsListAdapter);
         expandableListView.setOnGroupExpandListener(groupPosition -> {
 
@@ -87,12 +99,6 @@ public class HomeActivity extends AppCompatActivity {
         // Set the refresh listener
         jottingsListRefresh = findViewById(R.id.refreshable_jottings_list);
         jottingsListRefresh.setOnRefreshListener(this::onJottingsListRefresh);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        new TaskRunner().executeAsync(getJottingsRequest(), this::handleJottingsResponse);
     }
 
     @Override
@@ -143,18 +149,15 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     }
 
-    /* Helper Methods */
+    /* Request Executors */
 
-    private ApiRequestExecutor getJottingsRequest() {
+    ApiRequestExecutor getJottingsRequest() {
         return new ApiRequestExecutor() {
             @Override
             protected void initialize() {
                 super.initialize();
                 setRequestMethod("GET");
-                addRequestHeader("Authorization", "Basic " +
-                        getSharedPreferences("user identification", Context.MODE_PRIVATE)
-                                .getString("apiKey", "")
-                );
+                addAuthorizationHeader(userApiKey);
             }
 
             @Override
@@ -165,50 +168,77 @@ public class HomeActivity extends AppCompatActivity {
         };
     }
 
-    private void handleJottingsResponse(JSONObject data) {
-        progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
-        try {
-            if (data != null) {
-                if (data.has("data") && data.getInt("statusCode") == 200) { // If data was returned
-                    JSONArray jottingsData = data.getJSONArray("data");
-                    originalDataset.clear();
+    ApiRequestExecutor getSharedJottingsRequest() {
+        return new ApiRequestExecutor() {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("GET");
+                addAuthorizationHeader(userApiKey);
+            }
 
-                    for (int i = 0; i < jottingsData.length(); i++) {
-                        JSONObject row = jottingsData.getJSONObject(i);
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeQueryString("sharednotes"));
+            }
+        };
+    }
 
-                        if (row.getString("source").equals("note"))
-                            originalDataset.add(JSONToModel.convertJSONToNote(row));
-                        else if (row.getString("source").equals("task"))
-                            originalDataset.add(JSONToModel.convertJSONToTask(row));
+    /* Response Handlers */
+
+    ApiResponseExecutor handleJottingsResponse() {
+        return new ApiResponseExecutor() {
+            @Override
+            public void onComplete(JSONObject data) {
+                super.onComplete(data);
+                progressBar.setVisibility(View.GONE); // Remove progress bar because the request is complete
+                try {
+                    if (ranOk()) { // If data was returned
+                        jotListData.setOwnData(JSONToModel.convertJSONToJottings(data.getJSONArray("data")));
+                        jottingsListAdapter.setAllJottingsLists(jotListData.getData());
+
+                        toggleFilter(filterTasksBtn, true);
+                        toggleFilter(filterNotesBtn, true);
+                    } else if (data.has("error") && data.getJSONObject("error").has("message")) {
+                        Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
                     }
-
-                    ArrayList<Jotting> ownList = fullExpandableJottingMap.get("own");
-                    assert ownList != null;
-                    ownList.clear();
-                    ownList.addAll(originalDataset);
-                    jottingsListAdapter.notifyDataSetChanged();
-
-                    toggleFilter(filterTasksBtn, true);
-                    toggleFilter(filterNotesBtn, true);
-
-                    return;
-                } else if (data.has("error") && data.getJSONObject("error").has("message")) {
-                    Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
+                } finally {
+                    jottingsListRefresh.setRefreshing(false);
                 }
             }
-            Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Toast.makeText(this, JOTTINGS_ERROR, Toast.LENGTH_LONG).show();
-        } finally {
-            jottingsListRefresh.setRefreshing(false);
-        }
+        };
+    }
+
+    ApiResponseExecutor handleSharedJottingsResponse() {
+        return new ApiResponseExecutor() {
+            @Override
+            public void onComplete(JSONObject result) {
+                super.onComplete(result);
+                try {
+                    if (ranOk()) {
+                        jotListData.setSharedData(JSONToModel.convertJSONToJottings(result.getJSONArray("data")));
+                        jottingsListAdapter.setAllJottingsLists(jotListData.getData());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "An error occurred and the shared notes could not be fetched", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
     }
 
     /* Event Handlers */
 
+    /**
+     * Event handler for when the user swipe refreshes the jottings list adapter
+     */
     public void onJottingsListRefresh() {
-        new TaskRunner().executeAsync(getJottingsRequest(), this::handleJottingsResponse);
+        new TaskRunner().executeAsync(getJottingsRequest(), handleJottingsResponse());
+        new TaskRunner().executeAsync(getSharedJottingsRequest(), handleSharedJottingsResponse());
     }
 
     /**
@@ -267,12 +297,12 @@ public class HomeActivity extends AppCompatActivity {
      * @param view The button that is used to toggle the filtration of notes from the list
      */
     public void onToggleNotesFilter(View view) {
-        final ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
+        final ArrayList<Jotting> dataset = fullExpandableJottingMap.get("own");
 
         toggleFilter(view);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (dataset != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (view.getTag().equals("off")) // Filter OUT
-                jottingsListAdapter.getDataset().removeIf(jotting -> jotting instanceof Note);
+                dataset.removeIf(jotting -> jotting instanceof Note);
             else if (view.getTag().equals("on")) { // Add BACK
                 for (Jotting jotting : originalDataset) {
                     if (jotting instanceof Note) {
@@ -292,10 +322,10 @@ public class HomeActivity extends AppCompatActivity {
      * @param view The button that is used to toggle the filtration of tasks from the list
      */
     public void onToggleTasksFilter(View view) {
-        final ArrayList<Jotting> dataset = jottingsListAdapter.getDataset();
+        final ArrayList<Jotting> dataset = fullExpandableJottingMap.get("own");
 
         toggleFilter(view);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (dataset != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (view.getTag().equals("off")) // Filter OUT
                 dataset.removeIf(jotting -> jotting instanceof Task);
             else if (view.getTag().equals("on")) { // Add BACK
@@ -313,7 +343,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets or removes the border and resets the tag of the button
+     * Toggles the border and resets the tag of the button
      * @param view The view that is filtering the jotting type
      */
     public void toggleFilter(View view) {
@@ -331,6 +361,11 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets or removes the border based on passed in flag
+     * @param view The view that is filtering the jotting type
+     * @param flag True to add the border; false to remove border
+     */
     public void toggleFilter(View view, boolean flag) {
         GradientDrawable filterBtn = (GradientDrawable) view.getBackground();
 
