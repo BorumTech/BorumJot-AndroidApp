@@ -10,13 +10,13 @@
         android:id="@+id/jotting_name"
         android:layout_width="0dp"
         app:layout_flexBasisPercent="90%"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         android:textSize="@dimen/formcontrol_txtSize" />
 
     <com.boruminc.borumjot.android.customviews.SerializableImage
         android:id="@+id/pin_icon"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         app:layout_flexBasisPercent="10%"
         android:src="@drawable/ic_pin"
         android:contentDescription="@string/pin_content_desc" />

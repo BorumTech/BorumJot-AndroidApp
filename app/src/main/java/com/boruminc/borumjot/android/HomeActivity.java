@@ -83,18 +83,6 @@ public class HomeActivity extends AppCompatActivity {
         jotListData = new JottingsListDataPump();
         fullExpandableJottingMap = jotListData.getData();
         expandableListView.setAdapter(jottingsListAdapter);
-        expandableListView.setOnGroupExpandListener(groupPosition -> {
-
-        });
-
-        expandableListView.setOnGroupCollapseListener(groupPosition -> {
-
-        });
-
-        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
-            //
-            return true;
-        });
 
         // Set the refresh listener
         jottingsListRefresh = findViewById(R.id.refreshable_jottings_list);
