@@ -52,7 +52,7 @@ public class JSONToModel {
     private static Note convertJSONToNote(JSONObject row) throws JSONException {
         // Set note information
         Note note = new Note(row.getString("title"));
-        note.setId(row.getInt("id"));
+        note.setId(row.has("note_id") ? row.getInt("note_id") : row.getInt("id"));
         note.setPriority(row.optInt("priority"));
 
         return note;

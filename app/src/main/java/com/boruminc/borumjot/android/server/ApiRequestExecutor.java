@@ -35,7 +35,7 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
          * Develop URL: https://borum-jot-api-git-develop.varun-singh.vercel.app/api/
          * Production URL: https://api.jot.bforborum.com/api/v1
          */
-        BORUM_JOT_REQUEST_URL("https://borum-jot-api-git-borumer-issue21.varun-singh.vercel.app/api/v1"),
+        BORUM_JOT_REQUEST_URL("https://api.jot.bforborum.com/api/v1"),
 
         BORUM_REQUEST_URL("https://api.bforborum.com/api");
 

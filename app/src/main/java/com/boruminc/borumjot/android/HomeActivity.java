@@ -82,7 +82,9 @@ public class HomeActivity extends AppCompatActivity {
         jottingsListAdapter = new ExpandableJottingsListAdapter(this);
         jotListData = new JottingsListDataPump();
         fullExpandableJottingMap = jotListData.getData();
+        jottingsListAdapter.setAllJottingsLists(fullExpandableJottingMap);
         expandableListView.setAdapter(jottingsListAdapter);
+        expandableListView.expandGroup(0);
 
         // Set the refresh listener
         jottingsListRefresh = findViewById(R.id.refreshable_jottings_list);
