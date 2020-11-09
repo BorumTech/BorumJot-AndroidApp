@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
@@ -86,24 +87,8 @@ public class OptionsActivity extends OptionsMenuItemActivity {
                             // Write JSONObject to file
                             fileWriter.write(result.toString());
 
-                            ContentValues downloadInfo = getDownloadInfo(file);
-                            ContentResolver database = getContentResolver();
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                database.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, downloadInfo);
-                            } else {
-                                DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                                if (downloadManager != null) {
-                                    downloadManager.addCompletedDownload(
-                                            file.getName(),
-                                            file.getName(),
-                                            true,
-                                            "text/plain",
-                                            file.getAbsolutePath(),
-                                            file.length(),
-                                            true
-                                    );
-                                }
-                            }
+                            downloadWithDeprecatedManager(file);
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -136,5 +121,27 @@ public class OptionsActivity extends OptionsMenuItemActivity {
         }
 
         return contentValues;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void downloadWithMediaStore(File file) {
+        ContentValues downloadInfo = getDownloadInfo(file);
+        ContentResolver database = getContentResolver();
+        database.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, downloadInfo);
+    }
+
+    private void downloadWithDeprecatedManager(File file) {
+        DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        if (downloadManager != null) {
+            downloadManager.addCompletedDownload(
+                    file.getName(),
+                    file.getName(),
+                    true,
+                    "text/plain",
+                    file.getAbsolutePath(),
+                    file.length(),
+                    true
+            );
+        }
     }
 }

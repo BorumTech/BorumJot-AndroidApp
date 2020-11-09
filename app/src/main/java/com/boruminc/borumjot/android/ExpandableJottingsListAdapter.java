@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,6 +140,7 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
 
         ChildViewHolder holder = new ChildViewHolder(convertView, context);
         holder.bindView(jotting);
+        Log.d("Holder", jotting.toString());
 
         return convertView;
     }
@@ -258,7 +260,10 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
             bundle.putSerializable("data", (Serializable) v.getTag());
             bundle.putSerializable("view", pinIcon);
 
-            currentActivity.getSupportFragmentManager().findFragmentById(R.id.jotting_options_toolbar).setArguments(bundle);
+            Objects.requireNonNull(currentActivity
+                    .getSupportFragmentManager()
+                    .findFragmentById(R.id.jotting_options_toolbar))
+                    .setArguments(bundle);
 
             return true;
         }
