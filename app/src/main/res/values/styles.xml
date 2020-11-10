@@ -36,8 +36,14 @@
 
     <style name="ShareField" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:layout_width">@dimen/button_width</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:layout_marginTop">40dp</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+
+    <style name="ShareeList">
+        <item name="android:layout_margin">10dp</item>
     </style>
 
     <style name="NoteArea" parent="Widget.AppCompat.EditText">

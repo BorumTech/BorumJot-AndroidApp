@@ -4,6 +4,7 @@ import com.boruminc.borumjot.*;
 import org.json.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Class for converting <code>JSONObject</code>s
@@ -74,5 +75,21 @@ public class JSONToModel {
                 data.getInt("label_id"),
                 data.getString("name")
         );
+    }
+
+    /**
+     * Converts JSONArray to HashSet of email <code>String</code>s
+     * @param data The JSONArray
+     * @return HashSet of Strings
+     * @throws JSONException If the email property doesn't exist in any of the objects in the arrays
+     */
+    public static HashSet<String> convertJSONToUserEmails(JSONArray data) throws JSONException {
+        HashSet<String> emails = new HashSet<>();
+
+        for (int i = 0; i < data.length(); i++) {
+            emails.add(data.getJSONObject(i).getString("email"));
+        }
+
+        return emails;
     }
 }

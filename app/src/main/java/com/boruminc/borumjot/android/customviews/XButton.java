@@ -13,24 +13,30 @@ public class XButton extends AppCompatImageButton {
 
     public XButton(Context context) {
         super(context);
-        paint = new Paint();
+        initialize();
     }
 
     public XButton(Context context, AttributeSet attribute_set ) {
         super(context, attribute_set);
-        paint = new Paint();
+        initialize();
     }
 
-    public XButton( Context context, AttributeSet attribute_set, int def_style_attribute ) {
+    public XButton(Context context, AttributeSet attribute_set, int def_style_attribute ) {
         super(context, attribute_set, def_style_attribute);
+        initialize();
+    }
+
+    private void initialize() {
         paint = new Paint();
+        setBackground(null);
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         float width = getMeasuredWidth();
         float height = getMeasuredHeight();
-        paint.setColor(Color.BLACK);
+        paint.setColor(Color.RED);
+        paint.setStrokeWidth(2);
         canvas.drawLine(0,0,width,height,paint);
         canvas.drawLine(width,0,0,height,paint);
     }

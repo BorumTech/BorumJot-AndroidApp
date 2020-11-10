@@ -190,7 +190,7 @@ public class HomeActivity extends AppCompatActivity {
 
                         toggleFilter(filterTasksBtn, true);
                         toggleFilter(filterNotesBtn, true);
-                    } else if (data.has("error") && data.getJSONObject("error").has("message")) {
+                    } else if (data != null && data.has("error") && data.getJSONObject("error").has("message")) {
                         Log.e("Fetch Error", data.getJSONObject("error").getString("message"));
                     }
                 } catch (JSONException e) {

@@ -12,10 +12,11 @@ import java.util.Set;
  * @implSpec Can NOT send notifications about the content of the Note
  */
 public class Note extends Jotting implements Comparable<Jotting> {
-    private Set<String> sharees;
+    private HashSet<String> sharees;
 
     public Note(String n) {
         super(n);
+        sharees = new HashSet<>();
     }
 
     public Note(String n, String body, ArrayList<Label> labels) {
@@ -27,7 +28,11 @@ public class Note extends Jotting implements Comparable<Jotting> {
      * @return The value of the sharees PIV
      */
     public HashSet<String> getSharees() {
-        return (HashSet<String>) sharees;
+        return sharees;
+    }
+
+    public void setSharees(HashSet<String> newSharees) {
+        sharees = newSharees;
     }
 
     /**
@@ -36,8 +41,12 @@ public class Note extends Jotting implements Comparable<Jotting> {
      * @param newSharee The person who is requested to become a sharee for this note
      * @return Whether the new sharee was added
      */
-    public boolean addSharee(String newSharee) {
-        return sharees.add(newSharee);
+    public void addSharee(String newSharee) {
+        sharees.add(newSharee);
+    }
+
+    public boolean removeSharee(String existingSharee) {
+        return sharees.remove(existingSharee);
     }
 
     @NonNull
