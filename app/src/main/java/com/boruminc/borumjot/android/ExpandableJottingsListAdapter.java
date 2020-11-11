@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
@@ -42,6 +42,9 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
         context = c;
         jottingsListKeys = JottingsListDataPump.getKeys();
         jottingsListTitles = loadTitles();
+        allJottingsLists = new HashMap<>();
+        allJottingsLists.put("own", new ArrayList<>());
+        allJottingsLists.put("shared", new ArrayList<>());
     }
 
     private ArrayList<String> loadTitles() {
@@ -51,8 +54,20 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
         return titles;
     }
 
-    void setAllJottingsLists(HashMap<String, ArrayList<Jotting>> allJottingsLists) {
-        this.allJottingsLists = allJottingsLists;
+    ArrayList<Jotting> getOwnData() {
+        return this.allJottingsLists.get("own");
+    }
+
+    void setOwnData(ArrayList<Jotting> ownedJottings) {
+        this.allJottingsLists.replace("own", ownedJottings);
+    }
+
+    ArrayList<Jotting> getSharedData() {
+        return this.allJottingsLists.get("shared");
+    }
+
+    void setSharedData(ArrayList<Jotting> sharedJottings) {
+        this.allJottingsLists.replace("shared", sharedJottings);
     }
 
     public ExpandableJottingsListAdapter.GroupTitleViewHolder onCreateDividerViewHolder(ViewGroup parent) {
@@ -140,7 +155,6 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
 
         ChildViewHolder holder = new ChildViewHolder(convertView, context);
         holder.bindView(jotting);
-        Log.d("Holder", jotting.toString());
 
         return convertView;
     }

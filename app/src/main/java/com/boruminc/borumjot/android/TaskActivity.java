@@ -70,6 +70,7 @@ public class TaskActivity extends JottingActivity {
 
         setJottingType("Task");
         if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog((dialog, which) -> {
+            setJottingData(new Task());
             TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
 
             if (titleTextView == null) { // Display error and exit if appbar title could not be found
@@ -495,6 +496,9 @@ public class TaskActivity extends JottingActivity {
                             if (data != null) {
                                 if (data.has("error"))
                                     Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
+                                else if (data.optInt("statusCode") == 200) {
+                                    getJottingData().setBody(getTaskDetails());
+                                }
                             }
                         }
                 );

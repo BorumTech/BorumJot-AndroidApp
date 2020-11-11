@@ -197,10 +197,8 @@ public class NoteActivity extends JottingActivity {
     }
 
     public void onDetailsBoxFocus(View view, boolean isFocused) {
-        Log.d("Focused", String.valueOf(isFocused));
         if (!isFocused) {
-
-            if (!getNoteData().getBody().equals(getNoteBody())) {
+            if (!getNoteBody().equals(getNoteData().getBody())) {
                 new TaskRunner().executeAsync(
                         new ApiRequestExecutor(getNoteBody()) {
                             @Override

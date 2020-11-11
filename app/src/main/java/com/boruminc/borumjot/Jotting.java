@@ -13,6 +13,11 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
     private int id;
     private int priority;
 
+    Jotting() {
+        name = "";
+        body = "";
+    }
+
     /**
      * Constructor for creating a new task
      * @param n The name

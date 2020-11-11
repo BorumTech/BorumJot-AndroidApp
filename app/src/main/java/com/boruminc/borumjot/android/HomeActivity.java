@@ -1,6 +1,5 @@
 package com.boruminc.borumjot.android;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
@@ -12,9 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.BaseAdapter;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
@@ -46,8 +42,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final String JOTTINGS_ERROR = "The tasks and notes could not fetched at this time";
 
     private ExpandableJottingsListAdapter jottingsListAdapter;
-    private ArrayList<Jotting> originalDataset;
-    private HashMap<String, ArrayList<Jotting>> fullExpandableJottingMap;
+
     private JottingsListDataPump jotListData;
     private String userApiKey;
 
@@ -67,11 +62,13 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.my_toolbar));
         findViewById(R.id.jotting_options_toolbar).setVisibility(View.INVISIBLE);
 
+        // Set the views
         filterNotesBtn = findViewById(R.id.home_notes_toggle);
         filterTasksBtn = findViewById(R.id.home_tasks_toggle);
         progressBar = findViewById(R.id.progressPanel);
         expandableListView = findViewById(R.id.home_jottings_list);
 
+        // Set the user api key
         userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
 
         // Set appbar title
@@ -81,8 +78,7 @@ public class HomeActivity extends AppCompatActivity {
         // Set list adapter and related variables
         jottingsListAdapter = new ExpandableJottingsListAdapter(this);
         jotListData = new JottingsListDataPump();
-        fullExpandableJottingMap = jotListData.getData();
-        jottingsListAdapter.setAllJottingsLists(fullExpandableJottingMap);
+
         expandableListView.setAdapter(jottingsListAdapter);
         expandableListView.expandGroup(0);
 
@@ -100,7 +96,6 @@ public class HomeActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        originalDataset = new ArrayList<Jotting>();
         onJottingsListRefresh();
     }
 
@@ -186,7 +181,8 @@ public class HomeActivity extends AppCompatActivity {
                 try {
                     if (ranOk()) { // If data was returned
                         jotListData.setOwnData(JSONToModel.convertJSONToJottings(data.getJSONArray("data")));
-                        jottingsListAdapter.setAllJottingsLists(jotListData.getData());
+                        jottingsListAdapter.setOwnData(jotListData.getOwnData());
+                        jottingsListAdapter.notifyDataSetChanged();
 
                         toggleFilter(filterTasksBtn, true);
                         toggleFilter(filterNotesBtn, true);
@@ -207,16 +203,17 @@ public class HomeActivity extends AppCompatActivity {
         return new ApiResponseExecutor() {
             @Override
             public void onComplete(JSONObject result) {
-                super.onComplete(result);
-                try {
-                    if (ranOk()) {
-                        jotListData.setSharedData(JSONToModel.convertJSONToJottings(result.getJSONArray("data")));
-                        jottingsListAdapter.setAllJottingsLists(jotListData.getData());
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "An error occurred and the shared notes could not be fetched", Toast.LENGTH_LONG).show();
+            super.onComplete(result);
+            try {
+                if (ranOk()) {
+                    jotListData.setSharedData(JSONToModel.convertJSONToJottings(result.getJSONArray("data")));
+                    jottingsListAdapter.setSharedData(jotListData.getSharedData());
+                    jottingsListAdapter.notifyDataSetChanged();
                 }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "An error occurred and the shared notes could not be fetched", Toast.LENGTH_LONG).show();
+            }
             }
         };
     }
@@ -287,18 +284,21 @@ public class HomeActivity extends AppCompatActivity {
      * @param view The button that is used to toggle the filtration of notes from the list
      */
     public void onToggleNotesFilter(View view) {
-        final ArrayList<Jotting> dataset = fullExpandableJottingMap.get("own");
+        final ArrayList<Jotting> dataset = jotListData.getOwnData();
 
         toggleFilter(view);
         if (dataset != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (view.getTag().equals("off")) // Filter OUT
-                dataset.removeIf(jotting -> jotting instanceof Note);
-            else if (view.getTag().equals("on")) { // Add BACK
-                for (Jotting jotting : originalDataset) {
+            if (view.getTag().equals("off")) { // Filter OUT
+                ArrayList<Jotting> ownData = new ArrayList<>(jottingsListAdapter.getOwnData());
+                ownData.removeIf(jotting -> jotting instanceof Note);
+                jottingsListAdapter.setOwnData(ownData);
+            } else if (view.getTag().equals("on")) { // Add BACK
+                for (Jotting jotting : jotListData.getOwnData()) {
                     if (jotting instanceof Note) {
-                        dataset.add(jotting);
+                        jottingsListAdapter.getOwnData().add(jotting);
                     }
                 }
+                jottingsListAdapter.setOwnData(dataset);
             }
         } else {
             Toast.makeText(this, "Your device is too old to support jotting filtering", Toast.LENGTH_LONG).show();
@@ -312,24 +312,25 @@ public class HomeActivity extends AppCompatActivity {
      * @param view The button that is used to toggle the filtration of tasks from the list
      */
     public void onToggleTasksFilter(View view) {
-        final ArrayList<Jotting> dataset = fullExpandableJottingMap.get("own");
-
         toggleFilter(view);
-        if (dataset != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (view.getTag().equals("off")) // Filter OUT
-                dataset.removeIf(jotting -> jotting instanceof Task);
-            else if (view.getTag().equals("on")) { // Add BACK
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (view.getTag().equals("off")) {// Filter OUT
+                ArrayList<Jotting> ownData = new ArrayList<>(jottingsListAdapter.getOwnData());
+                ownData.removeIf(jotting -> jotting instanceof Task);
+                jottingsListAdapter.setOwnData(ownData);
+            } else if (view.getTag().equals("on")) { // Add BACK
+                ArrayList<Jotting> originalDataset = jotListData.getOwnData();
                 for (Jotting jotting : originalDataset) {
                     if (jotting instanceof Task) {
-                        dataset.add(jotting);
+                        jottingsListAdapter.getOwnData().add(jotting);
                     }
                 }
             }
+
+            jottingsListAdapter.notifyDataSetChanged();
         } else {
             Toast.makeText(this, "Your device is too old to support jotting filtering", Toast.LENGTH_LONG).show();
         }
-
-        jottingsListAdapter.notifyDataSetChanged();
     }
 
     /**

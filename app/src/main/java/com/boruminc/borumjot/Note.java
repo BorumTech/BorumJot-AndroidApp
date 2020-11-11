@@ -14,6 +14,10 @@ import java.util.Set;
 public class Note extends Jotting implements Comparable<Jotting> {
     private HashSet<String> sharees;
 
+    public Note() {
+        super();
+    }
+
     public Note(String n) {
         super(n);
         sharees = new HashSet<>();
