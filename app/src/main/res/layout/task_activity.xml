@@ -53,7 +53,7 @@
 
             <TableLayout
                 android:id="@+id/task_subtasks_box"
-                style="@style/SubtaskList" />t
+                style="@style/SubtaskList" />
 
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/task_labels_box"

@@ -298,7 +298,6 @@ public class HomeActivity extends AppCompatActivity {
                         jottingsListAdapter.getOwnData().add(jotting);
                     }
                 }
-                jottingsListAdapter.setOwnData(dataset);
             }
         } else {
             Toast.makeText(this, "Your device is too old to support jotting filtering", Toast.LENGTH_LONG).show();
@@ -314,7 +313,7 @@ public class HomeActivity extends AppCompatActivity {
     public void onToggleTasksFilter(View view) {
         toggleFilter(view);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (view.getTag().equals("off")) {// Filter OUT
+            if (view.getTag().equals("off")) { // Filter OUT
                 ArrayList<Jotting> ownData = new ArrayList<>(jottingsListAdapter.getOwnData());
                 ownData.removeIf(jotting -> jotting instanceof Task);
                 jottingsListAdapter.setOwnData(ownData);
