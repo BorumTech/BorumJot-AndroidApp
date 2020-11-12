@@ -67,11 +67,6 @@
         <activity android:name=".ChangeSignInActivity"
             android:label="Change Sign In"
             android:parentActivityName=".OptionsActivity"/>
-
-        <provider
-            android:authorities="com.boruminc.borumjot.android.TasksProvider"
-            android:name="com.boruminc.borumjot.android.TasksProvider"
-            android:exported="false" />
     </application>
 
 </manifest>
