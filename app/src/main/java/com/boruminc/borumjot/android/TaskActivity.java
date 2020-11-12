@@ -124,6 +124,7 @@ public class TaskActivity extends JottingActivity {
             setJottingName(getJottingData().getName());
             setTaskDetails(getJottingData().getBody());
             setTaskStatus(getTaskData().isCompleted());
+            setDueDate(getTaskData().getDueDate());
             loadSubtasks(); // Set subtasks asynchronously
         }
 
@@ -215,7 +216,10 @@ public class TaskActivity extends JottingActivity {
                 @Override
                 public JSONObject call() {
                     super.call();
-                    return this.connectToApi(encodeQueryString("task", "due_date=" + chosenDueDate.getTime()));
+                    return this.connectToApi(encodeQueryString(
+                            "task",
+                            "id=" + getTaskData().getId(),
+                            "due_date=" + (chosenDueDate.getTime() / 1000)));
                 }
             };
 
@@ -223,11 +227,22 @@ public class TaskActivity extends JottingActivity {
                 @Override
                 public void onComplete(JSONObject result) {
                     super.onComplete(result);
-                    if (ranOk()) setDueDate(chosenDueDate);
+                    try {
+                        if (ranOk()) {
+                            Log.d("Due Date after update", String.valueOf(chosenDueDate.getTime()));
+                            setDueDate(chosenDueDate);
+                            getTaskData().setDueDate(chosenDueDate);
+                        } else if (result.has("error") && result.getJSONObject("error").has("message")) {
+                            String errorMessage = result.getJSONObject("error").getString("message");
+                            Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             };
 
-            setDueDate(chosenDueDate);
+            new TaskRunner().executeAsync(updateDueDateRequest, updateDueDateResponse);
         };
 
         View.OnClickListener onDueDateBtnClick = v -> {
@@ -241,6 +256,7 @@ public class TaskActivity extends JottingActivity {
         };
 
         findViewById(R.id.due_date_btn).setOnClickListener(onDueDateBtnClick);
+        setDueDate(getTaskData().getDueDate());
     }
 
     /**
@@ -342,9 +358,14 @@ public class TaskActivity extends JottingActivity {
     }
 
     private void setDueDate(Date dueDate) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.US);
-        String formattedDate = simpleDateFormat.format(dueDate);
-        ((TextView) findViewById(R.id.due_date)).setText(formattedDate);
+        TextView dueDateView = findViewById(R.id.due_date);
+        if (dueDate != null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.US);
+            String formattedDate = simpleDateFormat.format(dueDate);
+            dueDateView.setText(formattedDate);
+        } else {
+            dueDateView.setText(R.string.no_due_date);
+        }
     }
 
     private void addSubtask(Task subtask, int index) {

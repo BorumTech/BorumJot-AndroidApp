@@ -85,4 +85,5 @@
     <string name="prompt_confirm_new_password">Confirm New Password</string>
     <string name="new_task_content_desc">\"Plus\" floating action button</string>
     <string name="action_due_date">Due Date</string>
+    <string name="no_due_date">No Due Date</string>
 </resources>
