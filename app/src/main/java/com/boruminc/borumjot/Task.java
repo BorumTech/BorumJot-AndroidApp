@@ -11,6 +11,7 @@ public class Task extends Jotting implements Comparable<Jotting> {
   private Date timeCreated;
   private boolean completed;
   private ArrayList<Task> subtasks;
+  private Date dueDate;
 
   public Task() {
     super();
@@ -76,5 +77,13 @@ public class Task extends Jotting implements Comparable<Jotting> {
 
   public void addSubtask(Task newSubtask) {
     subtasks.add(newSubtask);
+  }
+
+  public Date getDueDate() {
+    return dueDate;
+  }
+
+  public void setDueDate(Date newDate) {
+    dueDate = newDate;
   }
 }

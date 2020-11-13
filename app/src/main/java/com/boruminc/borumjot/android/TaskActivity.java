@@ -1,19 +1,23 @@
 package com.boruminc.borumjot.android;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -31,16 +35,24 @@ import com.boruminc.borumjot.android.customviews.EditTextV2;
 import com.boruminc.borumjot.android.customviews.XButton;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
+import com.boruminc.borumjot.android.server.Callback;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.datepicker.MaterialStyledDatePickerDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class TaskActivity extends JottingActivity {
     /* Views */
@@ -114,6 +126,7 @@ public class TaskActivity extends JottingActivity {
             setJottingName(getJottingData().getName());
             setTaskDetails(getJottingData().getBody());
             setTaskStatus(getTaskData().isCompleted());
+            setDueDate(getTaskData().getDueDate());
             loadSubtasks(); // Set subtasks asynchronously
         }
 
@@ -122,6 +135,8 @@ public class TaskActivity extends JottingActivity {
 
         if (getJottingData() != null)
             new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
+
+        handleDueDates();
     }
 
     @Override
@@ -188,6 +203,79 @@ public class TaskActivity extends JottingActivity {
 
     }
 
+    private void handleDueDates() {
+        DatePickerDialog.OnDateSetListener onDueDateSetListener = (view, year, month, dayOfMonth) -> {
+            Date chosenDueDate = Date.valueOf(year + "-" + (month + 1) + "-" + dayOfMonth);
+
+            ApiRequestExecutor updateDueDateRequest = new ApiRequestExecutor() {
+                @Override
+                protected void initialize() {
+                    super.initialize();
+                    setRequestMethod("PUT");
+                    addAuthorizationHeader(getUserApiKey());
+                }
+
+                @Override
+                public JSONObject call() {
+                    super.call();
+                    return this.connectToApi(encodeQueryString(
+                            "task",
+                            "id=" + getTaskData().getId(),
+                            "due_date=" + (chosenDueDate.getTime() / 1000)));
+                }
+            };
+
+            ApiResponseExecutor updateDueDateResponse = new ApiResponseExecutor() {
+                @Override
+                public void onComplete(JSONObject result) {
+                    super.onComplete(result);
+                    try {
+                        if (ranOk()) {
+                            Log.d("Due Date after update", String.valueOf(chosenDueDate.getTime()));
+                            setDueDate(chosenDueDate);
+                            getTaskData().setDueDate(chosenDueDate);
+                        } else if (result.has("error") && result.getJSONObject("error").has("message")) {
+                            String errorMessage = result.getJSONObject("error").getString("message");
+                            Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            new TaskRunner().executeAsync(updateDueDateRequest, updateDueDateResponse);
+        };
+
+        View.OnClickListener onDueDateBtnClick = v -> {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Date dueDate = getTaskData().getDueDate();
+                LocalDate localDate = dueDate != null ?
+                        dueDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() :
+                        LocalDate.now();
+
+                int month = localDate.getMonthValue();
+                int dayOfMonth = localDate.getDayOfMonth();
+                int year = localDate.getYear();
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        this,
+                        onDueDateSetListener,
+                        year,
+                        month - 1,
+                        dayOfMonth
+                );
+                datePickerDialog.setOnDateSetListener(onDueDateSetListener);
+                datePickerDialog.show();
+            } else {
+                Toast.makeText(this, "Your phone is too old to support due dates. Try on the web app", Toast.LENGTH_LONG).show();
+            }
+        };
+
+        findViewById(R.id.due_date_btn).setOnClickListener(onDueDateBtnClick);
+        setDueDate(getTaskData().getDueDate());
+    }
+
     /**
      * Calls {@link JottingActivity#displayRenameDialog(DialogInterface.OnClickListener)}
      * with "Task" as the second parameter
@@ -212,6 +300,10 @@ public class TaskActivity extends JottingActivity {
         if (appBarFrag != null) appBarFrag.passTitle(name);
     }
 
+    /**
+     * Updates the UI for labels
+     * @param labels The new labels list
+     */
     protected void setLabels(ArrayList<Label> labels) {
         FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
                 (int) getResources().getDimension(R.dimen.label_btn_width),
@@ -237,10 +329,18 @@ public class TaskActivity extends JottingActivity {
         return (Task) getJottingData();
     }
 
+    /**
+     * Gets the UI's task details
+     * @return The currently displayed text of the description box
+     */
     private String getTaskDetails() {
         return taskDescriptionBox.getText().toString();
     }
 
+    /**
+     * Sets the task details in the UI
+     * @param body The new body of the task
+     */
     private void setTaskDetails(String body) {
         taskDescriptionBox.setText(body);
     }
@@ -272,6 +372,17 @@ public class TaskActivity extends JottingActivity {
         addSubtaskLayout.addView(addSubtaskBtn);
         addSubtaskLayout.addView(newSubtaskField);
         subtaskList.addView(addSubtaskLayout);
+    }
+
+    private void setDueDate(Date dueDate) {
+        TextView dueDateView = findViewById(R.id.due_date);
+        if (dueDate != null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.US);
+            String formattedDate = simpleDateFormat.format(dueDate);
+            dueDateView.setText(formattedDate);
+        } else {
+            dueDateView.setText(R.string.no_due_date);
+        }
     }
 
     private void addSubtask(Task subtask, int index) {

@@ -60,6 +60,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/FlexibleListBox" />
+
+            <LinearLayout
+                style="@style/DueDateRow">
+                <ImageButton
+                    android:id="@+id/due_date_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:contentDescription="@string/action_due_date" />
+
+                <TextView
+                    android:id="@+id/due_date"
+                    style="@style/DueDateLabel"
+                    android:text="@string/action_due_date" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>

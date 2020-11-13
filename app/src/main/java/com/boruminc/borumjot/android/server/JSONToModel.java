@@ -1,10 +1,21 @@
 package com.boruminc.borumjot.android.server;
 
-import com.boruminc.borumjot.*;
-import org.json.*;
+import android.util.Log;
 
+import com.boruminc.borumjot.Jotting;
+import com.boruminc.borumjot.Label;
+import com.boruminc.borumjot.Note;
+import com.boruminc.borumjot.Task;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 
 /**
  * Class for converting <code>JSONObject</code>s
@@ -46,6 +57,11 @@ public class JSONToModel {
         task.setId(row.getInt("id"));
         task.setCompleted(row.optString("completed").equals("1"));
         task.setPriority(row.optInt("priority"));
+
+        if (!row.isNull("due_date")) {
+            Date dueDate = new Date(row.getLong("due_date") * 1000);
+            task.setDueDate(dueDate);
+        }
 
         return task;
     }
