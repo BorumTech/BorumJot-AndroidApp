@@ -4,6 +4,7 @@
     package="com.boruminc.borumjot.android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <application
         android:icon="@mipmap/icon"
@@ -67,6 +68,8 @@
         <activity android:name=".ChangeSignInActivity"
             android:label="Change Sign In"
             android:parentActivityName=".OptionsActivity"/>
+
+        <receiver android:name=".TaskNotificationPublisher" />
     </application>
 
 </manifest>

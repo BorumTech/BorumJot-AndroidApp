@@ -1,33 +1,34 @@
 package com.boruminc.borumjot.android;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
@@ -35,13 +36,11 @@ import com.boruminc.borumjot.android.customviews.EditTextV2;
 import com.boruminc.borumjot.android.customviews.XButton;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
-import com.boruminc.borumjot.android.server.Callback;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.android.material.datepicker.MaterialStyledDatePickerDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,7 +50,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Locale;
 
 public class TaskActivity extends JottingActivity {
@@ -244,7 +242,15 @@ public class TaskActivity extends JottingActivity {
                 }
             };
 
-            new TaskRunner().executeAsync(updateDueDateRequest, updateDueDateResponse);
+            new TaskRunner().executeAsync(updateDueDateRequest, updateDueDateResponse); // Update due date
+
+            // Schedule a notification for all tasks whose due date are set in the future
+            java.util.Date currentDate = new java.util.Date();
+            if (chosenDueDate.getTime() >= currentDate.getTime()) {
+                long delay = chosenDueDate.getTime() - currentDate.getTime();
+                delay -= 24 * 3600 * 1000; // Clock back a day
+                scheduleTaskDueDateNotification(delay);
+            }
         };
 
         View.OnClickListener onDueDateBtnClick = v -> {
@@ -288,6 +294,46 @@ public class TaskActivity extends JottingActivity {
         ImageButton imageBtn = new ImageButton(this);
         imageBtn.setBackgroundResource(R.drawable.floating_action_btn);
         return imageBtn;
+    }
+
+    /**
+     * Sends notification at 1200 hours GMT the day before the set due date
+     */
+    private void scheduleTaskDueDateNotification(long delay) {
+        final String PACKAGE_NAME = "com.boruminc.borumjot.android";
+        final String CATEGORY_NAME = "Tasks";
+        final int NOTIFICATION_ID = 5 * getTaskData().getId() + getTaskData().getUserId() % 4;
+
+        Intent notificationIntent = new Intent(getApplicationContext(), TaskNotificationPublisher.class);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "default")
+                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .setContentTitle("Reminder for " + getTaskData().getName())
+                .setContentText("\"" + getTaskData().getName() + "\" is due tomorrow")
+                .setAutoCancel(true)
+                .setCategory(CATEGORY_NAME)
+                .setChannelId(PACKAGE_NAME);
+
+        Notification notification = notificationBuilder.build();
+
+        notificationIntent.putExtra("notification", notification);
+        notificationIntent.putExtra("notification_id", NOTIFICATION_ID);
+
+        // Use Intent with same info as current intent
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                getApplicationContext(),
+                NOTIFICATION_ID,
+                notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        notificationBuilder.setContentIntent(pendingIntent);
+
+        long futureInMillis = SystemClock.elapsedRealtime() + delay;
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
+        }
     }
 
     /* Getter and Setter Methods */
