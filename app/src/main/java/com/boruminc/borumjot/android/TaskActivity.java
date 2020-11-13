@@ -48,6 +48,8 @@ import org.json.JSONObject;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -246,8 +248,23 @@ public class TaskActivity extends JottingActivity {
         };
 
         View.OnClickListener onDueDateBtnClick = v -> {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(this);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Date dueDate = getTaskData().getDueDate();
+                LocalDate localDate = dueDate != null ?
+                        dueDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() :
+                        LocalDate.now();
+
+                int month = localDate.getMonthValue();
+                int dayOfMonth = localDate.getDayOfMonth();
+                int year = localDate.getYear();
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        this,
+                        onDueDateSetListener,
+                        year,
+                        month - 1,
+                        dayOfMonth
+                );
                 datePickerDialog.setOnDateSetListener(onDueDateSetListener);
                 datePickerDialog.show();
             } else {
