@@ -131,10 +131,10 @@ public class TaskActivity extends JottingActivity {
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
         findViewById(R.id.appbar).setOnLongClickListener(this::onRenameJotting);
 
-        if (getJottingData() != null)
+        if (getJottingData() != null) {
             new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
-
-        handleDueDates();
+            handleDueDates();
+        }
     }
 
     @Override
