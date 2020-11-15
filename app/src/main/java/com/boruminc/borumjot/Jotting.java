@@ -1,7 +1,6 @@
 package com.boruminc.borumjot;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,6 +15,8 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
     Jotting() {
         name = "";
         body = "";
+        labels = new ArrayList<Label>();
+        priority = 0;
     }
 
     /**
@@ -26,6 +27,7 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
         name = n;
         labels = new ArrayList<Label>();
         body = "";
+        priority = 0;
     }
 
     /**

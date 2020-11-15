@@ -15,6 +15,9 @@ public class Task extends Jotting implements Comparable<Jotting> {
 
   public Task() {
     super();
+    subtasks = new ArrayList<Task>();
+    completed = false;
+    status = 0;
   }
 
   public Task(String n) {

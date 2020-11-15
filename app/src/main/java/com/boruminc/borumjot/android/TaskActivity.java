@@ -111,10 +111,18 @@ public class TaskActivity extends JottingActivity {
                         if (data.has("error") && data.getJSONObject("error").has("message")) {
                             Toast.makeText(TaskActivity.this, "The task could not be created at this time. ",
                                     Toast.LENGTH_SHORT).show();
+                        } else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
+                            getJottingData().setName(titleTextView.getText().toString());
+                            getJottingData().setId(data.getJSONObject("data").getInt("id"));
+                            new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
+                            setDueDate(null);
+                            handleDueDates();
+                            setTaskStatus(false);
                         }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -522,7 +530,7 @@ public class TaskActivity extends JottingActivity {
                     public void onComplete(JSONObject data) {
                         super.onComplete(data);
                         if (data != null) {
-                            if (data.has("error") || ranOk()) {
+                            if (data.has("error") || !ranOk()) {
                                 Toast.makeText(getApplicationContext(), "An error occurred and the task could not be marked as "
                                     + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
                             } else {
@@ -562,9 +570,11 @@ public class TaskActivity extends JottingActivity {
                 }, data -> {
                     if (data != null) {
                         try {
-                            if (data.getInt("statusCode") == 200) {
+                            if (data.getInt("statusCode") >= 200 && data.getInt("statusCode") < 300) {
                                 Task subtask = new Task(newSubtaskField.getText().toString());
-                                addSubtask(subtask, getTaskData().getSubtasks().size());
+                                subtask.setId(data.getJSONObject("data").getInt("id"));
+                                getTaskData().getSubtasks().add(subtask);
+                                addSubtask(subtask, getTaskData().getSubtasks().size() - 1);
                                 ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
                         } catch (JSONException e) {
@@ -653,7 +663,7 @@ public class TaskActivity extends JottingActivity {
                             if (data != null) {
                                 if (data.has("error"))
                                     Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
-                                else if (data.optInt("statusCode") == 200) {
+                                else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
                                     getJottingData().setBody(getTaskDetails());
                                 }
                             }
