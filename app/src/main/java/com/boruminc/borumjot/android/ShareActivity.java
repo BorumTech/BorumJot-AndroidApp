@@ -255,6 +255,19 @@ public class ShareActivity extends FragmentActivity {
 
     public void onShareClick(View view) {
         EditText emailView = findViewById(R.id.share_email_field);
+
+        String userEmail = getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                .getString("email", "");
+        if (userEmail.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (userEmail.equals(emailView.getText().toString())) {
+            Toast.makeText(getApplicationContext(), "You cannot share with yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new TaskRunner().executeAsync(
                 getShareRequest(noteData.getId(), emailView.getText().toString()),
                 getShareResponse()
