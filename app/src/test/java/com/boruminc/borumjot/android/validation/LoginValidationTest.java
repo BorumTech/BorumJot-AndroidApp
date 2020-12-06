@@ -1,9 +1,6 @@
 package com.boruminc.borumjot.android.validation;
 
 import android.app.Activity;
-import android.content.Context;
-
-import com.boruminc.borumjot.android.validation.LoginValidation;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
