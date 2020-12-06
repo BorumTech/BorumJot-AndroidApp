@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.SlashNormalizer;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
@@ -24,6 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NoteActivity extends JottingActivity {
     /* Views */
@@ -138,8 +141,10 @@ public class NoteActivity extends JottingActivity {
                     try {
                         if (data != null && data.has("data") && data.getInt("statusCode") >= 200 && data.getInt("statusCode") < 300) {
                             // If response ran okay
-                            setNoteBody(data.getJSONObject("data").getString("body"));
-                            setNoteBody(getNoteBody().replace("\\n", "\n"));
+                            String bodyToDisplay = data.getJSONObject("data").getString("body");
+                            bodyToDisplay = SlashNormalizer.unescapeControlCharacters(bodyToDisplay);
+                            bodyToDisplay = SlashNormalizer.unescapeUserSlashes(bodyToDisplay);
+                            setNoteBody(bodyToDisplay);
                         } else {
                             Toast.makeText(this, "An error occurred and this note could not be fetched", Toast.LENGTH_SHORT).show();
                         }
