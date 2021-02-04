@@ -142,7 +142,6 @@ public class NoteActivity extends JottingActivity {
                         if (data != null && data.has("data") && data.getInt("statusCode") >= 200 && data.getInt("statusCode") < 300) {
                             // If response ran okay
                             String bodyToDisplay = data.getJSONObject("data").getString("body");
-                            bodyToDisplay = SlashNormalizer.unescapeControlCharacters(bodyToDisplay);
                             bodyToDisplay = SlashNormalizer.unescapeUserSlashes(bodyToDisplay);
                             setNoteBody(bodyToDisplay);
                         } else {

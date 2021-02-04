@@ -10,13 +10,10 @@ public final class SlashNormalizer {
      * @return
      */
     public static String unescapeControlCharacters(String escapedStr) {
-        //                    (?<!\\)  (\\)  ([nrt'"])
-        final String regex = "(?<!\\\\)(\\\\)([nrt'\"])";
-        final String subst = "\n";
-        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(escapedStr);
-
-        return matcher.replaceAll(subst);
+        return escapedStr
+                .replace("\\'", "'")
+                .replace("\\n", "\n")
+                .replace("\\\"", "\"");
     }
 
     /**
@@ -36,12 +33,9 @@ public final class SlashNormalizer {
                                                 [      ]
                                                  nrt' "
         */
-        final String userSlashesRegex = "(\\\\)([nrt'\"])";
-
-        final String userSubstr = "\\n";
-        final Pattern pattern = Pattern.compile(userSlashesRegex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(userSlashEscapedStr);
-
-        return matcher.replaceAll(userSubstr);
+        return userSlashEscapedStr
+                .replace("\\'", "'")
+                .replace("\\n", "\n")
+                .replace("\\\"", "\"");
     }
 }
