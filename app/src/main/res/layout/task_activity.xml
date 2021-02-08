@@ -47,6 +47,7 @@
 
             <com.boruminc.borumjot.android.customviews.EditTextV2
                 android:id="@+id/task_description_box"
+                android:layout_height="wrap_content"
                 android:hint="@string/prompt_details_fill"
                 android:inputType="textMultiLine"
                 style="@style/NoteArea" />

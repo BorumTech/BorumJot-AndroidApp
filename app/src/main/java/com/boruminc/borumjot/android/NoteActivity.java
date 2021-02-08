@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.SlashNormalizer;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
@@ -25,8 +26,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class NoteActivity extends JottingActivity {
     /* Views */
@@ -51,6 +50,7 @@ public class NoteActivity extends JottingActivity {
         setJottingType("Note");
         if (getIntent().getBooleanExtra("Rename", false)) {
             displayRenameDialog((dialog, which) -> {
+                setJottingData(new Note());
                 TextView titleTextView = ((Dialog) dialog).findViewById(R.id.jot_name_edit);
                 setJottingName(titleTextView.getText().toString());
                 new TaskRunner().executeAsync(new ApiRequestExecutor(titleTextView.getText().toString()) {
@@ -69,16 +69,21 @@ public class NoteActivity extends JottingActivity {
                         super.call();
                         return this.connectToApi(encodeQueryString("note"));
                     }
-                }, data -> {
-                    try {
-                        if (data != null) {
-                            if (data.has("error") && data.getJSONObject("error").has("message")) {
-                                Toast.makeText(NoteActivity.this, "The note could not be created at this time. ",
-                                        Toast.LENGTH_SHORT).show();
+                }, new ApiResponseExecutor() {
+                    @Override
+                    public void onComplete(JSONObject result) {
+                        super.onComplete(result);
+                        if (this.ranOk()) {
+                            getJottingData().setName(titleTextView.getText().toString());
+                            try {
+                                getJottingData().setId(result.getJSONObject("data").getInt("id"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                        } else {
+                            Toast.makeText(NoteActivity.this, "The note could not be created at this time. ",
+                                Toast.LENGTH_SHORT).show();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
                 });
             });

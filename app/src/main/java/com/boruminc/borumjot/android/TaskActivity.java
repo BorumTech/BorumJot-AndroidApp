@@ -37,6 +37,7 @@ import com.boruminc.borumjot.android.customviews.XButton;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
+import com.boruminc.borumjot.android.server.SlashNormalizer;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
@@ -396,7 +397,7 @@ public class TaskActivity extends JottingActivity {
      * @param body The new body of the task
      */
     private void setTaskDetails(String body) {
-        taskDescriptionBox.setText(body);
+        taskDescriptionBox.setText(SlashNormalizer.unescapeUserSlashes(body));
     }
 
     private void setTaskStatus(boolean on) {
@@ -651,27 +652,19 @@ public class TaskActivity extends JottingActivity {
     }
 
     private void onDetailsBoxFocus(View view, boolean isFocused) {
-        LinearLayout.LayoutParams layoutParams;
-        if (isFocused) {
-            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.extended_txtbox_height));
-        } else {
-            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            if (!getJottingData().getBody().equals(getTaskDetails())) {
-                new TaskRunner().executeAsync(
-                        new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + getJottingData().getId()}, new String[] {getTaskDetails()}), data -> {
-                            if (data != null) {
-                                if (data.has("error"))
-                                    Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
-                                else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
-                                    getJottingData().setBody(getTaskDetails());
-                                }
-                            }
+        if (!getJottingData().getBody().equals(getTaskDetails())) {
+            new TaskRunner().executeAsync(
+                new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + getJottingData().getId()}, new String[] {getTaskDetails()}), data -> {
+                    if (data != null) {
+                        if (data.has("error"))
+                            Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
+                        else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
+                            getJottingData().setBody(getTaskDetails());
                         }
-                );
-            }
+                    }
+                }
+            );
         }
-        view.setLayoutParams(layoutParams);
     }
 
     private void onSubtaskBoxFocus(View view, boolean isFocused) {
