@@ -79,7 +79,7 @@
     <string name="action_close">Close</string>
     <string name="pin_content_desc">A pin icon</string>
     <string name="action_new_label">Create New Label</string>
-    <string name="forum_link">http://meta.bforborum.com/Topics/Borum-Jot</string>
+    <string name="forum_link">http://meta.borumtech.com/Topics/Borum-Jot</string>
     <string name="action_delete_label">Delete Label</string>
     <string name="all_borum_products_msg">Changes will affect your sign in across all Borum products</string>
     <string name="prompt_confirm_new_password">Confirm New Password</string>

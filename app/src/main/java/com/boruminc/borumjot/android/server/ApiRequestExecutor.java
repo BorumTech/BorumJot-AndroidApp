@@ -33,11 +33,11 @@ public class ApiRequestExecutor implements Callable<JSONObject> {
         /**
          * The url for the Borum Jot REST API for making requests specific to Borum Jot
          * Develop URL: https://borum-jot-api-git-develop.varun-singh.vercel.app/api/
-         * Production URL: https://api.jot.bforborum.com/api/v1
+         * Production URL: https://api.jot.borumtech.com/api/v1
          */
-        BORUM_JOT_REQUEST_URL("https://api.jot.bforborum.com/api/v1"),
+        BORUM_JOT_REQUEST_URL("https://api.jot.borumtech.com/api/v1"),
 
-        BORUM_REQUEST_URL("https://api.bforborum.com/api");
+        BORUM_REQUEST_URL("https://api.borumtech.com/api");
 
         public final String url;
 
