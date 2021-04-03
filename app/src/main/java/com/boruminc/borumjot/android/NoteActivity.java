@@ -47,6 +47,8 @@ public class NoteActivity extends JottingActivity {
             setUserApiKey(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""));
         }
 
+        appBarFrag.passSaveButton().setOnClickListener(this::onSaveClick);
+
         setJottingType("Note");
         if (getIntent().getBooleanExtra("Rename", false)) {
             displayRenameDialog((dialog, which) -> {
@@ -208,41 +210,54 @@ public class NoteActivity extends JottingActivity {
     public void onDetailsBoxFocus(View view, boolean isFocused) {
         if (!isFocused) {
             if (!getNoteBody().equals(getNoteData().getBody())) {
-                new TaskRunner().executeAsync(
-                        new ApiRequestExecutor(getNoteBody()) {
-                            @Override
-                            protected void initialize() {
-                                super.initialize();
-                                setRequestMethod("PUT");
-                                addRequestHeader("Authorization", "Basic " + getUserApiKey());
-                                setQuery(encodePostQuery("body=%s"));
-                            }
-
-                            @Override
-                            public JSONObject call() {
-                                super.call();
-                                return this.connectToApi(encodeQueryString("note", "id=" + getNoteData().getId()));
-                            }
-                        }, data -> {
-                            try {
-                                if (data != null) {
-                                    if (data.has("error"))
-                                        Toast.makeText(this, data.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
-                                    else {
-                                        getNoteData().setBody(getNoteBody());
-                                        Log.d("body", getNoteData().getBody());
-                                    }
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(this, "The note was not updated due to a system error", Toast.LENGTH_LONG).show();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Toast.makeText(this, "An unknown error occurred", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
+                updateNoteBody(getNoteBody());
             }
         }
+    }
+
+    public void onSaveClick(View view) {
+        if (!getNoteBody().equals(getNoteData().getBody())) {
+            updateNoteBody(getNoteBody());
+            startActivity(new Intent(this, HomeActivity.class));
+        }
+    }
+
+    public void updateNoteBody(String newBody) {
+        new TaskRunner().executeAsync(getUpdateNoteBodyRequest(newBody), data -> {
+            try {
+                if (data != null) {
+                    if (data.has("error"))
+                        Toast.makeText(this, data.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
+                    else {
+                        getNoteData().setBody(getNoteBody());
+                        Log.d("body", getNoteData().getBody());
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "The note was not updated due to a system error", Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "An unknown error occurred", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private ApiRequestExecutor getUpdateNoteBodyRequest(String newBody) {
+        return new ApiRequestExecutor(newBody) {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("PUT");
+                addRequestHeader("Authorization", "Basic " + getUserApiKey());
+                setQuery(encodePostQuery("body=%s"));
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeQueryString("note", "id=" + getNoteData().getId()));
+            }
+        };
     }
 }

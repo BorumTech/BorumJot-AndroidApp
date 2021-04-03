@@ -13,6 +13,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <Button
+                android:id="@+id/save_btn"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:text="@string/action_save"
+                android:visibility="gone"
+                android:layout_marginLeft="@dimen/action_btn_margin"
+                android:layout_marginStart="@dimen/action_btn_margin" />
+
             <TextView
                 android:id="@+id/appbar_title"
                 style="@style/Widget.AppCompat.TextView"
