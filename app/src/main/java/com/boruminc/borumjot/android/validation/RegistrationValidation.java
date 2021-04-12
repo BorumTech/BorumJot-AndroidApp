@@ -1,6 +1,7 @@
 package com.boruminc.borumjot.android.validation;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -72,7 +73,13 @@ public class RegistrationValidation extends Validation {
                                 if (data != null) {
                                     if (data.isNull("error") && data.getInt("statusCode") == 200) {
                                         Intent homeIntent = new Intent(context, HomeActivity.class);
-                                        homeIntent.putExtra("api_key", data.getJSONObject("data").getString("api_key"));
+
+                                        // Set the API key in internal, private, app-specific storage (Shared Preferences)
+                                        context.getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                                                .edit()
+                                                .putString("apiKey", data.getJSONObject("data").getString("api_key"))
+                                                .apply();
+
                                         context.startActivity(homeIntent);
                                     } else if ((data.getJSONObject("error")).has("message")) {
                                         Toast.makeText(context, (String) ((JSONObject) data.get("error")).get("message"), Toast.LENGTH_LONG).show();
