@@ -5,13 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,13 +28,13 @@ import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.SerializableImage;
+import com.google.android.flexbox.FlexboxLayout;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
@@ -69,27 +74,6 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
 
     void setSharedData(ArrayList<Jotting> sharedJottings) {
         this.allJottingsLists.replace("shared", sharedJottings);
-    }
-
-    public ExpandableJottingsListAdapter.GroupTitleViewHolder onCreateDividerViewHolder(ViewGroup parent) {
-        // Create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_group, parent, false);
-        return new GroupTitleViewHolder(v, context);
-    }
-
-    public ExpandableJottingsListAdapter.ChildViewHolder onCreateChildViewHolder(ViewGroup parent) {
-        // Create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.jotting_list_item, parent, false);
-        return new ChildViewHolder(v, context);
-    }
-
-    /*
-     * Replace the contents of a view (invoked by the layout manager)
-     * Get element from the dataset at this position
-     * Replace the contents of the view with that element
-     */
-    public void onBindViewHolder(ExpandableListViewHolder holder, String key, int position) {
-        holder.bindView(Objects.requireNonNull(allJottingsLists.get(key)).get(position));
     }
 
     @Override
@@ -200,7 +184,6 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    // DONE ChildViewHolder
     static class ChildViewHolder extends ExpandableListViewHolder implements View.OnLongClickListener {
         private TextView textView;
         private SerializableImage pinIcon;
@@ -271,6 +254,8 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
             // Make visible and set data to jotting options toolbar
             temporaryAppBar.setVisibility(View.VISIBLE);
 
+            indicateSelection(v, currentActivity);
+
             Bundle bundle = new Bundle();
             bundle.putSerializable("data", (Serializable) v.getTag());
             bundle.putSerializable("view", pinIcon);
@@ -281,6 +266,31 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
                     .setArguments(bundle);
 
             return true;
+        }
+
+        private void indicateSelection(View v, Activity currentActivity) {
+            if (v instanceof FlexboxLayout) { // The row was long clicked
+                highlightItem((ViewGroup) v, currentActivity);
+            } else if (v.getParent() instanceof FlexboxLayout) { // One of the children was long clicked
+                highlightItem(v.getParent(), currentActivity);
+            }
+        }
+
+        private void highlightItem(ViewParent listItemRoot, Activity currentActivity) {
+            int backgroundForSelectedView = currentActivity.getResources().getColor(R.color.cherryRasboraBackgroundSurface);
+            Drawable defaultBackground = currentActivity.getResources().getDrawable(
+                    R.drawable.orange_border,
+                    currentActivity.getTheme()
+            );
+
+            ViewGroup listView = (ViewGroup) listItemRoot.getParent();
+
+            for (int i = 0; i < listView.getChildCount(); i++) {
+                if (listView.getChildAt(i) instanceof FlexboxLayout)
+                    listView.getChildAt(i).setBackground(defaultBackground);
+            }
+
+            ((View) listItemRoot).setBackgroundColor(backgroundForSelectedView);
         }
     }
 }

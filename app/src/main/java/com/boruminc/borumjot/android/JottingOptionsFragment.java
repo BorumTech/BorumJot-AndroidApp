@@ -3,11 +3,14 @@ package com.boruminc.borumjot.android;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -28,6 +31,8 @@ import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 public class JottingOptionsFragment extends Fragment {
     private View root;
@@ -96,7 +101,19 @@ public class JottingOptionsFragment extends Fragment {
                     root.setVisibility(View.GONE);
                     normalToolbar.setVisibility(View.VISIBLE);
                 }
-            break;
+
+                View pin = (SerializableImage) requireArguments().getSerializable("view");
+
+                assert pin != null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ((View) pin.getParent()).setBackground(
+                            getResources().getDrawable(
+                                    R.drawable.orange_border,
+                                    Objects.requireNonNull(getActivity()).getTheme()
+                            )
+                    );
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
