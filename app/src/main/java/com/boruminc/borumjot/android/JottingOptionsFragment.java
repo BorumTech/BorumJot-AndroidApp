@@ -1,6 +1,8 @@
 package com.boruminc.borumjot.android;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -8,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +22,11 @@ import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.android.customviews.SerializableImage;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
+import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JottingOptionsFragment extends Fragment {
@@ -64,6 +70,24 @@ public class JottingOptionsFragment extends Fragment {
                     }
                 });
             break;
+            case R.id.delete_btn: {
+
+                if (getJotData() instanceof Task) {
+                    AlertDialog.Builder builder = buildDeleteJottingDialog("task");
+                    builder.setPositiveButton("Delete", (dialog, which) -> {
+                        deleteJotting("task");
+                    });
+                    builder.create().show();
+
+                } else if (getJotData() instanceof Note) {
+                    AlertDialog.Builder builder = buildDeleteJottingDialog("note");
+                    builder.setPositiveButton("Delete", (dialog, which) -> {
+                        deleteJotting("note");
+                    });
+                    builder.create().show();
+                }
+                break;
+            }
             case R.id.exit_jotting_options_btn:
                 Toolbar normalToolbar = requireActivity().findViewById(R.id.my_toolbar);
                 ((AppCompatActivity) requireActivity()).setSupportActionBar(normalToolbar);
@@ -107,5 +131,35 @@ public class JottingOptionsFragment extends Fragment {
                 return null;
             }
         };
+    }
+
+    private AlertDialog.Builder buildDeleteJottingDialog(String jotType) {
+        android.app.AlertDialog.Builder deleteDialog = new android.app.AlertDialog.Builder(getActivity());
+        deleteDialog
+                .setTitle("Delete Task")
+                .setMessage("Are you sure you would like to delete this task?")
+                .setNegativeButton("Cancel", (dialog, which) -> {});
+        return deleteDialog;
+    }
+
+    private void deleteJotting(String jotType) {
+        new TaskRunner().executeAsync(
+                new DeleteJottingRequest(getJotData().getId(), userApiKey, jotType),
+                data -> {
+                    try {
+                        if (data != null) {
+                            if (data.has("error") || data.getInt("statusCode") == 500) {
+                                Toast.makeText(getActivity(), "The " + jotType + " could not be deleted due to a system error", Toast.LENGTH_SHORT).show();
+                            } else {
+                                startActivity(new Intent(getActivity(), HomeActivity.class));
+                                Toast.makeText(getActivity(), "Task deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity(), "The " + jotType + " could not be deleted due to a system error", Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
     }
 }

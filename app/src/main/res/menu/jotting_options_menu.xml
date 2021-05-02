@@ -7,6 +7,11 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_pin"/>
 
+    <item android:id="@+id/delete_btn"
+        android:title="@string/action_delete"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_delete" />
+
     <item android:id="@+id/exit_jotting_options_btn"
         android:title="@string/action_close"
         app:showAsAction="ifRoom"

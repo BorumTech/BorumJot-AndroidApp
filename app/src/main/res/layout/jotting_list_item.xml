@@ -5,7 +5,9 @@
     android:layout_height="wrap_content"
     android:background="@drawable/orange_border"
     android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:padding="3dp" >
+    android:padding="3dp"
+    style="@style/JottingListItem"
+    >
     <TextView
         android:id="@+id/jotting_name"
         android:layout_width="0dp"

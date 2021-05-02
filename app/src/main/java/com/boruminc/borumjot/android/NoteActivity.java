@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,11 +27,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class NoteActivity extends JottingActivity {
     /* Views */
     private AppBarFragment appBarFrag;
     private EditText noteDescriptionBox;
+
+    private Intent nextIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,8 +50,6 @@ public class NoteActivity extends JottingActivity {
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
             setUserApiKey(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""));
         }
-
-        appBarFrag.passSaveButton().setOnClickListener(this::onSaveClick);
 
         setJottingType("Note");
         if (getIntent().getBooleanExtra("Rename", false)) {
@@ -165,7 +167,15 @@ public class NoteActivity extends JottingActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        overridePendingTransition(0, 0);
+        if (nextIntent == null) {
+            overridePendingTransition(0, 0);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        nextIntent = null;
     }
 
     /**
@@ -177,9 +187,10 @@ public class NoteActivity extends JottingActivity {
     }
 
     public void navigateToShare(View view) {
-        Intent shareIntent = new Intent(this, ShareActivity.class);
-        shareIntent.putExtra("jotting", getNoteData());
-        startActivity(shareIntent);
+        nextIntent = new Intent(this, ShareActivity.class);
+        nextIntent.putExtra("jotting", getNoteData());
+        nextIntent.putExtra("jotType", "note");
+        startActivity(nextIntent);
     }
 
     public void showDeleteDialog(View view) {

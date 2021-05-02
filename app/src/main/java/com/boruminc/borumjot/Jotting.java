@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public abstract class Jotting implements Serializable, Comparable<Jotting> {
     private ArrayList<Label> labels;
@@ -11,12 +13,14 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
     private String body;
     private int id;
     private int priority;
+    private HashSet<String> sharees;
 
     Jotting() {
         name = "";
         body = "";
         labels = new ArrayList<Label>();
         priority = 0;
+        sharees = new HashSet<>();
     }
 
     /**
@@ -28,6 +32,7 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
         labels = new ArrayList<Label>();
         body = "";
         priority = 0;
+        sharees = new HashSet<>();
     }
 
     /**
@@ -40,6 +45,7 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
         name = n;
         body = b;
         labels = l;
+        sharees = new HashSet<>();
     }
 
     public ArrayList<Label> getLabels() {
@@ -101,7 +107,8 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
     @NonNull
     public String toString() {
         return "Name: " + getName() + "\n"
-                + "Priority: " + getPriority();
+                + "Priority: " + getPriority() + "\n"
+                + "Sharees: " + getSharees().toString() + "";
     }
 
     @Override
@@ -124,5 +131,30 @@ public abstract class Jotting implements Serializable, Comparable<Jotting> {
 
     public void setPriority(int newPriority) {
         priority = newPriority;
+    }
+
+    /**
+     * @return The value of the sharees PIV
+     */
+    public HashSet<String> getSharees() {
+        return sharees;
+    }
+
+    public void setSharees(HashSet<String> newSharees) {
+        sharees = newSharees;
+    }
+
+    /**
+     * Add a new person that will have access to this note
+     * by adding the user to the sharees HashSet
+     * @param newSharee The person who is requested to become a sharee for this note
+     * @return Whether the new sharee was added
+     */
+    public void addSharee(String newSharee) {
+        sharees.add(newSharee);
+    }
+
+    public boolean removeSharee(String existingSharee) {
+        return sharees.remove(existingSharee);
     }
 }

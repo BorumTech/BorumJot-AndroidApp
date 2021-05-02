@@ -21,16 +21,16 @@
 
     <!-- Actions -->
 
-    <!-- Strings related to login/register -->
+    <!-- Actions related to login/register -->
     <string name="action_register">Register</string>
     <string name="action_sign_in">Login</string>
     <string name="action_home">Home</string>
 
-    <!-- Strings related to Jottings -->
+    <!-- Actions related to Jottings -->
     <string name="action_share">Share</string>
     <string name="action_rename">Rename</string>
 
-    <!-- Strings related to Options -->
+    <!-- Actions related to Options -->
     <string name="action_report_bug">Report Bug</string>
     <string name="action_donate">Donate</string>
     <string name="action_forum">Forum</string>
@@ -38,8 +38,12 @@
     <string name="action_export_data">Export Data</string>
     <string name="action_logout">Log Out</string>
 
+    <!-- Actions related to Labels -->
+    <string name="action_delete_label">Delete Label</string>
+
     <!-- General action strings -->
     <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
 
     <!-- Labels -->
     <string name="welcome">"Welcome !"</string>
@@ -48,7 +52,6 @@
     <string name="login_failed">"Login failed"</string>
     <string name="borum_borumjot_affiliation">Your Borum Jot account is your Borum account</string>
     <string name="register_for_borum">Register for Borum</string>
-
 
     <!-- Titles -->
     <string name="default_menu_title">Default Menu</string>
@@ -80,10 +83,12 @@
     <string name="pin_content_desc">A pin icon</string>
     <string name="action_new_label">Create New Label</string>
     <string name="forum_link">http://meta.borumtech.com/Topics/Borum-Jot</string>
-    <string name="action_delete_label">Delete Label</string>
     <string name="all_borum_products_msg">Changes will affect your sign in across all Borum products</string>
     <string name="prompt_confirm_new_password">Confirm New Password</string>
     <string name="new_task_content_desc">\"Plus\" floating action button</string>
     <string name="action_due_date">Due Date</string>
     <string name="no_due_date">No Due Date</string>
+    <string name="transition_jot_preview">openjot</string>
+    <string name="delete_content_desc">Trashcan or delete icon</string>
+    <string name="save_content_desc">Save icon</string>
 </resources>

@@ -3,19 +3,15 @@ package com.boruminc.borumjot.android;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class AppBarFragment extends Fragment {
     private TextView title;
-    private Button saveButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -24,7 +20,6 @@ public class AppBarFragment extends Fragment {
         View root = inflater.inflate(R.layout.appbar_appname_fragment, container, false);
 
         title = root.findViewById(R.id.appbar_title);
-        saveButton = root.findViewById(R.id.save_btn);
 
         return root;
     }
@@ -46,10 +41,5 @@ public class AppBarFragment extends Fragment {
                 // Remove the strikethrough from the paint flags using "&" bitwise operator
                 title.setPaintFlags(title.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
-    }
-
-    Button passSaveButton() {
-        saveButton.setVisibility(View.VISIBLE);
-        return saveButton;
     }
 }

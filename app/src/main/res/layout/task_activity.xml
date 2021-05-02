@@ -6,7 +6,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".TaskActivity">
+    tools:context=".TaskActivity"
+    >
 
     <fragment
         android:id="@+id/appbar"
@@ -29,11 +30,20 @@
             android:onClick="onCompleteClick"
             style="@style/HeaderButton" />
         <Button
-            android:id="@+id/delete_task_btn"
+            android:id="@+id/share_task_btn"
             android:layout_height="match_parent"
-            android:text="@string/prompt_task_delete"
-            android:onClick="onDeleteClick"
+            android:text="@string/action_share"
+            android:onClick="navigateToShare"
             style="@style/HeaderButton" />
+        <ImageButton
+            android:id="@+id/delete_task_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/action_delete"
+            android:background="@color/cherryRasboraPrimarySurface"
+            android:src="@drawable/ic_delete"
+            android:onClick="onDeleteClick"
+            android:contentDescription="@string/delete_content_desc" />
     </LinearLayout>
 
     <ScrollView

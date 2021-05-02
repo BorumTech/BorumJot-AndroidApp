@@ -62,6 +62,8 @@ public class TaskActivity extends JottingActivity {
     private EditTextV2 newSubtaskField;
     private FlexboxLayout labelsList;
 
+    private Intent nextIntent;
+
     /* Overriding Callback Methods */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -155,7 +157,14 @@ public class TaskActivity extends JottingActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        overridePendingTransition(0, 0);
+        if (nextIntent == null)
+            overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        nextIntent = null;
     }
 
     /* Helper Methods */
@@ -688,5 +697,12 @@ public class TaskActivity extends JottingActivity {
         Intent labelAct = new Intent(this, LabelActivity.class);
         labelAct.putExtra("label", getJottingData().getLabels().get(labelsList.indexOfChild(view) - 1));
         startActivity(labelAct);
+    }
+
+    public void navigateToShare(View view) {
+        nextIntent = new Intent(this, ShareActivity.class);
+        nextIntent.putExtra("jotting", getTaskData());
+        nextIntent.putExtra("jotType", "task");
+        startActivity(nextIntent);
     }
 }

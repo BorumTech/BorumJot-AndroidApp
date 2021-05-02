@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.boruminc.borumjot.Jotting;
@@ -164,7 +165,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString("sharednotes"));
+                return this.connectToApi(encodeQueryString("sharedjottings"));
             }
         };
     }
@@ -205,13 +206,19 @@ public class HomeActivity extends AppCompatActivity {
             super.onComplete(result);
             try {
                 if (ranOk()) {
-                    jotListData.setSharedData(JSONToModel.convertJSONToJottings(result.getJSONArray("data")));
+                    JSONObject groupedData = result.getJSONObject("data");
+
+                    ArrayList<Jotting> jottings = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("notes"));
+                    ArrayList<Jotting> tasks = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("tasks"));
+
+                    jottings.addAll(tasks);
+                    jotListData.setSharedData(jottings);
                     jottingsListAdapter.setSharedData(jotListData.getSharedData());
                     jottingsListAdapter.notifyDataSetChanged();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "An error occurred and the shared notes could not be fetched", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "An error occurred and the shared jottings could not be fetched", Toast.LENGTH_LONG).show();
             }
             }
         };
@@ -234,6 +241,7 @@ public class HomeActivity extends AppCompatActivity {
      */
     public void onFloatingActionBtnClick(View view) {
         AtomicReference<Intent> activityToStart = new AtomicReference<Intent>();
+
         AlertDialog.Builder jotTypeDialogBuilder = new AlertDialog.Builder(this);
         jotTypeDialogBuilder
                 .setTitle("New Jotting")
@@ -244,7 +252,7 @@ public class HomeActivity extends AppCompatActivity {
                         (dialog, which) -> {
                             switch (which) {
                                 case 0:
-                                    Intent activityIntent = new Intent(this, NoteActivity.class);
+                                    Intent activityIntent = new Intent(HomeActivity.this, NoteActivity.class);
                                     activityIntent.putExtra("Rename", true);
                                     activityToStart.set(activityIntent);
                                     break;

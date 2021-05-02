@@ -1,25 +1,22 @@
 package com.boruminc.borumjot.android;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Point;
-import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
-import com.boruminc.borumjot.Note;
+import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.android.customviews.SwipableTextView;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
@@ -33,7 +30,8 @@ import java.util.HashSet;
 
 public class ShareActivity extends FragmentActivity {
     String userApiKey;
-    private Note noteData;
+    private Jotting jottingData;
+    private String jotType;
 
     LinearLayout shareesList;
 
@@ -48,20 +46,17 @@ public class ShareActivity extends FragmentActivity {
         if (shareAppBar != null) shareAppBar.passTitle("Share");
 
         userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
-        noteData = (Note) getIntent().getSerializableExtra("jotting");
+        jottingData = (Jotting) getIntent().getSerializableExtra("jotting");
+        Log.d("jottingData", String.valueOf(jottingData));
+
         shareesList = findViewById(R.id.current_sharees_list);
+        jotType = getIntent().getStringExtra("jotType");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        new TaskRunner().executeAsync(getNoteShareesRequest(), getNoteShareesResponse());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        overridePendingTransition(0, 0);
+        new TaskRunner().executeAsync(getJotShareesRequest(), getJotShareesResponse());
     }
 
     /* Request and Responses */
@@ -79,7 +74,7 @@ public class ShareActivity extends FragmentActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString("note/share"));
+                return this.connectToApi(encodeQueryString(jotType + "/share"));
             }
         };
     }
@@ -91,16 +86,16 @@ public class ShareActivity extends FragmentActivity {
                 super.onComplete(result);
                 if (ranOk()) {
                     finish();
-                    Toast.makeText(getApplicationContext(), "Note successfully shared!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), jotType + " successfully shared!", Toast.LENGTH_SHORT).show();
                 } else if (result == null) {
-                    Toast.makeText(getApplicationContext(), "The note could not be shared because of an unknown server error", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "The " + jotType + " could not be shared because of an unknown server error", Toast.LENGTH_LONG).show();
                 } else {
                     String message = "";
                     try {
-                        message = "The note could not be shared because " + result.getJSONObject("error").getString("message").toLowerCase();
+                        message = "The " + jotType + " could not be shared because " + result.getJSONObject("error").getString("message").toLowerCase();
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        message = "The note could not be shared for an unknown reason";
+                        message = "The " + jotType + " could not be shared for an unknown reason";
                     } finally {
                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                     }
@@ -109,7 +104,7 @@ public class ShareActivity extends FragmentActivity {
         };
     }
 
-    private ApiRequestExecutor getNoteShareesRequest() {
+    private ApiRequestExecutor getJotShareesRequest() {
         return new ApiRequestExecutor() {
             @Override
             protected void initialize() {
@@ -121,19 +116,19 @@ public class ShareActivity extends FragmentActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString("note/share", "id=" + noteData.getId()));
+                return this.connectToApi(encodeQueryString(jotType + "/share", "id=" + jottingData.getId()));
             }
         };
     }
 
-    private ApiResponseExecutor getNoteShareesResponse() {
+    private ApiResponseExecutor getJotShareesResponse() {
         return new ApiResponseExecutor() {
             @Override
             public void onComplete(JSONObject result) {
                 super.onComplete(result);
                 if (ranOk()) {
                     try {
-                        setNoteSharees(JSONToModel.convertJSONToUserEmails(result.getJSONArray("data")));
+                        setJotSharees(JSONToModel.convertJSONToUserEmails(result.getJSONArray("data")));
                     } catch (JSONException e) {
                         e.printStackTrace();
                         Toast.makeText(getApplicationContext(), "A system error occurred", Toast.LENGTH_SHORT).show();
@@ -146,7 +141,7 @@ public class ShareActivity extends FragmentActivity {
     }
 
     private ApiRequestExecutor getShareeRemoveRequest(String email) {
-        return new ApiRequestExecutor(String.valueOf(noteData.getId()), email) {
+        return new ApiRequestExecutor(String.valueOf(jottingData.getId()), email) {
             @Override
             protected void initialize() {
                 super.initialize();
@@ -158,7 +153,7 @@ public class ShareActivity extends FragmentActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString("note/share"));
+                return this.connectToApi(encodeQueryString(jotType + "/share"));
             }
         };
     }
@@ -175,7 +170,7 @@ public class ShareActivity extends FragmentActivity {
 
     /* UI Getters */
 
-    private HashSet<String> getDisplayedNoteSharees() {
+    private HashSet<String> getDisplayedJotSharees() {
         HashSet<String> displayedSharees = new HashSet<>();
 
         for (int i = 0; i < shareesList.getChildCount(); i++) {
@@ -189,17 +184,17 @@ public class ShareActivity extends FragmentActivity {
     /* UI Setters And Adders */
 
     /**
-     * Sets the note sharees in the noteData and in the UI.
+     * Sets the jot sharees in the jottingData and in the UI.
      * Calls the <code>addSharee(String)</code> method
-     * @param emails The list without duplicates of the emails of the users who received the note
+     * @param emails The list without duplicates of the emails of the users who received the jot
      */
-    private void setNoteSharees(HashSet<String> emails) {
+    private void setJotSharees(HashSet<String> emails) {
         // If nothing has changed, exit the method
-        if (noteData.getSharees().equals(emails) && getDisplayedNoteSharees().equals(emails)) {
+        if (jottingData.getSharees().equals(emails) && getDisplayedJotSharees().equals(emails)) {
             return;
         }
 
-        noteData.setSharees(emails);
+        jottingData.setSharees(emails);
         shareesList.removeAllViews();
 
         for (String email : emails) {
@@ -269,7 +264,7 @@ public class ShareActivity extends FragmentActivity {
         }
 
         new TaskRunner().executeAsync(
-                getShareRequest(noteData.getId(), emailView.getText().toString()),
+                getShareRequest(jottingData.getId(), emailView.getText().toString()),
                 getShareResponse()
         );
     }
