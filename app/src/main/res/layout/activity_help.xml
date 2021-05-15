@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HelpActivity"
+    >
+
+    <fragment
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.boruminc.borumjot.android.AppBarFragment"
+        tools:layout="@layout/appbar_appname_fragment" />
+
+    <Button
+        android:id="@+id/forum_btn"
+        android:text="@string/action_forum"
+        style="@style/ActionButtonListItem.First"
+        android:layout_below="@id/appbar"
+        android:onClick="onForumClick"/>
+
+    <Button
+        android:id="@+id/privacy_policy_btn"
+        android:text="@string/privacy_policy_title"
+        style="@style/ActionButtonListItem"
+        android:layout_below="@id/forum_btn"
+        android:background="@drawable/orange_border_thin"
+        android:paddingTop="15dp"
+        android:onClick="onPrivacyPolicyClick"
+        />
+
+    <TextView
+        android:id="@+id/copyright_notice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/copyright_notice"
+        android:layout_marginTop="@dimen/action_btn_margin"
+        android:layout_marginEnd="@dimen/action_btn_margin"
+        android:layout_marginRight="@dimen/action_btn_margin"
+        android:layout_marginStart="@dimen/action_btn_margin"
+        android:layout_marginLeft="@dimen/action_btn_margin"
+        android:layout_above="@id/version_number"
+        />
+
+    <TextView
+        android:id="@+id/version_number"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/version_number"
+        android:layout_margin="@dimen/action_btn_margin"
+        />
+</RelativeLayout>

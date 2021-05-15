@@ -106,7 +106,6 @@ public class HomeActivity extends AppCompatActivity {
         if (findViewById(R.id.my_toolbar).getVisibility() == View.VISIBLE) { // If regular toolbar is active
             inflater.inflate(R.menu.options_menu, menu);
         }
-        Log.d("Menu", menu.getItem(0).toString());
 
         return true;
     }
@@ -119,21 +118,19 @@ public class HomeActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.options_btn:
                 startActivity(new Intent(this, OptionsActivity.class));
-                break;
-            case R.id.privacypolicy_btn:
-                startActivity(new Intent(this, PrivacyPolicyActivity.class));
-                break;
+                return true;
+            case R.id.help_btn:
+                startActivity(new Intent(this, HelpActivity.class));
+                return true;
+            case R.id.labels_btn:
+                startActivity(new Intent(this, LabelsActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-
-        // Animate the activity switch so that it slides the home activity out to the left and slides in the new OptionsItemActivity
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        return true;
     }
 
     /* Request Executors */

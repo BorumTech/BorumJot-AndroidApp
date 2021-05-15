@@ -18,21 +18,4 @@ public abstract class OptionsMenuItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setSupportActionBar(findViewById(R.id.my_toolbar));
     }
-
-    /*
-     * When the user presses the back button, this function gets invoked automatically.
-     */
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (getIntent().hasExtra("caller") && Objects.equals(getIntent().getStringExtra("caller"), "RegisterActivity"))
-                return;
-        }
-
-        overridePendingTransition(R.anim.slide_in_left,
-                R.anim.slide_out_right);
-
-    }
 }

@@ -171,7 +171,7 @@ public class TaskActivity extends JottingActivity {
 
     private void showLabelImageBtn() {
         ImageButton labelControlsBtn = new ImageButton(this);
-        labelControlsBtn.setBackgroundResource(R.drawable.label);
+        labelControlsBtn.setBackgroundResource(R.drawable.label_black_outline);
         FlexboxLayout.LayoutParams controlsLayoutParams = new FlexboxLayout.LayoutParams(
                 (int) getResources().getDimension(R.dimen.label_controls_btn_width),
                 (int) getResources().getDimension(R.dimen.label_btn_height)

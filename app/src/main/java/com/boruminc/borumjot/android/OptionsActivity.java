@@ -40,6 +40,11 @@ public class OptionsActivity extends OptionsMenuItemActivity {
         userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
     /**
      * Logs the user out
      * @param view The button that triggered this click event
@@ -48,15 +53,6 @@ public class OptionsActivity extends OptionsMenuItemActivity {
         getSharedPreferences("user identification", Context.MODE_PRIVATE).edit().clear().apply();
         startActivity(new Intent(this, LoginActivity.class));
         Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * Opens the Meta Borum "Borum Jot" Topic page in user's browser
-     * @param view The button that triggered this click event
-     */
-    public void onForumClick(View view) {
-        Intent borumIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.forum_link)));
-        startActivity(borumIntent);
     }
 
     /**
@@ -103,7 +99,11 @@ public class OptionsActivity extends OptionsMenuItemActivity {
      */
     public void onChangeSignInClick(View view) {
         startActivity(new Intent(this, ChangeSignInActivity.class));
+
+        overridePendingTransition(R.anim.slide_in_right,
+                R.anim.slide_out_left);
     }
+
 
     private ContentValues getDownloadInfo(File file) {
         ContentValues contentValues = new ContentValues();

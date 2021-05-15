@@ -69,6 +69,12 @@
             android:label="Change Sign In"
             android:parentActivityName=".OptionsActivity"/>
 
+        <activity android:name=".HelpActivity"
+            android:label="Help" />
+
+        <activity android:name=".LabelsActivity"
+            android:label="Labels" />
+
         <receiver android:name=".TaskNotificationPublisher" />
     </application>
 

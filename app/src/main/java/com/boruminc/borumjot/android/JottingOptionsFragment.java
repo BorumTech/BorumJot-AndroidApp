@@ -74,7 +74,7 @@ public class JottingOptionsFragment extends Fragment {
                         pin.setVisibility(getJotData().getPriority() == 1 ? View.VISIBLE : View.INVISIBLE);
                     }
                 });
-            break;
+                return true;
             case R.id.delete_btn: {
 
                 if (getJotData() instanceof Task) {
@@ -91,7 +91,8 @@ public class JottingOptionsFragment extends Fragment {
                     });
                     builder.create().show();
                 }
-                break;
+
+                return true;
             }
             case R.id.exit_jotting_options_btn:
                 Toolbar normalToolbar = requireActivity().findViewById(R.id.my_toolbar);
@@ -113,7 +114,7 @@ public class JottingOptionsFragment extends Fragment {
                             )
                     );
                 }
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

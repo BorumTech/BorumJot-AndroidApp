@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/labels_btn"
+        android:title="@string/action_labels"
+        android:icon="@drawable/label_white_outline"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/help_btn"
+        android:title="@string/action_help"
+        android:icon="@android:drawable/ic_menu_help"
+        app:showAsAction="ifRoom" />
+
     <item android:id="@+id/options_btn"
         android:title="@string/options_link_title"
-        app:showAsAction="collapseActionView" />
-    <item android:id="@+id/privacypolicy_btn"
-        android:title="@string/privacy_policy_title"
-        app:showAsAction="collapseActionView" />
+        android:icon="@android:drawable/ic_menu_preferences"
+        app:showAsAction="ifRoom" />
 </menu>
