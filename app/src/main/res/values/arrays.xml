@@ -4,4 +4,9 @@
         <item>Note</item>
         <item>Task</item>
     </string-array>
+
+    <string-array name="label_filtered_jottings">
+        <item>Website Modernization</item>
+        <item>Book Review for _Where the Crawdads Swing_</item>
+    </string-array>
 </resources>

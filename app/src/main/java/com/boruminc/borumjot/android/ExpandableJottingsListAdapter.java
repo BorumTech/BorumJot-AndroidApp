@@ -8,15 +8,11 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -149,51 +145,44 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    abstract static class ExpandableListViewHolder {
+    // TODO GroupTitleViewHolder
+    static class GroupTitleViewHolder implements JottingListViewHolderBase {
+        private TextView titleTextView;
         private Context context;
 
-        ExpandableListViewHolder(View vg, Context c) {
+        GroupTitleViewHolder(View vg, Context c) {
             context = c;
             setViewProperties(vg);
         }
 
-        Context getContext() {
-            return context;
-        }
-
-        abstract void setViewProperties(View vg);
-        abstract void bindView(Object data);
-    }
-
-    // TODO GroupTitleViewHolder
-    static class GroupTitleViewHolder extends ExpandableListViewHolder {
-        private TextView titleTextView;
-
-        GroupTitleViewHolder(View vg, Context c) {
-            super(vg, c);
-        }
+        Context getContext() { return context; }
 
         @Override
-        void setViewProperties(View vg) {
+        public void setViewProperties(View vg) {
             titleTextView = vg.findViewById(R.id.list_group_header);
             titleTextView.setTypeface(null, Typeface.BOLD);
         }
 
-        void bindView(Object data) {
+        public void bindView(Object data) {
             titleTextView.setText((String) data);
         }
     }
 
-    static class ChildViewHolder extends ExpandableListViewHolder implements View.OnLongClickListener {
+    static class ChildViewHolder implements JottingListViewHolderBase, View.OnLongClickListener {
         private TextView textView;
         private SerializableImage pinIcon;
 
+        private Context context;
+
         ChildViewHolder(View v, Context c) {
-            super(v, c);
+            context = c;
+            setViewProperties(v);
         }
 
+        Context getContext() { return context; }
+
         @Override
-        protected void setViewProperties(View v) {
+        public void setViewProperties(View v) {
             pinIcon = v.findViewById(R.id.pin_icon);
             pinIcon.setLongClickable(false);
 
@@ -210,7 +199,8 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
             textView.setPadding(padding, padding, 0, padding);
         }
 
-        void bindView(Object data) {
+        @Override
+        public void bindView(Object data) {
             Jotting jottingInst = (Jotting) data;
             textView.setText(jottingInst.getName());
             textView.setTag(jottingInst);

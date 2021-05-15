@@ -13,12 +13,12 @@ public class Label implements Serializable {
 
     /**
      * Default constructor for Label object
-     * @param n The name of the label
-     * @param u The id of the user who made the label
+     * @param id The id of the label
+     * @param n The name or content of the label
      */
     public Label(int id, String n) {
-        this.id = id;
-        name = n;
+        setId(id);
+        setName(n);
     }
 
     public int getId() {

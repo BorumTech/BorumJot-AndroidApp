@@ -106,6 +106,7 @@ public class HomeActivity extends AppCompatActivity {
         if (findViewById(R.id.my_toolbar).getVisibility() == View.VISIBLE) { // If regular toolbar is active
             inflater.inflate(R.menu.options_menu, menu);
         }
+        Log.d("Menu", menu.getItem(0).toString());
 
         return true;
     }
