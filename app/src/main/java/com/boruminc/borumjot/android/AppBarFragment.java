@@ -3,11 +3,14 @@ package com.boruminc.borumjot.android;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 public class AppBarFragment extends Fragment {
@@ -26,6 +29,15 @@ public class AppBarFragment extends Fragment {
 
     void passTitle(String titleTxt) {
         title.setText(titleTxt);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    void passTitleLeftAligned(String titleTxt) {
+        title.setText(titleTxt);
+        RelativeLayout.LayoutParams layoutParams =
+                (RelativeLayout.LayoutParams)title.getLayoutParams();
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
+        title.setLayoutParams(layoutParams);
     }
 
     /**

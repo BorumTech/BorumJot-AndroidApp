@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,24 +14,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.boruminc.borumjot.Jotting;
-import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
-import com.google.android.flexbox.FlexboxLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,10 +75,6 @@ public class HomeActivity extends AppCompatActivity {
 
         // Set the user api key
         userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
-
-        // Set appbar title
-        AppBarFragment appBarFragment = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.my_toolbar);
-        if (appBarFragment != null) appBarFragment.passTitle("My Jottings");
 
         // Set list adapter and related variables
         jottingsListAdapter = new ExpandableJottingsListAdapter(this);
@@ -133,10 +126,13 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(this, HelpActivity.class));
                 return true;
             case R.id.labels_btn:
-                if (labelsList.getVisibility() == View.VISIBLE)
+                if (labelsList.getVisibility() == View.VISIBLE) {
                     labelsList.setVisibility(View.GONE);
-                else
+                    item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+                } else {
                     labelsList.setVisibility(View.VISIBLE);
+                    item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
