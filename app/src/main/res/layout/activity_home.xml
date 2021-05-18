@@ -17,7 +17,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.boruminc.borumjot.android.JottingOptionsFragment"
-        tools:layout="@layout/jotting_options_fragment"/>
+        tools:layout="@layout/jotting_options_fragment" />
+
+    <fragment
+        android:id="@+id/labels_list_frag"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.boruminc.borumjot.android.LabelsList"
+        tools:layout="@layout/labels_list"
+        android:layout_below="@id/my_toolbar"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:id="@+id/jot_filter_btns_layout"

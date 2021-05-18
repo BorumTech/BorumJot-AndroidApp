@@ -5,7 +5,7 @@
     <item android:id="@+id/labels_btn"
         android:title="@string/action_labels"
         android:icon="@drawable/label_white_outline"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/help_btn"
         android:title="@string/action_help"

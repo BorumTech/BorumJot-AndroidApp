@@ -88,7 +88,7 @@ public class JSONToModel {
 
     private static Label convertJSONToLabel(JSONObject data) throws JSONException {
         return new Label(
-                data.getInt("label_id"),
+                data.getInt("id"),
                 data.getString("name")
         );
     }

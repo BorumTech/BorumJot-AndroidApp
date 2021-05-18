@@ -7,11 +7,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
@@ -21,16 +21,18 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.boruminc.borumjot.Jotting;
+import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
+import com.google.android.flexbox.FlexboxLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
     ProgressBar progressBar;
     SwipeRefreshLayout jottingsListRefresh;
     ExpandableListView expandableListView;
+    View labelsList;
 
     /* Overriding Callback Methods */
 
@@ -68,6 +71,10 @@ public class HomeActivity extends AppCompatActivity {
         filterTasksBtn = findViewById(R.id.home_tasks_toggle);
         progressBar = findViewById(R.id.progressPanel);
         expandableListView = findViewById(R.id.home_jottings_list);
+        labelsList = findViewById(R.id.labels_list_frag);
+
+        labelsList.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        labelsList.setVisibility(View.GONE);
 
         // Set the user api key
         userApiKey = getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", "");
@@ -126,14 +133,17 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(this, HelpActivity.class));
                 return true;
             case R.id.labels_btn:
-                startActivity(new Intent(this, LabelsActivity.class));
+                if (labelsList.getVisibility() == View.VISIBLE)
+                    labelsList.setVisibility(View.GONE);
+                else
+                    labelsList.setVisibility(View.VISIBLE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    /* Request Executors */
+    /* Jottings */
 
     ApiRequestExecutor getJottingsRequest() {
         return new ApiRequestExecutor() {
@@ -151,25 +161,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         };
     }
-
-    ApiRequestExecutor getSharedJottingsRequest() {
-        return new ApiRequestExecutor() {
-            @Override
-            protected void initialize() {
-                super.initialize();
-                setRequestMethod("GET");
-                addAuthorizationHeader(userApiKey);
-            }
-
-            @Override
-            public JSONObject call() {
-                super.call();
-                return this.connectToApi(encodeQueryString("sharedjottings"));
-            }
-        };
-    }
-
-    /* Response Handlers */
 
     ApiResponseExecutor handleJottingsResponse() {
         return new ApiResponseExecutor() {
@@ -198,27 +189,44 @@ public class HomeActivity extends AppCompatActivity {
         };
     }
 
+    ApiRequestExecutor getSharedJottingsRequest() {
+        return new ApiRequestExecutor() {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("GET");
+                addAuthorizationHeader(userApiKey);
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeQueryString("sharedjottings"));
+            }
+        };
+    }
+
     ApiResponseExecutor handleSharedJottingsResponse() {
         return new ApiResponseExecutor() {
             @Override
             public void onComplete(JSONObject result) {
-            super.onComplete(result);
-            try {
-                if (ranOk()) {
-                    JSONObject groupedData = result.getJSONObject("data");
+                super.onComplete(result);
+                try {
+                    if (ranOk()) {
+                        JSONObject groupedData = result.getJSONObject("data");
 
-                    ArrayList<Jotting> jottings = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("notes"));
-                    ArrayList<Jotting> tasks = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("tasks"));
+                        ArrayList<Jotting> jottings = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("notes"));
+                        ArrayList<Jotting> tasks = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("tasks"));
 
-                    jottings.addAll(tasks);
-                    jotListData.setSharedData(jottings);
-                    jottingsListAdapter.setSharedData(jotListData.getSharedData());
-                    jottingsListAdapter.notifyDataSetChanged();
+                        jottings.addAll(tasks);
+                        jotListData.setSharedData(jottings);
+                        jottingsListAdapter.setSharedData(jotListData.getSharedData());
+                        jottingsListAdapter.notifyDataSetChanged();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "An error occurred and the shared jottings could not be fetched", Toast.LENGTH_LONG).show();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "An error occurred and the shared jottings could not be fetched", Toast.LENGTH_LONG).show();
-            }
             }
         };
     }
