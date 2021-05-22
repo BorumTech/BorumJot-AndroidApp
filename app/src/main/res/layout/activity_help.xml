@@ -19,13 +19,23 @@
         android:text="@string/action_forum"
         style="@style/ActionButtonListItem.First"
         android:layout_below="@id/appbar"
-        android:onClick="onForumClick"/>
+        android:onClick="onForumClick"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/contact_btn"
+        android:text="@string/contact_title"
+        style="@style/ActionButtonListItem.First"
+        android:layout_below="@id/forum_btn"
+        android:paddingTop="7dp"
+        android:onClick="onContactClick"
+        />
 
     <Button
         android:id="@+id/privacy_policy_btn"
         android:text="@string/privacy_policy_title"
         style="@style/ActionButtonListItem"
-        android:layout_below="@id/forum_btn"
+        android:layout_below="@id/contact_btn"
         android:background="@drawable/orange_border_thin"
         android:paddingTop="15dp"
         android:onClick="onPrivacyPolicyClick"

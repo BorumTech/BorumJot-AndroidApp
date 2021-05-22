@@ -62,7 +62,7 @@
     <string name="tasks_title">Tasks</string>
     <string name="task_title">Task Name</string>
     <string name="search_title">Search</string>
-    <string name="contact_title">Contact</string>
+    <string name="contact_title">Contact Me</string>
     <string name="cherry_rasbora_title">Cherry Rasbora</string>
     <string name="golden_toad_title">Golden Toad</string>
 
@@ -95,4 +95,6 @@
     <string name="version_name">Version 2.3.0</string>
     <string name="action_labels">Labels</string>
     <string name="copyright_notice">Copyright 2021 Varun Singh</string>
+    <string name="support_email">support@borumtech.com</string>
+    <string name="privacy_policy_link">https://jot.borumtech.com/legal/PrivacyPolicy</string>
 </resources>
