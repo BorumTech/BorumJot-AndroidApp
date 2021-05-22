@@ -13,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/CherryRasbora"
         android:fullBackupContent="@xml/backup_descriptor"
-        tools:targetApi="n">
+        tools:targetApi="n"
+        android:allowBackup="true">
 
         <activity
             android:name=".LoginActivity"
@@ -35,6 +36,13 @@
             android:label="@string/action_home">
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <data android:scheme="https" android:host="jot.borumtech.com" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
         </activity>
 
         <activity
@@ -47,15 +55,18 @@
 
         <activity
             android:name=".ShareActivity"
-            android:label="Share">
-            <meta-data
-                android:name="com.boruminc.borumjot.android.NoteActivity"
-                android:value=".NoteActivity" />
-        </activity>
+            android:label="Share" />
 
         <activity
             android:name=".PrivacyPolicyActivity"
-            android:label="Privacy Policy" />
+            android:label="Privacy Policy">
+            <intent-filter>
+                <data android:scheme="https" android:host="jot.borumtech.com" android:path="/legal/PrivacyPolicy" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".OptionsActivity"
