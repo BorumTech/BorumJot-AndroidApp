@@ -185,6 +185,14 @@ public class TaskActivity extends JottingActivity {
         labelsList.addView(labelControlsBtn, 0);
     }
 
+    private void setSubtask(EditText view, boolean isCompleted) {
+        if (isCompleted)
+            // Add a strikethrough to the already existing paint flags using "|" bitwise operator
+            view.setPaintFlags(view.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        else
+            view.setPaintFlags(view.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+    }
+
     /**
      * Loads the subtasks.
      */
@@ -539,13 +547,11 @@ public class TaskActivity extends JottingActivity {
                     @Override
                     public void onComplete(JSONObject data) {
                         super.onComplete(data);
-                        if (data != null) {
-                            if (data.has("error") || !ranOk()) {
-                                Toast.makeText(getApplicationContext(), "An error occurred and the task could not be marked as "
-                                    + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
-                            } else {
-                                appBarFrag.displayStrikethrough(completed == 1);
-                            }
+                        if (ranOk()) {
+                            appBarFrag.displayStrikethrough(completed == 1);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "An error occurred and the task could not be marked as "
+                                + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
                         }
                     }
                 }
@@ -633,28 +639,25 @@ public class TaskActivity extends JottingActivity {
                         );
                     }
                 },
-                data -> {
-                    try {
-                        if (data != null) {
-                            if (data.has("error") || data.getInt("statusCode") != 200) {
-                                Toast.makeText(this, "An error occurred and the task could not be marked as "
-                                        + (completed == 1 ? "complete" : "incomplete"), Toast.LENGTH_LONG).show();
-                            } else {
-                                EditText subtaskTxt = (EditText) subtaskRow.getChildAt(1);
-                                // TODO Move into new class/fragment? because same code as in AppNameAppBarFragment
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    if (completed == 1)
-                                        // Add a strikethrough to the already existing paint flags using "|" bitwise operator
-                                        subtaskTxt.setPaintFlags(subtaskTxt.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                                    else
-                                        // Remove the strikethrough from the paint flags using "&" bitwise operator
-                                        subtaskTxt.setPaintFlags(subtaskTxt.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                                }
+                new ApiResponseExecutor() {
+                    @Override
+                    public void onComplete(JSONObject result) {
+                        super.onComplete(result);
+                        if (ranOk()) {
+                            EditText subtaskTxt = (EditText) subtaskRow.getChildAt(1);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                if (completed == 1)
+                                    setSubtask(subtaskTxt, true);
+                                else
+                                    setSubtask(subtaskTxt, false);
                             }
+                        } else {
+                            Toast.makeText(
+                                    getApplicationContext(),
+                                    "An error occurred and the task could not be marked as " + (completed == 1 ? "complete" : "incomplete"),
+                                    Toast.LENGTH_LONG
+                            ).show();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(this, "A server error occurred. The task was not updated", Toast.LENGTH_SHORT).show();
                     }
                 }
         );

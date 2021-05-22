@@ -52,7 +52,7 @@ public class RecyclableJottingsListAdapter extends RecyclerView.Adapter<Recyclab
 
     @Override
     public void onBindViewHolder(@NonNull JottingViewHolder holder, int position) {
-        holder.jottingName.setText(jottingData.get(position).getName());
+        holder.bindView(jottingData.get(position));
     }
 
     @Override
