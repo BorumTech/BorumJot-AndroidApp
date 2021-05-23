@@ -9,11 +9,10 @@ defaults:
 jobs:
 
   build:
-None
     strategy:
       fail-fast: false
       matrix: { os: [ubuntu] }
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v2
