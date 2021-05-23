@@ -1,0 +1,31 @@
+name: tweet
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+defaults:
+  run: { shell: bash }
+
+jobs:
+
+  build:
+None
+    strategy:
+      fail-fast: false
+      matrix: { os: [ubuntu] }
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+      with: {python-version: '3.8'}
+    - name: Run script
+      env:
+        CONTEXT_GITHUB: ${{ toJson(github) }}
+        CONTEXT_SECRETS: ${{ toJson(secrets) }}
+        TWEETREL_TEMPLATE: |
+          We are proud to announce the {tag_name} release of Borum Jot for Android!
+          
+          {body}
+      run: |
+        pip install -Uq tweetrel
+        python .github/scripts/build-tweet.py
