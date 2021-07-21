@@ -30,7 +30,10 @@ public class Task extends Jotting implements Comparable<Jotting> {
 
   @NonNull
   public String toString() {
-    return super.toString();
+    String str = super.toString();
+    str += "Completed: " + completed;
+
+    return str;
   }
 
   @Override

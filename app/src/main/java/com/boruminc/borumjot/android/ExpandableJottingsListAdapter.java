@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -199,12 +201,29 @@ public class ExpandableJottingsListAdapter extends BaseExpandableListAdapter {
             textView.setPadding(padding, padding, 0, padding);
         }
 
+        /**
+         * Sets a strikethrough on the title by adding a background
+         * @param on Whether to strikethrough or remove strikethrough
+         */
+        void displayStrikethrough(boolean on) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (on)
+                    textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                else
+                    textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            }
+        }
+
         @Override
         public void bindView(Object data) {
             Jotting jottingInst = (Jotting) data;
             textView.setText(jottingInst.getName());
             textView.setTag(jottingInst);
             pinIcon.setVisibility(jottingInst.getPriority() > 0 ? View.VISIBLE : View.INVISIBLE);
+
+            // Indicate whether the task is marked as complete to give the priority property meaning
+            boolean completed = data instanceof Task && ((Task) textView.getTag()).isCompleted();
+            displayStrikethrough(completed);
         }
 
         /**

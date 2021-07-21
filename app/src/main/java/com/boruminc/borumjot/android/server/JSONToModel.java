@@ -30,8 +30,9 @@ public class JSONToModel {
 
             if (row.getString("source").equals("note"))
                 jottings.add(convertJSONToNote(row));
-            else if (row.getString("source").equals("task"))
+            else if (row.getString("source").equals("task")) {
                 jottings.add(convertJSONToTask(row));
+            }
         }
 
         return jottings;
@@ -45,10 +46,26 @@ public class JSONToModel {
      */
     public static ArrayList<Task> convertJSONToTasks(JSONArray data) throws JSONException {
         ArrayList<Task> tasks = new ArrayList<Task>();
-        for (int i = 0; i < data.length(); i++)
+        for (int i = 0; i < data.length(); i++) {
             tasks.add(convertJSONToTask(data.getJSONObject(i)));
+        }
 
         return tasks;
+    }
+
+    /**
+     * Converts a <code>JSONArray</code> of <code>JSONObject</code>s to a <code>Task</code> object
+     * @param data The JSONArray
+     * @return A list of Tasks corresponding to the JSON data
+     * @throws JSONException if the id or title is not given for any row
+     */
+    public static ArrayList<Note> convertJSONToNotes(JSONArray data) throws JSONException {
+        ArrayList<Note> notes = new ArrayList<>();
+        for (int i = 0; i < data.length(); i++) {
+            notes.add(convertJSONToNote(data.getJSONObject(i)));
+        }
+
+        return notes;
     }
 
     private static Task convertJSONToTask(JSONObject row) throws JSONException {

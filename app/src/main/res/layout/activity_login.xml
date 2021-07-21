@@ -67,14 +67,14 @@
         app:layout_constraintTop_toBottomOf="@+id/password"
         app:layout_constraintBottom_toTopOf="@id/borumjot_affil_note">
 
-        <Button
+        <com.boruminc.borumjot.android.customviews.OrangeGradientButton
             android:id="@+id/login"
             style="@style/OneSelectButtonGradient"
             android:enabled="true"
             android:onClick="submitLogin"
             android:text="@string/action_sign_in" />
 
-        <Button
+        <com.boruminc.borumjot.android.customviews.OrangeGradientButton
             android:id="@+id/registernavbtn"
             style="@style/OneSelectButtonGradient"
             android:onClick="navToRegister"

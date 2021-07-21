@@ -211,10 +211,12 @@ public class HomeActivity extends AppCompatActivity {
                     if (ranOk()) {
                         JSONObject groupedData = result.getJSONObject("data");
 
-                        ArrayList<Jotting> jottings = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("notes"));
-                        ArrayList<Jotting> tasks = JSONToModel.convertJSONToJottings(groupedData.getJSONArray("tasks"));
+                        ArrayList<Note> notes = JSONToModel.convertJSONToNotes(groupedData.getJSONArray("notes"));
+                        ArrayList<Task> tasks = JSONToModel.convertJSONToTasks(groupedData.getJSONArray("tasks"));
 
+                        ArrayList<Jotting> jottings = new ArrayList<>(notes);
                         jottings.addAll(tasks);
+
                         jotListData.setSharedData(jottings);
                         jottingsListAdapter.setSharedData(jotListData.getSharedData());
                         jottingsListAdapter.notifyDataSetChanged();

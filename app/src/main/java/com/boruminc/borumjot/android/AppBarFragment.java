@@ -47,10 +47,8 @@ public class AppBarFragment extends Fragment {
     void displayStrikethrough(boolean on) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (on)
-                // Add a strikethrough to the already existing paint flags using "|" bitwise operator
                 title.setPaintFlags(title.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             else
-                // Remove the strikethrough from the paint flags using "&" bitwise operator
                 title.setPaintFlags(title.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
     }
