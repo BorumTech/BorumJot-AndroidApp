@@ -34,7 +34,7 @@
     <string name="action_report_bug">Report Bug</string>
     <string name="action_donate">Donate</string>
     <string name="action_forum">Forum</string>
-    <string name="action_change_sign_in">Change Sign-In</string>
+    <string name="action_manage_account">Manage Account</string>
     <string name="action_export_data">Export Data</string>
     <string name="action_logout">Log Out</string>
 
