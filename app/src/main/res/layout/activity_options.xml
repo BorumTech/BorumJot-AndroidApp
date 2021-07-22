@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OptionsActivity">
+    tools:context=".OptionsActivity"
+    android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
 
     <fragment
         android:id="@+id/appbar"
@@ -13,24 +14,25 @@
         android:name="com.boruminc.borumjot.android.AppBarFragment"
         tools:layout="@layout/appbar_appname_fragment" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/change_sign_in_btn"
-        style="@style/ActionButtonListItem.First"
+        style="@style/TextButtonListItem"
         android:text="@string/action_change_sign_in"
         android:onClick="onChangeSignInClick"
         android:layout_below="@id/appbar" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/export_data_btn"
         android:text="@string/action_export_data"
-        style="@style/ActionButtonListItem"
+        style="@style/TextButtonListItem"
         android:layout_below="@id/change_sign_in_btn"
         android:onClick="onExportDataClick" />
 
-    <com.boruminc.borumjot.android.customviews.OrangeGradientButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/logout_btn"
         android:text="@string/action_logout"
         android:onClick="onLogoutClick"
+        android:textColor="@color/cherryRasboraPrimarySurface"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="120dp"
         style="@style/OneSelectButtonGradient"

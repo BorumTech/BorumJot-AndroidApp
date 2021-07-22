@@ -9,11 +9,11 @@
 
     <item android:id="@+id/help_btn"
         android:title="@string/action_help"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/ic_help_outline"
         app:showAsAction="ifRoom" />
 
     <item android:id="@+id/options_btn"
         android:title="@string/options_link_title"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/ic_settings"
         app:showAsAction="ifRoom" />
 </menu>
