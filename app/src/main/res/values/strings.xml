@@ -92,9 +92,16 @@
     <string name="delete_content_desc">Trashcan or delete icon</string>
     <string name="save_content_desc">Save icon</string>
     <string name="action_help">Help</string>
-    <string name="version_name">Version 2.3.2</string>
+    <string name="version_name">Version 2.3.3</string>
     <string name="action_labels">Labels</string>
     <string name="copyright_notice">Copyright 2021 Varun Singh</string>
     <string name="support_email">support@borumtech.com</string>
     <string name="privacy_policy_link">https://jot.borumtech.com/legal/PrivacyPolicy</string>
+    <string name="twitter_title">Follow @BorumJot</string>
+    <string name="twitter_link">https://twitter.com/BorumJot</string>
+    <string name="product_hunt_link">https://www.producthunt.com/posts/borum-jot</string>
+    <string name="product_hunt_title">Give Feedback</string>
+    <string name="product_hunt_content_desc">Product Hunt Logo</string>
+    <string name="shr_button_next">Next</string>
+    <string name="shr_button_cancel">Cancel</string>
 </resources>
