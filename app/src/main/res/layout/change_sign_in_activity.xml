@@ -42,7 +42,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/confirm_password"
-        android:text="@string/action_change_sign_in"
+        android:text="@string/action_manage_account"
         android:onClick="onChangeSignInClick"
         style="@style/OneSelectButtonGradient" />
 
