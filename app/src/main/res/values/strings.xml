@@ -102,6 +102,4 @@
     <string name="product_hunt_link">https://www.producthunt.com/posts/borum-jot</string>
     <string name="product_hunt_title">Give Feedback</string>
     <string name="product_hunt_content_desc">Product Hunt Logo</string>
-    <string name="shr_button_next">Next</string>
-    <string name="shr_button_cancel">Cancel</string>
 </resources>

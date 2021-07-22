@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,7 +31,7 @@ public class OptionsActivity extends OptionsMenuItemActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.options_activity);
+        setContentView(R.layout.activity_options);
 
         AppBarFragment frag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         if (frag != null) frag.passTitle("Options");
