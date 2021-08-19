@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 import com.boruminc.borumjot.Jotting;
@@ -22,7 +23,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-abstract class JottingActivity extends FragmentActivity {
+abstract class JottingActivity extends AppCompatActivity {
     private String jottingType;
     private String userApiKey;
     private Jotting jottingData;

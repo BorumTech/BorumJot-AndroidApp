@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,17 +21,17 @@ import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.SlashNormalizer;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class NoteActivity extends JottingActivity {
     /* Views */
-    private AppBarFragment appBarFrag;
     private EditText noteDescriptionBox;
+    private MaterialToolbar appBar;
 
     private Intent nextIntent;
 
@@ -41,10 +40,11 @@ public class NoteActivity extends JottingActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_activity);
 
-        findViewById(R.id.nav_to_share_btn).setOnClickListener(this::navigateToShare);
-        findViewById(R.id.delete_note_btn).setOnClickListener(this::showDeleteDialog);
+        appBar = findViewById(R.id.appbar);
+//
+//        findViewById(R.id.nav_to_share_btn).setOnClickListener(this::navigateToShare);
+//        findViewById(R.id.delete_note_btn).setOnClickListener(this::showDeleteDialog);
         noteDescriptionBox = findViewById(R.id.note_content);
-        appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
 
         // Set the userApiKey for use throughout the class
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -100,11 +100,11 @@ public class NoteActivity extends JottingActivity {
         }
 
         noteDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
-        findViewById(R.id.appbar).setOnLongClickListener(this::onRenameJotting);
+        appBar.setOnLongClickListener(this::onRenameJotting);
     }
 
     protected void setJottingName(String name) {
-        if (appBarFrag != null) appBarFrag.passTitle(name);
+        ((TextView) findViewById(R.id.note_title)).setText(name);
     }
 
     private void setNoteBody(String body) {
