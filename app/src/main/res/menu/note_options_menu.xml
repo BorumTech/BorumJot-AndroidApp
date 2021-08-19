@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item android:id="@+id/save_btn"
+          android:title="@string/action_save"
+          app:showAsAction="always"
+          android:icon="@drawable/ic_save" />
+
     <item android:id="@+id/pin_btn"
         android:title="@string/action_pin"
         app:showAsAction="always"
@@ -23,9 +28,4 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_delete"
         tools:ignore="AlwaysShowAction" />
-
-    <item android:id="@+id/exit_jotting_options_btn"
-        android:title="@string/action_close"
-        app:showAsAction="always"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel" />
 </menu>

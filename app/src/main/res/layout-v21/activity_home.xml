@@ -17,8 +17,6 @@
         android:id="@+id/jotting_options_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fragmentEnterTransition="@anim/fragment_fade_enter"
-        android:fragmentExitTransition="@anim/fragment_fade_exit"
         android:name="com.boruminc.borumjot.android.JottingOptionsFragment"
         tools:layout="@layout/jotting_options_fragment"
         />
