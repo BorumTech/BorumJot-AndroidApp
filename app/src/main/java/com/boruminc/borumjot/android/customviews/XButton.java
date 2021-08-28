@@ -36,7 +36,7 @@ public class XButton extends AppCompatImageButton {
         float width = getMeasuredWidth();
         float height = getMeasuredHeight();
         paint.setColor(Color.RED);
-        paint.setStrokeWidth(2);
+        paint.setStrokeWidth(4);
         canvas.drawLine(0,0,width,height,paint);
         canvas.drawLine(width,0,0,height,paint);
     }

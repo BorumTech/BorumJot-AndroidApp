@@ -103,4 +103,5 @@
     <string name="product_hunt_title">Give Feedback</string>
     <string name="product_hunt_content_desc">Product Hunt Logo</string>
     <string name="loading_note">Loading Note...</string>
+    <string name="delete_subtask_content_desc">Red X</string>
 </resources>

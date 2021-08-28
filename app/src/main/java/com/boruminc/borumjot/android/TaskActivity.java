@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.NotificationCompat;
 
 import com.boruminc.borumjot.Label;
@@ -45,6 +47,7 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -426,8 +429,10 @@ public class TaskActivity extends JottingActivity {
         TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subtaskTitleColumnLayoutParams.setMargins(10, 0, 10, 0);
 
+        subtaskList.setColumnShrinkable(2, true);
+
         for (Task subtask : subtasks) {
-            addSubtask(subtask, subtaskList.getChildCount());
+            subtaskList.addView(addSubtask(subtask, subtaskList.getChildCount()));
         }
 
         TableRow addSubtaskLayout = new TableRow(this);
@@ -457,41 +462,21 @@ public class TaskActivity extends JottingActivity {
         }
     }
 
-    private void addSubtask(Task subtask, int index) {
-        TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        LinearLayout horizLayout = new TableRow(this);
+    private LinearLayout addSubtask(Task subtask, int index) {
+        LinearLayout horizLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.subtask, null);
         horizLayout.setTag(subtask.getId());
-        horizLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        EditTextV2 subtaskView = new EditTextV2(this);
-        subtaskView.setText(subtask.getName());
-        subtaskView.setTextSize(20f);
-        subtaskView.setTextColor(Color.RED);
-        subtaskView.setLayoutParams(subtaskTitleColumnLayoutParams);
-        subtaskView.setOnFocusChangeListener(this::onSubtaskBoxFocus);
+        TextView title = horizLayout.findViewById(R.id.subtask_title);
+        title.setText(subtask.getName());
+        title.setOnFocusChangeListener(this::onSubtaskBoxFocus);
         // Display strikethrough if the subtask is marked as complete
         if (subtask.isCompleted())
-            subtaskView.setPaintFlags(subtaskView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            title.setPaintFlags(title.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
-        CheckBox checkBox = new CheckBox(this);
-        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        checkBox.setLayoutParams(layoutParams);
-        checkBox.setOnClickListener(this::onCompleteSubtaskClick);
+        CheckBox checkBox = horizLayout.findViewById(R.id.completed_status);
         checkBox.setChecked(subtask.isCompleted());
 
-        ImageButton deleteBtn = new XButton(this);
-        TableRow.LayoutParams deleteBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        deleteBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-        deleteBtn.setLayoutParams(deleteBtnLayoutParams);
-        deleteBtn.setBackground(null);
-        deleteBtn.setOnClickListener(this::onDeleteSubtaskClick);
-
-        horizLayout.addView(checkBox);
-        horizLayout.addView(subtaskView);
-        horizLayout.addView(deleteBtn);
-
-        subtaskList.addView(horizLayout, index);
+        return horizLayout;
     }
 
     /* Event Handlers */

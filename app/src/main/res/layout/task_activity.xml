@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/action_delete"
-            android:background="@color/cherryRasboraPrimarySurface"
+            android:background="@android:color/black"
             android:src="@drawable/ic_delete"
             android:onClick="onDeleteClick"
             android:contentDescription="@string/delete_content_desc" />
