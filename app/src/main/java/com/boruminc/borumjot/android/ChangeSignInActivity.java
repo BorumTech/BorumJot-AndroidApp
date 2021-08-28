@@ -1,21 +1,14 @@
 package com.boruminc.borumjot.android;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.webkit.WebView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
-import com.boruminc.borumjot.android.server.ApiRequestExecutor;
-import com.boruminc.borumjot.android.server.ApiResponseExecutor;
-import com.boruminc.borumjot.android.server.TaskRunner;
-
-import org.json.JSONObject;
-
-public class ChangeSignInActivity extends FragmentActivity {
+public class ChangeSignInActivity extends AppCompatActivity {
     AppBarFragment appBarFragment;
 
     private String userApiKey;

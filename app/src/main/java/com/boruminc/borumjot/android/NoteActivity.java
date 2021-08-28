@@ -7,12 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
@@ -41,9 +43,27 @@ public class NoteActivity extends JottingActivity {
         setContentView(R.layout.note_activity);
 
         appBar = findViewById(R.id.appbar);
-//
-//        findViewById(R.id.nav_to_share_btn).setOnClickListener(this::navigateToShare);
-//        findViewById(R.id.delete_note_btn).setOnClickListener(this::showDeleteDialog);
+        appBar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.labels_btn:
+                    new TaskRunner();
+                    break;
+                case R.id.share_btn:
+                    navigateToShare();
+                    break;
+                case R.id.delete_btn:
+                    showDeleteDialog();
+                    break;
+                case R.id.save_btn:
+                    onSaveClick();
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
+        });
+
         noteDescriptionBox = findViewById(R.id.note_content);
 
         // Set the userApiKey for use throughout the class
@@ -186,14 +206,14 @@ public class NoteActivity extends JottingActivity {
         super.displayRenameDialog(onPositiveButtonClick);
     }
 
-    public void navigateToShare(View view) {
+    public void navigateToShare() {
         nextIntent = new Intent(this, ShareActivity.class);
         nextIntent.putExtra("jotting", getNoteData());
         nextIntent.putExtra("jotType", "note");
         startActivity(nextIntent);
     }
 
-    public void showDeleteDialog(View view) {
+    public void showDeleteDialog() {
         AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
         deleteDialog
                 .setTitle("Delete Note")
@@ -226,11 +246,11 @@ public class NoteActivity extends JottingActivity {
         }
     }
 
-    public void onSaveClick(View view) {
+    public void onSaveClick() {
         if (!getNoteBody().equals(getNoteData().getBody())) {
             updateNoteBody(getNoteBody());
-            startActivity(new Intent(this, HomeActivity.class));
         }
+        startActivity(new Intent(this, HomeActivity.class));
     }
 
     public void updateNoteBody(String newBody) {
