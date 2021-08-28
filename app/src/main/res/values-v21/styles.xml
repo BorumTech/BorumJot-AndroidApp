@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="HeaderButton" parent="TextAppearance.AppCompat.Button">
-        <item name="android:layout_marginRight">5dp</item>
-        <item name="android:layout_width">@dimen/header_btn_width</item>
-        <item name="background">@drawable/header_button</item>
-    </style>
-</resources>

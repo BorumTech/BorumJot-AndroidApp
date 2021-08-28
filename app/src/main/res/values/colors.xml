@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!-- Cherry Rasbora Theme -->
-  <color name="cherryRasboraPrimary">#D62828</color>
+  <color name="cherryRasboraPrimary">#003049</color>
   <color name="cherryRasboraSecondary">#F77F00</color>
-  <color name="cherryRasboraAccent">#003049</color>
+  <color name="cherryRasboraAccent">#D62828</color>
   <color name="cherryRasboraBackgroundSurface">#EAE2B7</color>
   <color name="cherryRasboraPrimarySurface">#FFFFFF</color>
 </resources>

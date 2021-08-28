@@ -19,4 +19,6 @@
     <dimen name="change_sign_in_field_width">375dp</dimen>
 
     <dimen name="text_button_padding">20dp</dimen>
+
+    <dimen name="filter_btn_activated">4dp</dimen>
 </resources>

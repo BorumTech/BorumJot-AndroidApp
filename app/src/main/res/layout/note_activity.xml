@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/CherryRasbora"
     tools:context=".NoteActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -22,6 +21,7 @@
                 android:background="@android:color/transparent"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:menu="@menu/note_options_menu" />
 
             <TextView

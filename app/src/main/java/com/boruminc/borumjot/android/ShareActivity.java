@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 import com.boruminc.borumjot.Jotting;
@@ -28,7 +29,7 @@ import org.json.JSONObject;
 
 import java.util.HashSet;
 
-public class ShareActivity extends FragmentActivity {
+public class ShareActivity extends AppCompatActivity {
     String userApiKey;
     private Jotting jottingData;
     private String jotType;

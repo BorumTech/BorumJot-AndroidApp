@@ -1,8 +1,9 @@
 <resources>
 
     <!-- Base application themes -->
-    <style name="CherryRasbora" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="CherryRasbora" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/cherryRasboraPrimary</item>
+        <item name="colorPrimaryDark">@color/cherryRasboraPrimary</item>
         <item name="colorSecondary">@color/cherryRasboraSecondary</item>
         <item name="colorAccent">@color/cherryRasboraAccent</item>
         <item name="colorSurface">@color/cherryRasboraBackgroundSurface</item>
@@ -47,20 +48,18 @@
         <item name="android:paddingLeft">0dp</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_centerHorizontal">true</item>
-        <item name="android:textColor">@color/cherryRasboraAccent</item>
         <item name="android:inputType">text</item>
-        <item name="android:background">@color/cherryRasboraBackgroundSurface</item>
     </style>
 
     <style name="ActionButtonListItem.First">
         <item name="android:layout_marginTop">@dimen/action_btn_margin</item>
     </style>
 
-    <style name="HeaderButton" parent="TextAppearance.AppCompat.Button">
+    <style name="HeaderButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:layout_width">@dimen/header_btn_width</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginRight">5dp</item>
-        <item name="android:textColor">?attr/colorAccent</item>
-        <item name="android:background">@drawable/header_button</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
     </style>
 
     <style name="ShareField" parent="Widget.AppCompat.AutoCompleteTextView">
@@ -69,6 +68,7 @@
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:layout_marginTop">40dp</item>
         <item name="android:textSize">19sp</item>
+
     </style>
 
     <style name="ShareeList">
@@ -173,10 +173,13 @@
         <item name="android:layout_alignParentEnd">true</item>
     </style>
 
-    <style name="FilterButton" parent="HeaderButton">
+    <style name="FilterButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:layout_width">@dimen/header_btn_width</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">5dp</item>
-        <item name="android:background">@drawable/header_filter_btn</item>
+        <item name="strokeWidth">4dp</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
     </style>
 
     <style name="SubtaskList" parent="Theme.AppCompat.Light.NoActionBar">
@@ -213,4 +216,6 @@
     <style name="JottingListItem">
         <item name="android:activatedBackgroundIndicator">@color/cherryRasboraPrimarySurface</item>
     </style>
+
+
 </resources>

@@ -2,6 +2,8 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,7 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -47,8 +49,8 @@ public class HomeActivity extends AppCompatActivity {
     private String userApiKey;
 
     /* Views */
-    Button filterTasksBtn;
-    Button filterNotesBtn;
+    MaterialButton filterTasksBtn;
+    MaterialButton filterNotesBtn;
     ProgressBar progressBar;
     SwipeRefreshLayout jottingsListRefresh;
     ExpandableListView expandableListView;
@@ -349,17 +351,10 @@ public class HomeActivity extends AppCompatActivity {
      * @param view The view that is filtering the jotting type
      */
     public void toggleFilter(View view) {
-        GradientDrawable filterBtn = (GradientDrawable) view.getBackground();
-
-        TypedValue a = new TypedValue();
-        getTheme().resolveAttribute(R.attr.colorSecondary, a, true);
-
         if (view.getTag().equals("on")) {
-            view.setTag("off");
-            filterBtn.setStroke(0, a.data);
+            toggleFilter(view, false);
         } else {
-            view.setTag("on");
-            filterBtn.setStroke(10, a.data);
+            toggleFilter(view, true);
         }
     }
 
@@ -369,12 +364,7 @@ public class HomeActivity extends AppCompatActivity {
      * @param flag True to add the border; false to remove border
      */
     public void toggleFilter(View view, boolean flag) {
-        GradientDrawable filterBtn = (GradientDrawable) view.getBackground();
-
-        TypedValue a = new TypedValue();
-        getTheme().resolveAttribute(R.attr.colorSecondary, a, true);
-
         view.setTag(flag ? "on" : "off");
-        filterBtn.setStroke(flag ? 10 : 0, a.data);
+        ((MaterialButton) view).setStrokeWidth(flag ? (int) getResources().getDimension(R.dimen.filter_btn_activated) : 0);
     }
 }
