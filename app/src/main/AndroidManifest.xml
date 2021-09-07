@@ -73,7 +73,7 @@
             android:label="Options" />
 
         <activity
-            android:name=".LabelActivity"
+            android:name=".labels.LabelActivity"
             android:label="Label" />
 
         <activity android:name=".ChangeSignInActivity"

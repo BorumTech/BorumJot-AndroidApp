@@ -27,7 +27,7 @@ public class AppBarFragment extends Fragment {
         return root;
     }
 
-    void passTitle(String titleTxt) {
+    public void passTitle(String titleTxt) {
         title.setText(titleTxt);
     }
 
