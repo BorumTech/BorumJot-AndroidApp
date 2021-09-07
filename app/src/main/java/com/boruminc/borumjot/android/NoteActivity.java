@@ -5,19 +5,24 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
+import com.boruminc.borumjot.android.labels.JotLabelsList;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.SlashNormalizer;
@@ -34,8 +39,11 @@ public class NoteActivity extends JottingActivity {
     /* Views */
     private EditText noteDescriptionBox;
     private MaterialToolbar appBar;
+    private LinearLayout animateContainer;
 
     private Intent nextIntent;
+
+    JotLabelsList labelsList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,7 +54,7 @@ public class NoteActivity extends JottingActivity {
         appBar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.labels_btn:
-                    new TaskRunner();
+                    onLabelListClick(item);
                     break;
                 case R.id.share_btn:
                     navigateToShare();
@@ -65,6 +73,7 @@ public class NoteActivity extends JottingActivity {
         });
 
         noteDescriptionBox = findViewById(R.id.note_content);
+//        animateContainer = findViewById(R.id.main_content_container);
 
         // Set the userApiKey for use throughout the class
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -111,12 +120,26 @@ public class NoteActivity extends JottingActivity {
                     }
                 });
             });
-        }
-        else if (getIntent().hasExtra("data")) {
+        } else if (getIntent().hasExtra("data")) {
             setJottingData((Note) getIntent().getSerializableExtra("data"));
             assert getNoteData() != null;
             setJottingName(getNoteData().getName());
             setNoteBody(getNoteData().getBody());
+
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+
+            labelsList = new JotLabelsList();
+
+            ft
+                    .add(R.id.label_frame, labelsList)
+                    .hide(labelsList)
+                    .commit();
+
+            Bundle b = new Bundle();
+            b.putSerializable("jotting", getJottingData());
+
+            labelsList.setArguments(b);
         }
 
         noteDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
@@ -251,6 +274,37 @@ public class NoteActivity extends JottingActivity {
             updateNoteBody(getNoteBody());
         }
         startActivity(new Intent(this, HomeActivity.class));
+    }
+
+    protected void onLabelListClick(MenuItem item) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
+
+        // Hide and show to constrain label note request to one and show animation
+        if (labelsList.isHidden()) {
+            item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
+            ft.show(labelsList).commit();
+        } else {
+            item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+            slideLabelsListUp(ft);
+        }
+    }
+
+    private void slideLabelsListDown() {
+        labelsList.requireView()
+                .animate()
+                .translationY(0);
+    }
+
+    private void slideLabelsListUp(FragmentTransaction ft) {
+        labelsList.requireView()
+                .animate()
+                .translationY(-labelsList.requireView().getHeight())
+                .withEndAction(() -> {
+                    ft.hide(labelsList).commit();
+                    slideLabelsListDown();
+                    Log.d("Visibility", String.valueOf(labelsList.isVisible()));
+                });
     }
 
     public void updateNoteBody(String newBody) {
