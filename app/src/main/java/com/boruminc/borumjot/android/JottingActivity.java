@@ -1,20 +1,27 @@
 package com.boruminc.borumjot.android;
 
 import android.app.Dialog;
+import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
+import com.boruminc.borumjot.android.labels.UpdateJottingLabels;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
+import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 
@@ -126,34 +133,6 @@ abstract class JottingActivity extends AppCompatActivity {
         };
     }
 
-    /**
-     * Returns the request that adds or removes labels from the current jotting
-     * @return The ApiRequestExecutor object
-     */
-    protected ApiRequestExecutor updateJottingLabels() {
-        StringBuilder labelIds = new StringBuilder();
-        for (int i = 0; i < getJottingData().getLabels().size(); i++)
-            labelIds.append(getJottingData().getLabels().get(i).getId()).append(",");
-
-        return new ApiRequestExecutor(String.valueOf(getJottingData().getId()), labelIds.toString()) {
-            @Override
-            protected void initialize() {
-                super.initialize();
-                setRequestMethod("PUT");
-                addAuthorizationHeader(getUserApiKey());
-                setQuery(this.formatPostQuery(jottingType.toLowerCase() + "_id=%s&label_ids=%s"));
-                Log.d("Query", formatPostQuery(jottingType.toLowerCase() + "_id=%s&label_ids=%s"));
-            }
-
-            @Override
-            public JSONObject call() {
-                super.call();
-                return this.connectToApi(encodeQueryString(jottingType.toLowerCase() + "/labels"));
-            }
-        };
-    }
-
-    /* API Response Handlers */
 
     /**
      * Loads the labels
@@ -173,6 +152,8 @@ abstract class JottingActivity extends AppCompatActivity {
             }
         }
     }
+
+    /* API Response Handlers */
 
     protected void loadNewLabels(JSONObject data, String newLabelName) {
         try {
@@ -283,22 +264,32 @@ abstract class JottingActivity extends AppCompatActivity {
 
         alertDialog = new AlertDialog.Builder(this);
 
+
+
         alertDialog
             .setTitle("Labels")
             .setMultiChoiceItems(labelNames, labelStatuses, this::onLabelsListChoiceClick)
             .setView(R.layout.label_controls_dialog)
             .setCancelable(true)
             .setPositiveButton("Save", (dialog, which) -> {
-                new TaskRunner().executeAsync(updateJottingLabels(), data -> {
-                    if (data == null || data.optInt("statusCode") < 200 || data.optInt("statusCode") >= 300) {
-                        Toast.makeText(this, "A system error occurred", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                new UpdateJottingLabels(getJottingData(), jottingType).runAsync(
+                        getSharedPreferences("user identification", Context.MODE_PRIVATE)
+                                .getString("apiKey", ""),
+                        new ApiResponseExecutor() {
+                            @Override
+                            public void onComplete(JSONObject result) {
+                                super.onComplete(result);
+                                Toast.makeText(getApplicationContext(), "A system error occurred", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
             })
             .setNegativeButton("Cancel", (dialog, which) -> {});
 
         alertDialog.create().show();
     }
+
+
 
     private void onLabelsListChoiceClick(DialogInterface dialog, int which, boolean checked) {
         if (checked) {

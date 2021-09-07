@@ -23,7 +23,7 @@
         android:id="@+id/labels_list_frag"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.boruminc.borumjot.android.LabelsList"
+        android:name="com.boruminc.borumjot.android.labels.LabelsList"
         tools:layout="@layout/labels_list"
         android:layout_below="@id/my_toolbar"
         android:visibility="gone"/>
@@ -35,14 +35,14 @@
         android:layout_centerHorizontal="true"
         android:layout_height="wrap_content">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/home_notes_toggle"
             android:text="@string/notes_title"
             android:onClick="onToggleNotesFilter"
             android:tag="on"
             style="@style/FilterButton"
             />
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/home_tasks_toggle"
             android:text="@string/tasks_title"
             android:onClick="onToggleTasksFilter"

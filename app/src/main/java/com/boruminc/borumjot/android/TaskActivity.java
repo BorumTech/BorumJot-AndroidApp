@@ -8,12 +8,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -29,13 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.NotificationCompat;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
-import com.boruminc.borumjot.android.customviews.XButton;
+import com.boruminc.borumjot.android.labels.LabelActivity;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
@@ -47,7 +44,6 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -432,7 +428,7 @@ public class TaskActivity extends JottingActivity {
         subtaskList.setColumnShrinkable(2, true);
 
         for (Task subtask : subtasks) {
-            subtaskList.addView(addSubtask(subtask, subtaskList.getChildCount()));
+            subtaskList.addView(addSubtaskToTable(subtask));
         }
 
         TableRow addSubtaskLayout = new TableRow(this);
@@ -462,7 +458,7 @@ public class TaskActivity extends JottingActivity {
         }
     }
 
-    private LinearLayout addSubtask(Task subtask, int index) {
+    private LinearLayout addSubtaskToTable(Task subtask) {
         LinearLayout horizLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.subtask, null);
         horizLayout.setTag(subtask.getId());
 
@@ -568,14 +564,20 @@ public class TaskActivity extends JottingActivity {
                         super.call();
                         return this.connectToApi(this.encodeQueryString("subtasks"));
                     }
-                }, data -> {
-                    if (data != null) {
+                }, new ApiResponseExecutor() {
+                    @Override
+                    public void onComplete(JSONObject result) {
+                        super.onComplete(result);
                         try {
-                            if (data.getInt("statusCode") >= 200 && data.getInt("statusCode") < 300) {
+                            if (ranOk()) {
                                 Task subtask = new Task(newSubtaskField.getText().toString());
-                                subtask.setId(data.getJSONObject("data").getInt("id"));
+                                subtask.setId(result.getJSONObject("data").getInt("id"));
+
                                 getTaskData().getSubtasks().add(subtask);
-                                addSubtask(subtask, getTaskData().getSubtasks().size() - 1);
+
+                                // Add right before "new subtask" row (1-indexed)
+                                subtaskList.addView(addSubtaskToTable(subtask), subtaskList.getChildCount() - 1);
+
                                 ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
                         } catch (JSONException e) {
