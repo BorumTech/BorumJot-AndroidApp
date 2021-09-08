@@ -202,19 +202,18 @@ public class LabelActivity extends AppCompatActivity {
     }
 
     private ApiRequestExecutor deleteLabelRequest() {
-        return new ApiRequestExecutor(String.valueOf(currentLabel.getId())) {
+        return new ApiRequestExecutor() {
             @Override
             protected void initialize() {
                 super.initialize();
                 addAuthorizationHeader(userApiKey);
                 setRequestMethod("DELETE");
-                setQuery(encodePostQuery("id=%s"));
             }
 
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString("label"));
+                return this.connectToApi(encodeQueryString("label", "id=" + currentLabel.getId()));
             }
         };
     }

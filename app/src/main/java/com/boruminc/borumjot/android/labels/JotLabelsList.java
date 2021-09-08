@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.boruminc.borumjot.JotLabel;
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.android.R;
@@ -27,6 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class JotLabelsList extends Fragment {
     private View root;
@@ -34,9 +38,10 @@ public class JotLabelsList extends Fragment {
 
     private FlexboxLayoutManager labelLayout;
     private RecyclerView labelsRecycler;
-    private LabelsListAdapter adapter;
+    private JotLabelsListAdapter adapter;
 
     private Jotting jotting;
+    private String jotType;
 
     @Nullable
     @Override
@@ -53,6 +58,7 @@ public class JotLabelsList extends Fragment {
         Bundle bundle = getArguments();
         assert bundle != null;
         jotting = (Jotting) bundle.getSerializable("jotting");
+        jotType = bundle.getString("jotType");
 
         labelLayout = new FlexboxLayoutManager(root.getContext());
         labelLayout.setJustifyContent(JustifyContent.FLEX_START);
@@ -89,7 +95,7 @@ public class JotLabelsList extends Fragment {
         @Override
         public JSONObject call() {
             super.call();
-            return this.connectToApi(this.encodeQueryString("task/labels", "id=" + jotting.getId()));
+            return this.connectToApi(this.encodeQueryString("labels", "jot_type=" + jotType, "id=" + jotting.getId()));
         }
     };
 
@@ -99,9 +105,8 @@ public class JotLabelsList extends Fragment {
             super.onComplete(result);
             try {
                 if (ranOk()) {
-                    ArrayList<Label> labelsData = JSONToModel.convertJSONToLabels(result.getJSONArray("data"), true);
-
-                    adapter = new LabelsListAdapter(root.getContext(), labelsData);
+                    ArrayList<JotLabel> labelsData = JSONToModel.convertJSONToLabelBooleanMap(result.getJSONArray("data"));
+                    adapter = new JotLabelsListAdapter(root.getContext(), labelsData, jotting);
                     labelsRecycler.setAdapter(adapter);
                 }
             } catch (JSONException e) {
