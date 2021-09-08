@@ -105,7 +105,7 @@ abstract class JottingActivity extends AppCompatActivity {
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString(jottingType.toLowerCase() + "/labels", "id=" + getJottingData().getId()));
+                return this.connectToApi(encodeQueryString("labels", "jot_type=" + jottingType, "id=" + getJottingData().getId()));
             }
         };
     }

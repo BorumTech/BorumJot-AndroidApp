@@ -5,12 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -138,6 +136,7 @@ public class NoteActivity extends JottingActivity {
 
             Bundle b = new Bundle();
             b.putSerializable("jotting", getJottingData());
+            b.putString("jotType", "note");
 
             labelsList.setArguments(b);
         }

@@ -28,20 +28,19 @@ public class UpdateJottingLabels {
         for (int i = 0; i < jotting.getLabels().size(); i++)
             labelIds.append(jotting.getLabels().get(i).getId()).append(",");
 
-        return new ApiRequestExecutor(String.valueOf(jotting.getId()), labelIds.toString()) {
+        return new ApiRequestExecutor(jottingType.toLowerCase(), String.valueOf(jotting.getId()), labelIds.toString()) {
             @Override
             protected void initialize() {
                 super.initialize();
                 setRequestMethod("PUT");
                 addAuthorizationHeader(userApiKey);
-                setQuery(this.formatPostQuery(jottingType.toLowerCase() + "_id=%s&label_ids=%s"));
-                Log.d("Query", formatPostQuery(jottingType.toLowerCase() + "_id=%s&label_ids=%s"));
+                setQuery(this.formatPostQuery("jot_type=%s&" + jottingType.toLowerCase() + "_id=%s&label_ids=%s"));
             }
 
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString(jottingType.toLowerCase() + "/labels"));
+                return this.connectToApi(encodeQueryString("labels"));
             }
         };
     }
