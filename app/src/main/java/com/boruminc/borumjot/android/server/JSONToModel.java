@@ -99,7 +99,7 @@ public class JSONToModel {
         ArrayList<Label> labels = new ArrayList<>();
 
         for (int i = 0; i < data.length(); i++) {
-            if (withAll || data.getJSONObject(i).getBoolean("task_under_label"))
+            if (withAll || data.getJSONObject(i).getBoolean("jot_under_label"))
                 labels.add(convertJSONToLabel(data.getJSONObject(i)));
         }
 

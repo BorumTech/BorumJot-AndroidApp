@@ -2,21 +2,16 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import com.google.android.material.button.MaterialButton;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -32,6 +27,8 @@ import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +52,8 @@ public class HomeActivity extends AppCompatActivity {
     SwipeRefreshLayout jottingsListRefresh;
     ExpandableListView expandableListView;
     View labelsList;
+    ImageView addJotBtn;
+    ExtendedFloatingActionButton addLabelBtn;
 
     /* Overriding Callback Methods */
 
@@ -71,6 +70,8 @@ public class HomeActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressPanel);
         expandableListView = findViewById(R.id.home_jottings_list);
         labelsList = findViewById(R.id.labels_list_frag);
+        addJotBtn = findViewById(R.id.add_jotting_btn_home);
+        addLabelBtn = findViewById(R.id.add_label_btn);
 
         labelsList.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         labelsList.setVisibility(View.GONE);
@@ -131,9 +132,13 @@ public class HomeActivity extends AppCompatActivity {
                 if (labelsList.getVisibility() == View.VISIBLE) {
                     labelsList.setVisibility(View.GONE);
                     item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+                    addJotBtn.setVisibility(View.VISIBLE);
+                    addLabelBtn.setVisibility(View.GONE);
                 } else {
                     labelsList.setVisibility(View.VISIBLE);
                     item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
+                    addJotBtn.setVisibility(View.GONE);
+                    addLabelBtn.setVisibility(View.VISIBLE);
                 }
                 return true;
             default:
@@ -287,6 +292,10 @@ public class HomeActivity extends AppCompatActivity {
         jotTypeDialog.setOnShowListener((dialog) -> {
             jotTypeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         });
+
+    }
+
+    public void onAddLabelFABClick(View v) {
 
     }
 
