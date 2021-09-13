@@ -264,8 +264,6 @@ abstract class JottingActivity extends AppCompatActivity {
 
         alertDialog = new AlertDialog.Builder(this);
 
-
-
         alertDialog
             .setTitle("Labels")
             .setMultiChoiceItems(labelNames, labelStatuses, this::onLabelsListChoiceClick)
@@ -279,7 +277,8 @@ abstract class JottingActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(JSONObject result) {
                                 super.onComplete(result);
-                                Toast.makeText(getApplicationContext(), "A system error occurred", Toast.LENGTH_SHORT).show();
+                                if (!ranOk())
+                                    Toast.makeText(getApplicationContext(), "A system error occurred", Toast.LENGTH_SHORT).show();
                             }
                         }
                 );

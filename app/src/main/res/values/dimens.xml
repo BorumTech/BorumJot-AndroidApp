@@ -15,7 +15,7 @@
     <dimen name="chkbox_txtSize">15sp</dimen>
 
     <dimen name="action_btn_margin">20dp</dimen>
-    <dimen name="floating_action_btn_size">96dp</dimen>
+    <dimen name="floating_action_btn_size">56dp</dimen>
     <dimen name="change_sign_in_field_width">375dp</dimen>
 
     <dimen name="text_button_padding">20dp</dimen>

@@ -108,6 +108,7 @@ public class JotLabelsList extends Fragment {
                     ArrayList<JotLabel> labelsData = JSONToModel.convertJSONToLabelBooleanMap(result.getJSONArray("data"));
                     adapter = new JotLabelsListAdapter(root.getContext(), labelsData, jotting);
                     labelsRecycler.setAdapter(adapter);
+                    jotting.setLabels(JSONToModel.convertJSONToLabels(result.getJSONArray("data"), false));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
