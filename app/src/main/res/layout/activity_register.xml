@@ -5,6 +5,7 @@
     android:id="@+id/register_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
     tools:context=".RegisterActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -129,7 +130,7 @@
 
     <Button
         android:id="@+id/registerbtn"
-        style="@style/OneSelectButtonGradient"
+        style="@style/HeaderButton"
         android:enabled="false"
         android:text="@string/register_for_borum"
         android:onClick="validateRegistration"
