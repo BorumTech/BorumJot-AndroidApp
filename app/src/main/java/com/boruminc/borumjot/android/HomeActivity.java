@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -23,6 +24,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
+import com.boruminc.borumjot.android.labels.LabelActivity;
+import com.boruminc.borumjot.android.labels.NewLabelActivity;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
@@ -46,14 +49,15 @@ public class HomeActivity extends AppCompatActivity {
     private String userApiKey;
 
     /* Views */
-    MaterialButton filterTasksBtn;
-    MaterialButton filterNotesBtn;
+    Button filterTasksBtn;
+    Button filterNotesBtn;
     ProgressBar progressBar;
     SwipeRefreshLayout jottingsListRefresh;
     ExpandableListView expandableListView;
     View labelsList;
     ImageView addJotBtn;
     ExtendedFloatingActionButton addLabelBtn;
+    private MenuItem labelMenuItem;
 
     /* Overriding Callback Methods */
 
@@ -104,10 +108,23 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (labelsList.getVisibility() == View.VISIBLE) {
+            hideLabelsList();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         if (findViewById(R.id.my_toolbar).getVisibility() == View.VISIBLE) { // If regular toolbar is active
             inflater.inflate(R.menu.options_menu, menu);
+
+            if (menu != null) {
+                labelMenuItem = menu.findItem(R.id.labels_btn);
+            }
         }
 
         return true;
@@ -130,10 +147,8 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             case R.id.labels_btn:
                 if (labelsList.getVisibility() == View.VISIBLE) {
-                    labelsList.setVisibility(View.GONE);
-                    item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
-                    addJotBtn.setVisibility(View.VISIBLE);
-                    addLabelBtn.setVisibility(View.GONE);
+                    Log.d("labelMenuItem", String.valueOf(labelMenuItem));
+                    hideLabelsList();
                 } else {
                     labelsList.setVisibility(View.VISIBLE);
                     item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
@@ -144,6 +159,13 @@ public class HomeActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void hideLabelsList() {
+        labelsList.setVisibility(View.GONE);
+        labelMenuItem.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+        addJotBtn.setVisibility(View.VISIBLE);
+        addLabelBtn.setVisibility(View.GONE);
     }
 
     /* Jottings */
@@ -296,7 +318,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onAddLabelFABClick(View v) {
-
+        startActivity(new Intent(this, NewLabelActivity.class));
     }
 
     /**
