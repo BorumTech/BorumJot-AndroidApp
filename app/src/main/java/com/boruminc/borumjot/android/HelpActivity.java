@@ -17,7 +17,7 @@ public class HelpActivity extends AppCompatActivity {
         AppBarFragment appBar = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
 
         assert appBar != null;
-        appBar.passTitle("Help");
+        appBar.passTitle("Help and Feedback");
     }
 
     /**
@@ -45,4 +45,14 @@ public class HelpActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void onTwitterClick(View view) {
+        Intent twitterIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(getString(R.string.twitter_link)));
+        view.requestFocus();
+        startActivity(twitterIntent);
+    }
+
+    public void onProductHuntClick(View view) {
+        Intent productHuntIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(getString(R.string.product_hunt_link)));
+        startActivity(productHuntIntent);
+    }
 }

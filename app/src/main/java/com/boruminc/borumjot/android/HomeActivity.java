@@ -2,19 +2,17 @@ package com.boruminc.borumjot.android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,10 +24,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.Task;
+import com.boruminc.borumjot.android.labels.LabelActivity;
+import com.boruminc.borumjot.android.labels.NewLabelActivity;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,6 +55,9 @@ public class HomeActivity extends AppCompatActivity {
     SwipeRefreshLayout jottingsListRefresh;
     ExpandableListView expandableListView;
     View labelsList;
+    ImageView addJotBtn;
+    ExtendedFloatingActionButton addLabelBtn;
+    private MenuItem labelMenuItem;
 
     /* Overriding Callback Methods */
 
@@ -69,6 +74,8 @@ public class HomeActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressPanel);
         expandableListView = findViewById(R.id.home_jottings_list);
         labelsList = findViewById(R.id.labels_list_frag);
+        addJotBtn = findViewById(R.id.add_jotting_btn_home);
+        addLabelBtn = findViewById(R.id.add_label_btn);
 
         labelsList.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         labelsList.setVisibility(View.GONE);
@@ -101,10 +108,23 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (labelsList.getVisibility() == View.VISIBLE) {
+            hideLabelsList();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         if (findViewById(R.id.my_toolbar).getVisibility() == View.VISIBLE) { // If regular toolbar is active
             inflater.inflate(R.menu.options_menu, menu);
+
+            if (menu != null) {
+                labelMenuItem = menu.findItem(R.id.labels_btn);
+            }
         }
 
         return true;
@@ -127,16 +147,25 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             case R.id.labels_btn:
                 if (labelsList.getVisibility() == View.VISIBLE) {
-                    labelsList.setVisibility(View.GONE);
-                    item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+                    Log.d("labelMenuItem", String.valueOf(labelMenuItem));
+                    hideLabelsList();
                 } else {
                     labelsList.setVisibility(View.VISIBLE);
                     item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
+                    addJotBtn.setVisibility(View.GONE);
+                    addLabelBtn.setVisibility(View.VISIBLE);
                 }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void hideLabelsList() {
+        labelsList.setVisibility(View.GONE);
+        labelMenuItem.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+        addJotBtn.setVisibility(View.VISIBLE);
+        addLabelBtn.setVisibility(View.GONE);
     }
 
     /* Jottings */
@@ -288,6 +317,10 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    public void onAddLabelFABClick(View v) {
+        startActivity(new Intent(this, NewLabelActivity.class));
+    }
+
     /**
      * Toggles the display of notes.
      * Toggles the border,
@@ -349,17 +382,10 @@ public class HomeActivity extends AppCompatActivity {
      * @param view The view that is filtering the jotting type
      */
     public void toggleFilter(View view) {
-        GradientDrawable filterBtn = (GradientDrawable) view.getBackground();
-
-        TypedValue a = new TypedValue();
-        getTheme().resolveAttribute(R.attr.colorSecondary, a, true);
-
         if (view.getTag().equals("on")) {
-            view.setTag("off");
-            filterBtn.setStroke(0, a.data);
+            toggleFilter(view, false);
         } else {
-            view.setTag("on");
-            filterBtn.setStroke(10, a.data);
+            toggleFilter(view, true);
         }
     }
 
@@ -369,12 +395,7 @@ public class HomeActivity extends AppCompatActivity {
      * @param flag True to add the border; false to remove border
      */
     public void toggleFilter(View view, boolean flag) {
-        GradientDrawable filterBtn = (GradientDrawable) view.getBackground();
-
-        TypedValue a = new TypedValue();
-        getTheme().resolveAttribute(R.attr.colorSecondary, a, true);
-
         view.setTag(flag ? "on" : "off");
-        filterBtn.setStroke(flag ? 10 : 0, a.data);
+        ((MaterialButton) view).setStrokeWidth(flag ? (int) getResources().getDimension(R.dimen.filter_btn_activated) : 0);
     }
 }

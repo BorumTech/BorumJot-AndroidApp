@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/action_delete"
-            android:background="@color/cherryRasboraPrimarySurface"
+            android:background="@android:color/black"
             android:src="@drawable/ic_delete"
             android:onClick="onDeleteClick"
             android:contentDescription="@string/delete_content_desc" />
@@ -66,11 +66,11 @@
                 android:id="@+id/task_subtasks_box"
                 style="@style/SubtaskList" />
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/task_labels_box"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/FlexibleListBox" />
+<!--            <com.google.android.flexbox.FlexboxLayout-->
+<!--                android:id="@+id/task_labels_box"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:theme="@style/FlexibleListBox" />-->
 
             <LinearLayout
                 style="@style/DueDateRow">

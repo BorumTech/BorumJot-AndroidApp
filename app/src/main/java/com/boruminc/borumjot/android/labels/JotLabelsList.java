@@ -1,26 +1,27 @@
-package com.boruminc.borumjot.android;
+package com.boruminc.borumjot.android.labels;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.boruminc.borumjot.JotLabel;
+import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
+import com.boruminc.borumjot.android.R;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.google.android.flexbox.AlignItems;
-import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 
@@ -28,14 +29,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-public class LabelsList extends Fragment {
+public class JotLabelsList extends Fragment {
     private View root;
     private String userApiKey;
 
     private FlexboxLayoutManager labelLayout;
     private RecyclerView labelsRecycler;
-    private LabelsListAdapter adapter;
+    private JotLabelsListAdapter adapter;
+
+    private Jotting jotting;
+    private String jotType;
 
     @Nullable
     @Override
@@ -48,6 +54,11 @@ public class LabelsList extends Fragment {
         // Get/set the user api key from the preferences because it is otherwise inaccessible
         userApiKey = requireActivity().getSharedPreferences("user identification", Context.MODE_PRIVATE)
                 .getString("apiKey", "");
+
+        Bundle bundle = getArguments();
+        assert bundle != null;
+        jotting = (Jotting) bundle.getSerializable("jotting");
+        jotType = bundle.getString("jotType");
 
         labelLayout = new FlexboxLayoutManager(root.getContext());
         labelLayout.setJustifyContent(JustifyContent.FLEX_START);
@@ -84,7 +95,7 @@ public class LabelsList extends Fragment {
         @Override
         public JSONObject call() {
             super.call();
-            return this.connectToApi(this.encodeQueryString("label"));
+            return this.connectToApi(this.encodeQueryString("labels", "jot_type=" + jotType, "id=" + jotting.getId()));
         }
     };
 
@@ -94,10 +105,10 @@ public class LabelsList extends Fragment {
             super.onComplete(result);
             try {
                 if (ranOk()) {
-                    ArrayList<Label> labelsData = JSONToModel.convertJSONToLabels(result.getJSONArray("data"), true);
-
-                    adapter = new LabelsListAdapter(root.getContext(), labelsData);
+                    ArrayList<JotLabel> labelsData = JSONToModel.convertJSONToLabelBooleanMap(result.getJSONArray("data"));
+                    adapter = new JotLabelsListAdapter(root.getContext(), labelsData, jotting);
                     labelsRecycler.setAdapter(adapter);
+                    jotting.setLabels(JSONToModel.convertJSONToLabels(result.getJSONArray("data"), false));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

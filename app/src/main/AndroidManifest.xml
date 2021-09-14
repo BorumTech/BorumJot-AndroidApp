@@ -73,7 +73,7 @@
             android:label="Options" />
 
         <activity
-            android:name=".LabelActivity"
+            android:name=".labels.LabelActivity"
             android:label="Label" />
 
         <activity android:name=".ChangeSignInActivity"
@@ -82,6 +82,9 @@
 
         <activity android:name=".HelpActivity"
             android:label="Help" />
+
+        <activity android:name=".labels.NewLabelActivity"
+            android:label="Create New Label" />
 
         <receiver android:name=".TaskNotificationPublisher" />
     </application>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HelpActivity"
-    >
+    tools:context=".HelpActivity">
 
     <fragment
         android:id="@+id/appbar"
@@ -17,27 +17,44 @@
     <Button
         android:id="@+id/forum_btn"
         android:text="@string/action_forum"
-        style="@style/ActionButtonListItem.First"
+        style="@style/TextButtonListItem"
         android:layout_below="@id/appbar"
         android:onClick="onForumClick"
         android:visibility="gone" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/contact_btn"
         android:text="@string/contact_title"
-        style="@style/ActionButtonListItem.First"
+        style="@style/TextButtonListItem"
         android:layout_below="@id/forum_btn"
-        android:paddingTop="7dp"
+        app:icon="@drawable/mail"
         android:onClick="onContactClick"
         />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/twitter_btn"
+        android:text="@string/twitter_title"
+        style="@style/TextButtonListItem"
+        android:layout_below="@id/contact_btn"
+        app:icon="@drawable/twitter"
+        android:onClick="onTwitterClick"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/product_hunt_btn"
+        android:text="@string/product_hunt_title"
+        style="@style/TextButtonListItem"
+        android:layout_below="@id/twitter_btn"
+        app:icon="@drawable/product_hunt"
+        android:onClick="onProductHuntClick"
+    />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/privacy_policy_btn"
         android:text="@string/privacy_policy_title"
-        style="@style/ActionButtonListItem"
-        android:layout_below="@id/contact_btn"
-        android:background="@drawable/orange_border_thin"
-        android:paddingTop="15dp"
+        style="@style/TextButtonListItem"
+        android:layout_below="@id/product_hunt_btn"
+        app:icon="@drawable/privacy_policy_icon"
         android:onClick="onPrivacyPolicyClick"
         />
 

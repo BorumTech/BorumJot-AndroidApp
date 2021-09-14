@@ -6,6 +6,7 @@
     android:id="@+id/login_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
     tools:context=".LoginActivity">
 
     <fragment
@@ -67,16 +68,16 @@
         app:layout_constraintTop_toBottomOf="@+id/password"
         app:layout_constraintBottom_toTopOf="@id/borumjot_affil_note">
 
-        <com.boruminc.borumjot.android.customviews.OrangeGradientButton
+        <Button
             android:id="@+id/login"
-            style="@style/OneSelectButtonGradient"
+            style="@style/HeaderButton"
             android:enabled="true"
             android:onClick="submitLogin"
             android:text="@string/action_sign_in" />
 
-        <com.boruminc.borumjot.android.customviews.OrangeGradientButton
+        <Button
             android:id="@+id/registernavbtn"
-            style="@style/OneSelectButtonGradient"
+            style="@style/HeaderButton"
             android:onClick="navToRegister"
             android:text="@string/action_register"
             app:layout_constraintBottom_toBottomOf="parent"

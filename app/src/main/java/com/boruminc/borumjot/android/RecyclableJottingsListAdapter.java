@@ -36,7 +36,7 @@ public class RecyclableJottingsListAdapter extends RecyclerView.Adapter<Recyclab
     private Context context;
     private ArrayList<Jotting> jottingData;
 
-    RecyclableJottingsListAdapter(Context ct, ArrayList<Jotting> d) {
+    public RecyclableJottingsListAdapter(Context ct, ArrayList<Jotting> d) {
         context = ct;
         jottingData = d;
     }

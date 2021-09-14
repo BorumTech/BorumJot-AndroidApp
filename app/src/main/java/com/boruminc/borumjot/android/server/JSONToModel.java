@@ -2,6 +2,7 @@ package com.boruminc.borumjot.android.server;
 
 import android.util.Log;
 
+import com.boruminc.borumjot.JotLabel;
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
@@ -14,7 +15,9 @@ import org.json.JSONObject;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 /**
@@ -93,14 +96,29 @@ public class JSONToModel {
     }
 
     public static ArrayList<Label> convertJSONToLabels(JSONArray data, boolean withAll) throws JSONException {
-        ArrayList<Label> labels = new ArrayList<Label>();
+        ArrayList<Label> labels = new ArrayList<>();
 
         for (int i = 0; i < data.length(); i++) {
-            if (withAll || data.getJSONObject(i).getBoolean("task_under_label"))
+            if (withAll || data.getJSONObject(i).getBoolean("jot_under_label"))
                 labels.add(convertJSONToLabel(data.getJSONObject(i)));
         }
 
         return labels;
+    }
+
+    public static ArrayList<JotLabel> convertJSONToLabelBooleanMap(JSONArray data) throws JSONException {
+        ArrayList<JotLabel> labelBooleanMap = new ArrayList<>();
+
+        for (int i = 0; i < data.length(); i++) {
+            labelBooleanMap.add(
+                    new JotLabel(
+                            convertJSONToLabel(data.getJSONObject(i)),
+                            data.getJSONObject(i).getBoolean("jot_under_label")
+                    )
+            );
+        }
+
+        return labelBooleanMap;
     }
 
     private static Label convertJSONToLabel(JSONObject data) throws JSONException {

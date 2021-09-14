@@ -5,46 +5,73 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
+import com.boruminc.borumjot.android.labels.JotLabelsList;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.SlashNormalizer;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class NoteActivity extends JottingActivity {
     /* Views */
-    private AppBarFragment appBarFrag;
     private EditText noteDescriptionBox;
+    private MaterialToolbar appBar;
+    private LinearLayout animateContainer;
 
     private Intent nextIntent;
+
+    JotLabelsList labelsList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_activity);
 
-        findViewById(R.id.nav_to_share_btn).setOnClickListener(this::navigateToShare);
-        findViewById(R.id.delete_note_btn).setOnClickListener(this::showDeleteDialog);
+        appBar = findViewById(R.id.appbar);
+        appBar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.labels_btn:
+                    onLabelListClick(item);
+                    break;
+                case R.id.share_btn:
+                    navigateToShare();
+                    break;
+                case R.id.delete_btn:
+                    showDeleteDialog();
+                    break;
+                case R.id.save_btn:
+                    onSaveClick();
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
+        });
+
         noteDescriptionBox = findViewById(R.id.note_content);
-        appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
+//        animateContainer = findViewById(R.id.main_content_container);
 
         // Set the userApiKey for use throughout the class
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -91,20 +118,35 @@ public class NoteActivity extends JottingActivity {
                     }
                 });
             });
-        }
-        else if (getIntent().hasExtra("data")) {
+        } else if (getIntent().hasExtra("data")) {
             setJottingData((Note) getIntent().getSerializableExtra("data"));
             assert getNoteData() != null;
             setJottingName(getNoteData().getName());
             setNoteBody(getNoteData().getBody());
+
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+
+            labelsList = new JotLabelsList();
+
+            ft
+                    .add(R.id.label_frame, labelsList)
+                    .hide(labelsList)
+                    .commit();
+
+            Bundle b = new Bundle();
+            b.putSerializable("jotting", getJottingData());
+            b.putString("jotType", "note");
+
+            labelsList.setArguments(b);
         }
 
         noteDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
-        findViewById(R.id.appbar).setOnLongClickListener(this::onRenameJotting);
+        appBar.setOnLongClickListener(this::onRenameJotting);
     }
 
     protected void setJottingName(String name) {
-        if (appBarFrag != null) appBarFrag.passTitle(name);
+        ((TextView) findViewById(R.id.note_title)).setText(name);
     }
 
     private void setNoteBody(String body) {
@@ -186,14 +228,14 @@ public class NoteActivity extends JottingActivity {
         super.displayRenameDialog(onPositiveButtonClick);
     }
 
-    public void navigateToShare(View view) {
+    public void navigateToShare() {
         nextIntent = new Intent(this, ShareActivity.class);
         nextIntent.putExtra("jotting", getNoteData());
         nextIntent.putExtra("jotType", "note");
         startActivity(nextIntent);
     }
 
-    public void showDeleteDialog(View view) {
+    public void showDeleteDialog() {
         AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
         deleteDialog
                 .setTitle("Delete Note")
@@ -226,11 +268,42 @@ public class NoteActivity extends JottingActivity {
         }
     }
 
-    public void onSaveClick(View view) {
+    public void onSaveClick() {
         if (!getNoteBody().equals(getNoteData().getBody())) {
             updateNoteBody(getNoteBody());
-            startActivity(new Intent(this, HomeActivity.class));
         }
+        startActivity(new Intent(this, HomeActivity.class));
+    }
+
+    protected void onLabelListClick(MenuItem item) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
+
+        // Hide and show to constrain label note request to one and show animation
+        if (labelsList.isHidden()) {
+            item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
+            ft.show(labelsList).commit();
+        } else {
+            item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+            slideLabelsListUp(ft);
+        }
+    }
+
+    private void slideLabelsListDown() {
+        labelsList.requireView()
+                .animate()
+                .translationY(0);
+    }
+
+    private void slideLabelsListUp(FragmentTransaction ft) {
+        labelsList.requireView()
+                .animate()
+                .translationY(-labelsList.requireView().getHeight())
+                .withEndAction(() -> {
+                    ft.hide(labelsList).commit();
+                    slideLabelsListDown();
+                    Log.d("Visibility", String.valueOf(labelsList.isVisible()));
+                });
     }
 
     public void updateNoteBody(String newBody) {

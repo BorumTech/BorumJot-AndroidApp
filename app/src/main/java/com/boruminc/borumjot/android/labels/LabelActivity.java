@@ -1,7 +1,6 @@
-package com.boruminc.borumjot.android;
+package com.boruminc.borumjot.android.labels;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
+import com.boruminc.borumjot.android.AppBarFragment;
+import com.boruminc.borumjot.android.R;
+import com.boruminc.borumjot.android.RecyclableJottingsListAdapter;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
@@ -200,19 +202,18 @@ public class LabelActivity extends AppCompatActivity {
     }
 
     private ApiRequestExecutor deleteLabelRequest() {
-        return new ApiRequestExecutor(String.valueOf(currentLabel.getId())) {
+        return new ApiRequestExecutor() {
             @Override
             protected void initialize() {
                 super.initialize();
                 addAuthorizationHeader(userApiKey);
                 setRequestMethod("DELETE");
-                setQuery(encodePostQuery("id=%s"));
             }
 
             @Override
             public JSONObject call() {
                 super.call();
-                return this.connectToApi(encodeQueryString("label"));
+                return this.connectToApi(encodeQueryString("label", "id=" + currentLabel.getId()));
             }
         };
     }

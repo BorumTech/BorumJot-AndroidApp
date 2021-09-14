@@ -20,6 +20,6 @@
         android:layout_width="0dp"
         android:layout_height="75dp"
         app:layout_flexBasisPercent="10%"
-        android:src="@drawable/ic_pin"
+        android:src="@drawable/ic_pin_black"
         android:contentDescription="@string/pin_content_desc" />
 </com.google.android.flexbox.FlexboxLayout>

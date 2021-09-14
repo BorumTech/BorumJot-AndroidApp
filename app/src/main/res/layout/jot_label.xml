@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="150dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginHorizontal="@dimen/action_btn_margin"
+    android:layout_height="wrap_content"
+    android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/label_name"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:padding="@dimen/action_btn_margin"
+        android:checked="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

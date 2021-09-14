@@ -34,7 +34,7 @@
     <string name="action_report_bug">Report Bug</string>
     <string name="action_donate">Donate</string>
     <string name="action_forum">Forum</string>
-    <string name="action_change_sign_in">Change Sign-In</string>
+    <string name="action_manage_account">Manage Account</string>
     <string name="action_export_data">Export Data</string>
     <string name="action_logout">Log Out</string>
 
@@ -92,9 +92,20 @@
     <string name="delete_content_desc">Trashcan or delete icon</string>
     <string name="save_content_desc">Save icon</string>
     <string name="action_help">Help</string>
-    <string name="version_name">Version 2.3.2</string>
+    <string name="version_name">Version 2.3.3</string>
     <string name="action_labels">Labels</string>
     <string name="copyright_notice">Copyright 2021 Varun Singh</string>
     <string name="support_email">support@borumtech.com</string>
     <string name="privacy_policy_link">https://jot.borumtech.com/legal/PrivacyPolicy</string>
+    <string name="twitter_title">Follow @BorumJot</string>
+    <string name="twitter_link">https://twitter.com/BorumJot</string>
+    <string name="product_hunt_link">https://www.producthunt.com/posts/borum-jot</string>
+    <string name="product_hunt_title">Give Feedback</string>
+    <string name="product_hunt_content_desc">Product Hunt Logo</string>
+    <string name="loading_note">Loading Note…</string>
+    <string name="delete_subtask_content_desc">Red X</string>
+    <string name="new_label_content_desc">Create New Label</string>
+    <string name="action_create">Create</string>
+    <string name="close_content_desc">Close menu</string>
+    <string name="create_new_label_hint">New Label Name</string>
 </resources>

@@ -8,7 +8,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,7 +32,7 @@ import androidx.core.app.NotificationCompat;
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
-import com.boruminc.borumjot.android.customviews.XButton;
+import com.boruminc.borumjot.android.labels.LabelActivity;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
@@ -74,7 +73,7 @@ public class TaskActivity extends JottingActivity {
         appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
         subtaskList = findViewById(R.id.task_subtasks_box);
-        labelsList = findViewById(R.id.task_labels_box);
+        labelsList = new FlexboxLayout(this); //findViewById(R.id.task_labels_box);
 
         // Set the userApiKey for class use
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -426,8 +425,10 @@ public class TaskActivity extends JottingActivity {
         TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subtaskTitleColumnLayoutParams.setMargins(10, 0, 10, 0);
 
+        subtaskList.setColumnShrinkable(2, true);
+
         for (Task subtask : subtasks) {
-            addSubtask(subtask, subtaskList.getChildCount());
+            subtaskList.addView(addSubtaskToTable(subtask));
         }
 
         TableRow addSubtaskLayout = new TableRow(this);
@@ -457,41 +458,21 @@ public class TaskActivity extends JottingActivity {
         }
     }
 
-    private void addSubtask(Task subtask, int index) {
-        TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        LinearLayout horizLayout = new TableRow(this);
+    private LinearLayout addSubtaskToTable(Task subtask) {
+        LinearLayout horizLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.subtask, null);
         horizLayout.setTag(subtask.getId());
-        horizLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        EditTextV2 subtaskView = new EditTextV2(this);
-        subtaskView.setText(subtask.getName());
-        subtaskView.setTextSize(20f);
-        subtaskView.setTextColor(Color.RED);
-        subtaskView.setLayoutParams(subtaskTitleColumnLayoutParams);
-        subtaskView.setOnFocusChangeListener(this::onSubtaskBoxFocus);
+        TextView title = horizLayout.findViewById(R.id.subtask_title);
+        title.setText(subtask.getName());
+        title.setOnFocusChangeListener(this::onSubtaskBoxFocus);
         // Display strikethrough if the subtask is marked as complete
         if (subtask.isCompleted())
-            subtaskView.setPaintFlags(subtaskView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            title.setPaintFlags(title.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
-        CheckBox checkBox = new CheckBox(this);
-        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        checkBox.setLayoutParams(layoutParams);
-        checkBox.setOnClickListener(this::onCompleteSubtaskClick);
+        CheckBox checkBox = horizLayout.findViewById(R.id.completed_status);
         checkBox.setChecked(subtask.isCompleted());
 
-        ImageButton deleteBtn = new XButton(this);
-        TableRow.LayoutParams deleteBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        deleteBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-        deleteBtn.setLayoutParams(deleteBtnLayoutParams);
-        deleteBtn.setBackground(null);
-        deleteBtn.setOnClickListener(this::onDeleteSubtaskClick);
-
-        horizLayout.addView(checkBox);
-        horizLayout.addView(subtaskView);
-        horizLayout.addView(deleteBtn);
-
-        subtaskList.addView(horizLayout, index);
+        return horizLayout;
     }
 
     /* Event Handlers */
@@ -583,14 +564,20 @@ public class TaskActivity extends JottingActivity {
                         super.call();
                         return this.connectToApi(this.encodeQueryString("subtasks"));
                     }
-                }, data -> {
-                    if (data != null) {
+                }, new ApiResponseExecutor() {
+                    @Override
+                    public void onComplete(JSONObject result) {
+                        super.onComplete(result);
                         try {
-                            if (data.getInt("statusCode") >= 200 && data.getInt("statusCode") < 300) {
+                            if (ranOk()) {
                                 Task subtask = new Task(newSubtaskField.getText().toString());
-                                subtask.setId(data.getJSONObject("data").getInt("id"));
+                                subtask.setId(result.getJSONObject("data").getInt("id"));
+
                                 getTaskData().getSubtasks().add(subtask);
-                                addSubtask(subtask, getTaskData().getSubtasks().size() - 1);
+
+                                // Add right before "new subtask" row (1-indexed)
+                                subtaskList.addView(addSubtaskToTable(subtask), subtaskList.getChildCount() - 1);
+
                                 ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
                         } catch (JSONException e) {

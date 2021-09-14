@@ -1,79 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/main_view"
+    android:layout_height="match_parent"
     tools:context=".NoteActivity">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/top_section"
-        android:background="?attr/colorPrimary">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+
+    <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="128dp">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/appbar"
+                    android:background="@android:color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_scrollFlags="scroll|enterAlways|snap"
+                    app:menu="@menu/note_options_menu" />
+
+                <TextView
+                    android:id="@+id/note_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="72dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    style="@style/TextAppearance.App.CollapsingToolbar.Expanded"
+                    android:text="@string/loading_note"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"/>
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/main_content_container"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/app_bar_layout"-->
+<!--        android:orientation="vertical">-->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/label_frame"
+            android:layout_below="@id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/action_btn_margin"
-            android:id="@+id/action_bar">
-            <Button
-                android:id="@+id/save_btn"
-                android:layout_width="75dp"
-                android:layout_height="wrap_content"
-                android:text="@string/action_save"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:onClick="onSaveClick"
-                />
+            />
 
-            <Button
-                android:id="@+id/nav_to_share_btn"
-                android:layout_height="wrap_content"
-                android:text="@string/action_share"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/save_btn"
-                style="@style/HeaderButton" />
-            <ImageButton
-                android:id="@+id/delete_note_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/nav_to_share_btn"
-                android:layout_centerVertical="true"
-                android:text="@string/action_delete"
-                android:src="@drawable/ic_delete"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:background="@color/cherryRasboraPrimary"
-                android:contentDescription="@string/delete_content_desc"
-                android:layout_toEndOf="@id/nav_to_share_btn" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <fragment
-            android:id="@+id/appbar"
+        <ScrollView
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:name="com.boruminc.borumjot.android.AppBarFragment"
-            tools:layout="@layout/appbar_appname_fragment" />
-    </LinearLayout>
+            android:layout_below="@id/label_frame"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/top_section">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <com.boruminc.borumjot.android.customviews.EditTextV2
-                android:id="@+id/note_content"
-                android:inputType="text|textMultiLine"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:autofillHints=""
-                android:hint="@string/note_hint"
-                style="@style/NoteArea"/>
-        </LinearLayout>
-    </ScrollView>
+                <com.boruminc.borumjot.android.customviews.EditTextV2
+                    style="@style/NoteArea"
+                    android:autofillHints=""
+                    android:hint="@string/note_hint"
+                    android:id="@+id/note_content"
+                    android:inputType="text|textMultiLine"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+        </ScrollView>
+<!--    </LinearLayout>-->
+
 </RelativeLayout>
+
