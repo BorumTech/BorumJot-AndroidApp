@@ -66,11 +66,11 @@
                 android:id="@+id/task_subtasks_box"
                 style="@style/SubtaskList" />
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/task_labels_box"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/FlexibleListBox" />
+<!--            <com.google.android.flexbox.FlexboxLayout-->
+<!--                android:id="@+id/task_labels_box"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:theme="@style/FlexibleListBox" />-->
 
             <LinearLayout
                 style="@style/DueDateRow">

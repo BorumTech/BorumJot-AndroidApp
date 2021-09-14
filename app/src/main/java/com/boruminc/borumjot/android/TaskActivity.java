@@ -73,7 +73,7 @@ public class TaskActivity extends JottingActivity {
         appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
         subtaskList = findViewById(R.id.task_subtasks_box);
-        labelsList = findViewById(R.id.task_labels_box);
+        labelsList = new FlexboxLayout(this); //findViewById(R.id.task_labels_box);
 
         // Set the userApiKey for class use
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
