@@ -105,4 +105,7 @@
     <string name="loading_note">Loading Note…</string>
     <string name="delete_subtask_content_desc">Red X</string>
     <string name="new_label_content_desc">Create New Label</string>
+    <string name="action_create">Create</string>
+    <string name="close_content_desc">Close menu</string>
+    <string name="create_new_label_hint">New Label Name</string>
 </resources>
