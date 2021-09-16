@@ -3,7 +3,7 @@
     <!-- Base application themes -->
     <style name="CherryRasbora" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/cherryRasboraPrimary</item>
-        <item name="colorPrimaryDark">@color/cherryRasboraPrimary</item>
+        <item name="colorPrimaryDark">@color/cherryRasboraPrimaryDark</item>
         <item name="colorSecondary">@color/cherryRasboraSecondary</item>
         <item name="colorAccent">@color/cherryRasboraAccent</item>
         <item name="colorSurface">@color/cherryRasboraBackgroundSurface</item>
