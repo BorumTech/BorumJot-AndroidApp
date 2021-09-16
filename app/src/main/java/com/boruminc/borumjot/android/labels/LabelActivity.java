@@ -141,12 +141,20 @@ public class LabelActivity extends AppCompatActivity {
                 try {
                     if (ranOk()) {
                         jottingListData = JSONToModel.convertJSONToJottings(result.getJSONArray("data"));
+
+                        if (jottingListData.isEmpty()) {
+                            findViewById(R.id.label_filtered_jotting_list).setVisibility(View.GONE);
+                            findViewById(R.id.empty_label_empty_state_container).setVisibility(View.VISIBLE);
+                            return;
+                        }
                         RecyclableJottingsListAdapter adapter = new RecyclableJottingsListAdapter(
                                 LabelActivity.this,
                                 jottingListData
                         );
                         jottingListView.setAdapter(adapter);
                         jottingListView.setLayoutManager(new LinearLayoutManager(LabelActivity.this));
+                    } else {
+                        Toast.makeText(getApplicationContext(), "A server error occurred", Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     Toast.makeText(LabelActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();

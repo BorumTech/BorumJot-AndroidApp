@@ -108,7 +108,10 @@
     <string name="action_create">Create</string>
     <string name="close_content_desc">Close menu</string>
     <string name="create_new_label_hint">New Label Name</string>
-    <string name="loading_task">Loading Task...</string>
+    <string name="loading_task">Loading Task…</string>
     <string name="action_convert">Convert to Note</string>
     <string name="checkbox_content_desc">Empty Checkbox</string>
+    <string name="empty_label">No jottings with this label at the moment</string>
+    <string name="add_label_to_jot">Categorize your jottings with labels to better organize your notes and tasks</string>
+    <string name="empty_label_content_desc">Empty label</string>
 </resources>

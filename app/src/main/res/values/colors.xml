@@ -2,6 +2,7 @@
 <resources>
   <!-- Cherry Rasbora Theme -->
   <color name="cherryRasboraPrimary">#003049</color>
+  <color name="cherryRasboraPrimaryDark">#003027</color>
   <color name="cherryRasboraSecondary">#F77F00</color>
   <color name="cherryRasboraAccent">#D62828</color>
   <color name="cherryRasboraBackgroundSurface">#EAE2B7</color>

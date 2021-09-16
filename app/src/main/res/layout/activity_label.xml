@@ -17,4 +17,42 @@
         android:id="@+id/label_filtered_jotting_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/empty_label_empty_state_container"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_marginTop="100dp"
+            android:layout_height="300dp"
+            android:src="@drawable/empty_label_empty_state"
+            android:contentDescription="@string/empty_label_content_desc" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Display1"
+            android:textSize="30sp"
+            android:text="@string/empty_label"
+            android:textColor="?attr/colorPrimary"
+            android:layout_marginHorizontal="10dp"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Display1"
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:textSize="18sp"
+            android:text="@string/add_label_to_jot"
+            android:textColor="?attr/colorPrimaryDark"
+            android:gravity="center_horizontal"/>
+    </LinearLayout>
+
+
 </LinearLayout>
