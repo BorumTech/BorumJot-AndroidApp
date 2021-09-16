@@ -44,6 +44,7 @@ import com.boruminc.borumjot.android.server.JSONToModel;
 import com.boruminc.borumjot.android.server.SlashNormalizer;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
+import com.boruminc.borumjot.android.server.requests.PinJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -97,6 +98,9 @@ public class TaskActivity extends JottingActivity {
                     break;
                 case R.id.delete_btn:
                     onDeleteClick();
+                    break;
+                case R.id.pin_btn:
+                    onPinClick(item);
                     break;
                 default:
                     return false;
@@ -160,6 +164,7 @@ public class TaskActivity extends JottingActivity {
             setJottingName(getJottingData().getName());
             setTaskDetails(getJottingData().getBody());
             setTaskStatus(getTaskData().isCompleted());
+            setTaskPriority(getTaskData().getPriority());
             setDueDate(getTaskData().getDueDate());
             loadSubtasks(); // Set subtasks asynchronously
         }
@@ -186,6 +191,34 @@ public class TaskActivity extends JottingActivity {
         getLabelsList().setArguments(b);
 
 }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void setTaskPriority(int priority) {
+        if (priority == 1) {
+            appBar.getMenu().findItem(R.id.pin_btn).setIcon(getResources().getDrawable(R.drawable.ic_filled_pin, getTheme()));
+        }
+    }
+
+    private void onPinClick(MenuItem item) {
+        new TaskRunner().executeAsync(new PinJottingRequest(getUserApiKey(), getJottingData()), new ApiResponseExecutor() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onComplete(JSONObject result) {
+                super.onComplete(result);
+                if (ranOk()) {
+                    if (getJottingData().getPriority() == 0) {
+                        getJottingData().setPriority(1);
+                        item.setIcon(
+                                getResources().getDrawable(R.drawable.ic_filled_pin, getTheme())
+                        );
+                    } else {
+                        getJottingData().setPriority(0);
+                        item.setIcon(getResources().getDrawable(R.drawable.ic_outline_pin, getTheme()));
+                    }
+                }
+            }
+        });
+    }
 
     @Override
     protected void onStart() {

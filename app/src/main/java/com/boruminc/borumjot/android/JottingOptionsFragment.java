@@ -28,6 +28,7 @@ import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
+import com.boruminc.borumjot.android.server.requests.PinJottingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,7 +64,7 @@ public class JottingOptionsFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pin_btn:
-                new TaskRunner().executeAsync(getPinRequest(), data -> {
+                new TaskRunner().executeAsync(new PinJottingRequest(userApiKey, getJotData()), data -> {
                     if (data != null && data.optInt("statusCode") == 200) {
                         // Set priority to new value
                         getJotData().setPriority(getJotData().getPriority() >= 1 ? 0 : 1);
@@ -110,7 +111,7 @@ public class JottingOptionsFragment extends Fragment {
                     ((View) pin.getParent()).setBackground(
                             getResources().getDrawable(
                                     R.drawable.orange_border,
-                                    Objects.requireNonNull(getActivity()).getTheme()
+                                    requireActivity().getTheme()
                             )
                     );
                 }
@@ -121,34 +122,6 @@ public class JottingOptionsFragment extends Fragment {
 
     private Jotting getJotData() {
         return (Jotting) requireArguments().getSerializable("data");
-    }
-
-    private ApiRequestExecutor getPinRequest() {
-        return new ApiRequestExecutor() {
-            @Override
-            protected void initialize() {
-                super.initialize();
-                setRequestMethod("PUT");
-                addAuthorizationHeader(userApiKey);
-            }
-
-            @Override
-            public JSONObject call() {
-                super.call();
-
-                String[] params = new String[2];
-                params[0] = "id=" + getJotData().getId();
-                params[1] = "priority=" + (getJotData().getPriority() == 0 ? 1 : 0);
-
-                if (getJotData() instanceof Task) {
-                    return this.connectToApi(this.encodeQueryString("task", params));
-                } else if (getJotData() instanceof Note) {
-                    return this.connectToApi(this.encodeQueryString("note", params));
-                }
-
-                return null;
-            }
-        };
     }
 
     private AlertDialog.Builder buildDeleteJottingDialog(String jotType) {

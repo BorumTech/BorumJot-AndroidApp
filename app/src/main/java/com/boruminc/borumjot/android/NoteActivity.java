@@ -5,14 +5,17 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -23,6 +26,7 @@ import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.SlashNormalizer;
 import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
+import com.boruminc.borumjot.android.server.requests.PinJottingRequest;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
@@ -55,6 +59,8 @@ public class NoteActivity extends JottingActivity {
                 case R.id.save_btn:
                     onSaveClick();
                     break;
+                case R.id.pin_btn:
+                    onPinClick(item);
                 default:
                     return false;
             }
@@ -114,6 +120,7 @@ public class NoteActivity extends JottingActivity {
             assert getNoteData() != null;
             setJottingName(getNoteData().getName());
             setNoteBody(getNoteData().getBody());
+            setNotePriority(getNoteData().getPriority());
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
@@ -134,6 +141,35 @@ public class NoteActivity extends JottingActivity {
 
         noteDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
         appBar.setOnLongClickListener(this::onRenameJotting);
+    }
+
+    private void setNotePriority(int priority) {
+        if (priority == 1) {
+            appBar.getMenu().findItem(R.id.pin_btn).setIcon(getResources().getDrawable(R.drawable.ic_filled_pin, getTheme()));
+        }
+    }
+
+    private void onPinClick(MenuItem item) {
+        new TaskRunner().executeAsync(new PinJottingRequest(getUserApiKey(), getJottingData()), new ApiResponseExecutor() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onComplete(JSONObject result) {
+                super.onComplete(result);
+                if (ranOk()) {
+                    if (getJottingData().getPriority() == 0) {
+                        getJottingData().setPriority(1);
+                        item.setIcon(
+                                getResources().getDrawable(R.drawable.ic_filled_pin, getTheme())
+                        );
+                    } else {
+                        getJottingData().setPriority(0);
+                        item.setIcon(
+                                getResources().getDrawable(R.drawable.ic_outline_pin, getTheme())
+                        );
+                    }
+                }
+            }
+        });
     }
 
     protected void setJottingName(String name) {

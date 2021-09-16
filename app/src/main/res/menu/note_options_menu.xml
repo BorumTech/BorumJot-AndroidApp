@@ -11,7 +11,7 @@
     <item android:id="@+id/pin_btn"
         android:title="@string/action_pin"
         app:showAsAction="always"
-        android:icon="@drawable/ic_pin"/>
+        android:icon="@drawable/ic_outline_pin"/>
 
     <item android:id="@+id/share_btn"
         android:title="@string/action_share"
