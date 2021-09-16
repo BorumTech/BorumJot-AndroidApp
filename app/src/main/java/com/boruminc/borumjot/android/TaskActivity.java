@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.boruminc.borumjot.Label;
@@ -41,6 +42,7 @@ import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,31 +56,52 @@ import java.util.Locale;
 
 public class TaskActivity extends JottingActivity {
     /* Views */
-    private AppBarFragment appBarFrag;
+    private MaterialToolbar appBar;
     private EditText taskDescriptionBox;
-    private CheckBox taskCompletionBox;
+    private ImageButton taskCompletionBox;
     private TableLayout subtaskList;
     private EditTextV2 newSubtaskField;
     private FlexboxLayout labelsList;
+    private TextView taskTitle;
 
     private Intent nextIntent;
 
     /* Overriding Callback Methods */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.task_activity);
 
         taskDescriptionBox = findViewById(R.id.task_description_box);
-        appBarFrag = (AppBarFragment) getSupportFragmentManager().findFragmentById(R.id.appbar);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
         subtaskList = findViewById(R.id.task_subtasks_box);
         labelsList = new FlexboxLayout(this); //findViewById(R.id.task_labels_box);
+        taskTitle = findViewById(R.id.task_title);
 
         // Set the userApiKey for class use
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
             setUserApiKey(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""));
         }
+
+        appBar = findViewById(R.id.appbar);
+        appBar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.labels_btn:
+//                    onLabelListClick(item);
+                    break;
+                case R.id.share_btn:
+                    navigateToShare();
+                    break;
+                case R.id.delete_btn:
+                    onDeleteClick();
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
+        });
 
         setJottingType("Task");
         if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog((dialog, which) -> {
@@ -368,7 +391,7 @@ public class TaskActivity extends JottingActivity {
      * @param name The new name of the jotting
      */
     protected void setJottingName(String name) {
-        if (appBarFrag != null) appBarFrag.passTitle(name);
+        taskTitle.setText(name);
     }
 
     /**
@@ -416,9 +439,17 @@ public class TaskActivity extends JottingActivity {
         taskDescriptionBox.setText(SlashNormalizer.unescapeUserSlashes(body));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setTaskStatus(boolean on) {
-        appBarFrag.displayStrikethrough(on);
-        taskCompletionBox.setChecked(on);
+        displayStrikethrough(on);
+        taskCompletionBox.setBackground(on ? getResources().getDrawable(R.drawable.ic_checked_circle, getTheme()) : getResources().getDrawable(R.drawable.ic_unchecked_checkbox_circle, getTheme()));
+    }
+
+    private void displayStrikethrough(boolean on) {
+        if (on)
+            taskTitle.setPaintFlags(taskTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        else
+            taskTitle.setPaintFlags(taskTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
     private void setSubtasks(ArrayList<Task> subtasks) {
@@ -477,7 +508,7 @@ public class TaskActivity extends JottingActivity {
 
     /* Event Handlers */
 
-    public void onDeleteClick(View view) {
+    public void onDeleteClick() {
         android.app.AlertDialog.Builder deleteDialog = new android.app.AlertDialog.Builder(this);
         deleteDialog
                 .setTitle("Delete Task")
@@ -529,7 +560,7 @@ public class TaskActivity extends JottingActivity {
                     public void onComplete(JSONObject data) {
                         super.onComplete(data);
                         if (ranOk()) {
-                            appBarFrag.displayStrikethrough(completed == 1);
+                            displayStrikethrough(completed == 1);
                         } else {
                             Toast.makeText(getApplicationContext(), "An error occurred and the task could not be marked as "
                                 + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
@@ -689,7 +720,7 @@ public class TaskActivity extends JottingActivity {
         startActivity(labelAct);
     }
 
-    public void navigateToShare(View view) {
+    public void navigateToShare() {
         nextIntent = new Intent(this, ShareActivity.class);
         nextIntent.putExtra("jotting", getTaskData());
         nextIntent.putExtra("jotType", "task");

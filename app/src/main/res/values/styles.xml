@@ -10,6 +10,8 @@
         <item name="colorOnPrimarySurface">@color/cherryRasboraPrimarySurface</item>
         <item name="android:windowBackground">?attr/colorOnPrimarySurface</item>
         <item name="android:editTextStyle">@style/FormInputFields</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
+        <item name="actionOverflowButtonStyle">@style/OverflowButton</item>
     </style>
 
     <!-- Base Styles -->
@@ -213,6 +215,15 @@
 
     <style name="JottingListItem">
         <item name="android:activatedBackgroundIndicator">@color/cherryRasboraPrimarySurface</item>
+    </style>
+
+    <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>
+        <item name="android:dropDownVerticalOffset">4.0dip</item>
+    </style>
+
+    <style name="OverflowButton" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">@android:color/white</item>
     </style>
 
 

@@ -108,4 +108,7 @@
     <string name="action_create">Create</string>
     <string name="close_content_desc">Close menu</string>
     <string name="create_new_label_hint">New Label Name</string>
+    <string name="loading_task">Loading Task...</string>
+    <string name="action_convert">Convert to Note</string>
+    <string name="checkbox_content_desc">Empty Checkbox</string>
 </resources>
