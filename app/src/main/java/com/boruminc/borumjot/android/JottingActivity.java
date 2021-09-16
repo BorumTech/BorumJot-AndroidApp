@@ -1,7 +1,6 @@
 package com.boruminc.borumjot.android;
 
 import android.app.Dialog;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
@@ -16,9 +15,11 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.boruminc.borumjot.Jotting;
 import com.boruminc.borumjot.Label;
+import com.boruminc.borumjot.android.labels.JotLabelsList;
 import com.boruminc.borumjot.android.labels.UpdateJottingLabels;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
@@ -36,6 +37,7 @@ abstract class JottingActivity extends AppCompatActivity {
     private Jotting jottingData;
     private ArrayList<Label> allUserLabels;
     private AlertDialog.Builder alertDialog;
+    private JotLabelsList labelsList;
 
     /* Getters and Setters */
 
@@ -46,6 +48,10 @@ abstract class JottingActivity extends AppCompatActivity {
     public String getUserApiKey() {
         return userApiKey;
     }
+
+    protected void setLabelsList(JotLabelsList labelsList) { this.labelsList = labelsList; }
+
+    protected JotLabelsList getLabelsList() { return labelsList; }
 
     public void setUserApiKey(String userApiKey) {
         this.userApiKey = userApiKey;
@@ -108,28 +114,6 @@ abstract class JottingActivity extends AppCompatActivity {
                 return this.connectToApi(encodeQueryString("labels", "jot_type=" + jottingType, "id=" + getJottingData().getId()));
             }
         };
-    }
-
-
-
-
-    /**
-     * Loads the labels
-     * @param data The label data as a JSONObject
-     */
-    protected void loadLabels(JSONObject data) {
-        if (data != null) {
-            try {
-                if (data.optInt("statusCode") == 200 && data.has("data")) {
-                    allUserLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), true);
-                    ArrayList<Label> taskLabels = JSONToModel.convertJSONToLabels(data.getJSONArray("data"), false);
-                    setLabels(taskLabels);
-                    getJottingData().setLabels(taskLabels);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /* API Response Handlers */
@@ -240,7 +224,19 @@ abstract class JottingActivity extends AppCompatActivity {
         alertDialog.create().show();
     }
 
+    protected void onLabelListClick(MenuItem item) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
 
+        // Hide and show to constrain label note request to one and show animation
+        if (getLabelsList().isHidden()) {
+            item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
+            ft.show(getLabelsList()).commit();
+        } else {
+            item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
+            slideLabelsListUp(ft);
+        }
+    }
 
     private void onLabelsListChoiceClick(DialogInterface dialog, int which, boolean checked) {
         if (checked) {
@@ -251,6 +247,23 @@ abstract class JottingActivity extends AppCompatActivity {
         Log.d("Jotting labels", getJottingData().getLabels().toString());
     }
 
+    protected void slideLabelsListDown() {
+        labelsList.requireView()
+                .animate()
+                .translationY(0);
+    }
+
+    protected void slideLabelsListUp(FragmentTransaction ft) {
+        labelsList.requireView()
+                .animate()
+                .translationY(-labelsList.requireView().getHeight())
+                .withEndAction(() -> {
+                    ft.hide(labelsList).commit();
+                    slideLabelsListDown();
+                    Log.d("Visibility", String.valueOf(labelsList.isVisible()));
+                });
+    }
+
     /* Abstract Methods */
 
     /**
@@ -258,10 +271,4 @@ abstract class JottingActivity extends AppCompatActivity {
      * @param name The new name of the jotting
      */
     abstract void setJottingName(String name);
-
-    /**
-     * Replaces the current labels list views with the passed in ones
-     * @param labels The new labels list
-     */
-    abstract void setLabels(ArrayList<Label> labels);
 }

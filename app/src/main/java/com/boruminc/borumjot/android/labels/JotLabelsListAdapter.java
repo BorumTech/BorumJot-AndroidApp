@@ -24,11 +24,13 @@ public class JotLabelsListAdapter extends RecyclerView.Adapter<JotLabelsListAdap
     private Context context;
     private ArrayList<JotLabel> labelData;
     private Jotting jotting;
+    private String jotType;
 
-    JotLabelsListAdapter(Context ct, ArrayList<JotLabel> d, Jotting j) {
+    JotLabelsListAdapter(Context ct, ArrayList<JotLabel> d, Jotting j, String jt) {
         context = ct;
         labelData = d;
         jotting = j;
+        jotType = jt;
     }
 
     @NonNull
@@ -50,7 +52,7 @@ public class JotLabelsListAdapter extends RecyclerView.Adapter<JotLabelsListAdap
             else
                 jotting.removeLabel(labelBoolRelation.getLabel());
 
-            new UpdateJottingLabels(jotting, "note").runAsync(
+            new UpdateJottingLabels(jotting, jotType).runAsync(
                     context.getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("userApiKey", ""),
                     new ApiResponseExecutor() {
                         @Override

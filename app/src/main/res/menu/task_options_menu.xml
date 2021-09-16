@@ -23,9 +23,4 @@
         app:showAsAction="never"
         android:icon="@drawable/ic_delete"/>
 
-    <item android:id="@+id/convert_btn"
-        android:title="@string/action_convert"
-        app:showAsAction="never"
-        android:icon="@drawable/ic_cycle" />
-
 </menu>
