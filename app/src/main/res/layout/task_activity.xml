@@ -1,55 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".TaskActivity"
-    >
+    tools:context=".TaskActivity">
 
-    <fragment
-        android:id="@+id/appbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="128dp">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/appbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:menu="@menu/task_options_menu"
+                style="@style/OverflowMenu"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="70dp">
+                <ImageButton
+                    android:id="@+id/complete_task_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:background="@android:color/transparent"
+                    android:onClick="onCompleteClick"
+                    android:layout_marginLeft="10dp"
+                    android:tint="@android:color/white"
+                    android:contentDescription="@string/checkbox_content_desc"
+                    android:src="@drawable/ic_unchecked_checkbox_circle"
+                    android:layout_marginStart="10dp" />
+
+                <TextView
+                    android:id="@+id/task_title"
+                    style="@style/TextAppearance.App.CollapsingToolbar.Expanded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="20dp"
+                    android:paddingLeft="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/loading_task" />
+            </LinearLayout>
+
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/label_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="com.boruminc.borumjot.android.AppBarFragment"
-        tools:layout="@layout/appbar_appname_fragment" />
-
-    <LinearLayout
-        android:id="@+id/header_btns"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/appbar"
-        android:gravity="center_horizontal"
-        app:layout_constraintTop_toTopOf="parent">
-        <CheckBox
-            android:id="@+id/complete_task_btn"
-            android:layout_height="match_parent"
-            android:text="@string/prompt_task_complete"
-            android:onClick="onCompleteClick"
-            style="@style/HeaderButton" />
-        <Button
-            android:id="@+id/share_task_btn"
-            android:layout_height="match_parent"
-            android:text="@string/action_share"
-            android:onClick="navigateToShare"
-            style="@style/HeaderButton" />
-        <ImageButton
-            android:id="@+id/delete_task_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/action_delete"
-            android:background="@android:color/black"
-            android:src="@drawable/ic_delete"
-            android:onClick="onDeleteClick"
-            android:contentDescription="@string/delete_content_desc" />
-    </LinearLayout>
+        android:layout_below="@id/app_bar_layout" />
 
     <ScrollView
-        android:layout_below="@id/header_btns"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar_layout">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,29 +79,23 @@
 
             <com.boruminc.borumjot.android.customviews.EditTextV2
                 android:id="@+id/task_description_box"
+                style="@style/NoteArea"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_details_fill"
-                android:inputType="textMultiLine"
-                style="@style/NoteArea" />
+                android:inputType="textMultiLine" />
 
             <TableLayout
                 android:id="@+id/task_subtasks_box"
                 style="@style/SubtaskList" />
 
-<!--            <com.google.android.flexbox.FlexboxLayout-->
-<!--                android:id="@+id/task_labels_box"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:theme="@style/FlexibleListBox" />-->
+            <LinearLayout style="@style/DueDateRow">
 
-            <LinearLayout
-                style="@style/DueDateRow">
                 <ImageButton
                     android:id="@+id/due_date_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_menu_my_calendar"
-                    android:contentDescription="@string/action_due_date" />
+                    android:contentDescription="@string/action_due_date"
+                    android:src="@android:drawable/ic_menu_my_calendar" />
 
                 <TextView
                     android:id="@+id/due_date"
