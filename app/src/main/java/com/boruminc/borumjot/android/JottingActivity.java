@@ -110,28 +110,7 @@ abstract class JottingActivity extends AppCompatActivity {
         };
     }
 
-    /**
-     * Returns the requests that creates a new label to be added to any jotting
-     * @param newLabelName The name of the new label
-     * @return The ApiRequestExecutor object
-     */
-    protected ApiRequestExecutor createNewLabel(String newLabelName) {
-        return new ApiRequestExecutor(newLabelName) {
-            @Override
-            protected void initialize() {
-                super.initialize();
-                setRequestMethod("POST");
-                addAuthorizationHeader(getUserApiKey());
-                setQuery(encodePostQuery("name=%s"));
-            }
 
-            @Override
-            public JSONObject call() {
-                super.call();
-                return this.connectToApi(encodeQueryString("label"));
-            }
-        };
-    }
 
 
     /**
@@ -184,33 +163,6 @@ abstract class JottingActivity extends AppCompatActivity {
     }
 
     /* Event Handlers */
-
-    public void onNewLabelClick(View view) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            View renameJottingDialog = getLayoutInflater().inflate(R.layout.rename_jotting_dialog, null);
-
-            ((EditText) renameJottingDialog.findViewById(R.id.jot_name_edit)).setText("");
-
-            AlertDialog.Builder renameBuilder = new AlertDialog.Builder(this);
-            renameBuilder
-                    .setView(renameJottingDialog)
-                    .setTitle("Labels")
-                    .setCancelable(true)
-                    .setPositiveButton("Save", (dialog, which) -> {
-                        String newLabelName =
-                                ((EditText) ((Dialog) dialog).findViewById(R.id.jot_name_edit))
-                                        .getText()
-                                        .toString();
-
-                        new TaskRunner().executeAsync(createNewLabel(newLabelName), data -> {
-                            loadNewLabels(data, newLabelName);
-                        });
-                    });
-            renameBuilder.create().show();
-        } else {
-            Toast.makeText(this, "Your phone is too old to create a new label. Try on the web app", Toast.LENGTH_LONG).show();
-        }
-    }
 
     protected boolean onRenameJotting(View view) {
         displayRenameDialog(((dialog, which) -> {

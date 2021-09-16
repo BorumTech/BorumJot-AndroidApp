@@ -37,7 +37,6 @@ public class NoteActivity extends JottingActivity {
     /* Views */
     private EditText noteDescriptionBox;
     private MaterialToolbar appBar;
-    private LinearLayout animateContainer;
 
     private Intent nextIntent;
 

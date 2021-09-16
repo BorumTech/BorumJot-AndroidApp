@@ -121,7 +121,7 @@ public class JSONToModel {
         return labelBooleanMap;
     }
 
-    private static Label convertJSONToLabel(JSONObject data) throws JSONException {
+    public static Label convertJSONToLabel(JSONObject data) throws JSONException {
         return new Label(
                 data.getInt("id"),
                 data.getString("name")
