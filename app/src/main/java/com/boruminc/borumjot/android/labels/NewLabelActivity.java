@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.android.R;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
@@ -81,8 +82,12 @@ public class NewLabelActivity extends Activity {
                 try {
                     if (ranOk()) {
                         Intent confirmNewLabel = new Intent(NewLabelActivity.this, LabelActivity.class);
-                        confirmNewLabel.putExtra("label", JSONToModel.convertJSONToLabel(result.getJSONObject("data")));
+                        confirmNewLabel.putExtra("label", new Label(
+                                result.getJSONObject("data").getInt("id"),
+                                Objects.requireNonNull(labelName.getText()).toString()
+                        ));
                         startActivity(confirmNewLabel);
+                        finish();
                     } else {
                         Toast.makeText(NewLabelActivity.this, "A server error occurred", Toast.LENGTH_SHORT).show();
                     }

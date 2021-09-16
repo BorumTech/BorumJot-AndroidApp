@@ -7,10 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Note;
 import com.boruminc.borumjot.android.labels.JotLabelsList;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
@@ -31,16 +28,12 @@ import com.google.android.material.appbar.MaterialToolbar;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 public class NoteActivity extends JottingActivity {
     /* Views */
     private EditText noteDescriptionBox;
     private MaterialToolbar appBar;
 
     private Intent nextIntent;
-
-    JotLabelsList labelsList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,7 +63,6 @@ public class NoteActivity extends JottingActivity {
         });
 
         noteDescriptionBox = findViewById(R.id.note_content);
-//        animateContainer = findViewById(R.id.main_content_container);
 
         // Set the userApiKey for use throughout the class
         if (getSharedPreferences("user identification", Context.MODE_PRIVATE) != null) {
@@ -126,18 +118,18 @@ public class NoteActivity extends JottingActivity {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
 
-            labelsList = new JotLabelsList();
+            setLabelsList(new JotLabelsList());
 
             ft
-                    .add(R.id.label_frame, labelsList)
-                    .hide(labelsList)
+                    .add(R.id.label_frame, getLabelsList())
+                    .hide(getLabelsList())
                     .commit();
 
             Bundle b = new Bundle();
             b.putSerializable("jotting", getJottingData());
             b.putString("jotType", "note");
 
-            labelsList.setArguments(b);
+            getLabelsList().setArguments(b);
         }
 
         noteDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
@@ -150,10 +142,6 @@ public class NoteActivity extends JottingActivity {
 
     private void setNoteBody(String body) {
         noteDescriptionBox.setText(body == null || body.equals("null") ? "" : body);
-    }
-
-    protected void setLabels(ArrayList<Label> labels) {
-
     }
 
     /**
@@ -272,37 +260,6 @@ public class NoteActivity extends JottingActivity {
             updateNoteBody(getNoteBody());
         }
         startActivity(new Intent(this, HomeActivity.class));
-    }
-
-    protected void onLabelListClick(MenuItem item) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.setCustomAnimations(R.anim.slide_down, R.anim.slide_up);
-
-        // Hide and show to constrain label note request to one and show animation
-        if (labelsList.isHidden()) {
-            item.setIcon(getResources().getDrawable(R.drawable.label_white_fill));
-            ft.show(labelsList).commit();
-        } else {
-            item.setIcon(getResources().getDrawable(R.drawable.label_white_outline));
-            slideLabelsListUp(ft);
-        }
-    }
-
-    private void slideLabelsListDown() {
-        labelsList.requireView()
-                .animate()
-                .translationY(0);
-    }
-
-    private void slideLabelsListUp(FragmentTransaction ft) {
-        labelsList.requireView()
-                .animate()
-                .translationY(-labelsList.requireView().getHeight())
-                .withEndAction(() -> {
-                    ft.hide(labelsList).commit();
-                    slideLabelsListDown();
-                    Log.d("Visibility", String.valueOf(labelsList.isVisible()));
-                });
     }
 
     public void updateNoteBody(String newBody) {

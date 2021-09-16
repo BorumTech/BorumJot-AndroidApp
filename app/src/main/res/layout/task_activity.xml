@@ -32,17 +32,15 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="70dp">
-                <ImageButton
+                <CheckBox
                     android:id="@+id/complete_task_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
                     android:background="@android:color/transparent"
                     android:onClick="onCompleteClick"
                     android:layout_marginLeft="10dp"
-                    android:tint="@android:color/white"
+                    android:buttonTint="@android:color/white"
                     android:contentDescription="@string/checkbox_content_desc"
-                    android:src="@drawable/ic_unchecked_checkbox_circle"
                     android:layout_marginStart="10dp" />
 
                 <TextView
@@ -70,7 +68,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/app_bar_layout">
+        android:layout_below="@id/label_frame">
 
         <LinearLayout
             android:layout_width="match_parent"

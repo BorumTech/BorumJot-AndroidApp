@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -29,10 +30,13 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
+import com.boruminc.borumjot.android.labels.JotLabelsList;
 import com.boruminc.borumjot.android.labels.LabelActivity;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
@@ -58,10 +62,9 @@ public class TaskActivity extends JottingActivity {
     /* Views */
     private MaterialToolbar appBar;
     private EditText taskDescriptionBox;
-    private ImageButton taskCompletionBox;
+    private CheckBox taskCompletionBox;
     private TableLayout subtaskList;
     private EditTextV2 newSubtaskField;
-    private FlexboxLayout labelsList;
     private TextView taskTitle;
 
     private Intent nextIntent;
@@ -76,7 +79,6 @@ public class TaskActivity extends JottingActivity {
         taskDescriptionBox = findViewById(R.id.task_description_box);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
         subtaskList = findViewById(R.id.task_subtasks_box);
-        labelsList = new FlexboxLayout(this); //findViewById(R.id.task_labels_box);
         taskTitle = findViewById(R.id.task_title);
 
         // Set the userApiKey for class use
@@ -88,7 +90,7 @@ public class TaskActivity extends JottingActivity {
         appBar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.labels_btn:
-//                    onLabelListClick(item);
+                    onLabelListClick(item);
                     break;
                 case R.id.share_btn:
                     navigateToShare();
@@ -102,6 +104,8 @@ public class TaskActivity extends JottingActivity {
 
             return true;
         });
+
+        setLabelsList(new JotLabelsList());
 
         setJottingType("Task");
         if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog((dialog, which) -> {
@@ -139,7 +143,6 @@ public class TaskActivity extends JottingActivity {
                         } else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
                             getJottingData().setName(titleTextView.getText().toString());
                             getJottingData().setId(data.getJSONObject("data").getInt("id"));
-                            new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
                             setDueDate(null);
                             handleDueDates();
                             setTaskStatus(false);
@@ -164,16 +167,29 @@ public class TaskActivity extends JottingActivity {
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
         findViewById(R.id.appbar).setOnLongClickListener(this::onRenameJotting);
 
-        if (getJottingData() != null) {
-            new TaskRunner().executeAsync(getJottingLabels(), this::loadLabels);
-            handleDueDates();
-        }
-    }
+        if (getJottingData() == null) return;
+
+        handleDueDates();
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        ft
+                .add(R.id.label_frame, getLabelsList())
+                .hide(getLabelsList())
+                .commit();
+
+        Bundle b = new Bundle();
+        b.putSerializable("jotting", getJottingData());
+        b.putString("jotType", "task");
+
+        getLabelsList().setArguments(b);
+
+}
 
     @Override
     protected void onStart() {
         super.onStart();
-        showLabelImageBtn();
     }
 
     @Override
@@ -190,22 +206,6 @@ public class TaskActivity extends JottingActivity {
     }
 
     /* Helper Methods */
-
-    private void showLabelImageBtn() {
-        ImageButton labelControlsBtn = new ImageButton(this);
-        labelControlsBtn.setBackgroundResource(R.drawable.label_black_outline);
-        FlexboxLayout.LayoutParams controlsLayoutParams = new FlexboxLayout.LayoutParams(
-                (int) getResources().getDimension(R.dimen.label_controls_btn_width),
-                (int) getResources().getDimension(R.dimen.label_btn_height)
-        );
-
-        if (labelsList.getChildAt(0) != null && labelsList.getChildAt(0).getLayoutParams().width == controlsLayoutParams.width) return;
-
-        controlsLayoutParams.setMargins(20, 0, 15, 0);
-        labelControlsBtn.setLayoutParams(controlsLayoutParams);
-        labelControlsBtn.setOnClickListener(this::onLabelControlsBtnClick);
-        labelsList.addView(labelControlsBtn, 0);
-    }
 
     private void setSubtask(EditText view, boolean isCompleted) {
         if (isCompleted)
@@ -388,6 +388,7 @@ public class TaskActivity extends JottingActivity {
 
     /**
      * Implements {@link JottingActivity#setJottingName(String)}
+     *
      * @param name The new name of the jotting
      */
     protected void setJottingName(String name) {
@@ -395,28 +396,8 @@ public class TaskActivity extends JottingActivity {
     }
 
     /**
-     * Updates the UI for labels
-     * @param labels The new labels list
-     */
-    protected void setLabels(ArrayList<Label> labels) {
-        FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
-                (int) getResources().getDimension(R.dimen.label_btn_width),
-                (int) getResources().getDimension(R.dimen.label_btn_height)
-        );
-        layoutParams.setMargins(20, 0, 15, 0);
-
-        for (int i = 0; i < labels.size(); i++) {
-            Button labelButton = new Button(this);
-            labelButton.setText(labels.get(i).getName());
-            labelButton.setLayoutParams(layoutParams);
-            labelButton.setOnClickListener(this::onLabelClick);
-
-            labelsList.addView(labelButton);
-        }
-    }
-
-    /**
      * Convenience method for getting the jotting data with the Task type
+     *
      * @return The jotting data as a Task object
      */
     private Task getTaskData() {
@@ -425,6 +406,7 @@ public class TaskActivity extends JottingActivity {
 
     /**
      * Gets the UI's task details
+     *
      * @return The currently displayed text of the description box
      */
     private String getTaskDetails() {
@@ -433,6 +415,7 @@ public class TaskActivity extends JottingActivity {
 
     /**
      * Sets the task details in the UI
+     *
      * @param body The new body of the task
      */
     private void setTaskDetails(String body) {
@@ -442,7 +425,7 @@ public class TaskActivity extends JottingActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setTaskStatus(boolean on) {
         displayStrikethrough(on);
-        taskCompletionBox.setBackground(on ? getResources().getDrawable(R.drawable.ic_checked_circle, getTheme()) : getResources().getDrawable(R.drawable.ic_unchecked_checkbox_circle, getTheme()));
+        taskCompletionBox.setChecked(on);
     }
 
     private void displayStrikethrough(boolean on) {
@@ -534,12 +517,14 @@ public class TaskActivity extends JottingActivity {
                     );
 
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> {});
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                });
         deleteDialog.create().show();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void onCompleteClick(View view) {
-        int completed = ((CheckBox) view).isChecked() ? 1 : 0;
+        boolean completed = ((CheckBox) view).isChecked();
         new TaskRunner().executeAsync(
                 new ApiRequestExecutor() {
                     @Override
@@ -552,7 +537,7 @@ public class TaskActivity extends JottingActivity {
                     @Override
                     public JSONObject call() {
                         super.call();
-                        return this.connectToApi(encodeQueryString("task", "completed=" + completed, "id=" + getTaskData().getId()));
+                        return this.connectToApi(encodeQueryString("task", "completed=" + (completed ? 1 : 0), "id=" + getTaskData().getId()));
                     }
                 },
                 new ApiResponseExecutor() {
@@ -560,10 +545,10 @@ public class TaskActivity extends JottingActivity {
                     public void onComplete(JSONObject data) {
                         super.onComplete(data);
                         if (ranOk()) {
-                            displayStrikethrough(completed == 1);
+                            displayStrikethrough(completed);
                         } else {
                             Toast.makeText(getApplicationContext(), "An error occurred and the task could not be marked as "
-                                + (completed == 1 ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
+                                    + (completed ? "completed" : "incomplete"), Toast.LENGTH_LONG).show();
                         }
                     }
                 }
@@ -624,12 +609,12 @@ public class TaskActivity extends JottingActivity {
 
         new TaskRunner().executeAsync(
                 new DeleteJottingRequest((Integer) subtaskRow.getTag(), getUserApiKey(), "task"), data -> {
-                if (data != null) {
-                    if (data.optInt("statusCode") == 200) {
-                        ((ViewGroup) subtaskRow.getParent()).removeView(subtaskRow);
+                    if (data != null) {
+                        if (data.optInt("statusCode") == 200) {
+                            ((ViewGroup) subtaskRow.getParent()).removeView(subtaskRow);
+                        }
                     }
                 }
-            }
         );
     }
 
@@ -684,15 +669,15 @@ public class TaskActivity extends JottingActivity {
     private void onDetailsBoxFocus(View view, boolean isFocused) {
         if (!getJottingData().getBody().equals(getTaskDetails())) {
             new TaskRunner().executeAsync(
-                new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + getJottingData().getId()}, new String[] {getTaskDetails()}), data -> {
-                    if (data != null) {
-                        if (data.has("error"))
-                            Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
-                        else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
-                            getJottingData().setBody(getTaskDetails());
+                    new UpdateTaskRequest(getUserApiKey(), new String[]{"id=" + getJottingData().getId()}, new String[]{getTaskDetails()}), data -> {
+                        if (data != null) {
+                            if (data.has("error"))
+                                Toast.makeText(this, "The tasks details could not be saved due to an error", Toast.LENGTH_LONG).show();
+                            else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
+                                getJottingData().setBody(getTaskDetails());
+                            }
                         }
                     }
-                }
             );
         }
     }
@@ -707,17 +692,11 @@ public class TaskActivity extends JottingActivity {
 
         if (isFocused || contents.equals(originalContents)) return;
 
-        new TaskRunner().executeAsync(new UpdateTaskRequest(getUserApiKey(), new String[] {"id=" + id, "name=" + contents}, null), data -> {
+        new TaskRunner().executeAsync(new UpdateTaskRequest(getUserApiKey(), new String[]{"id=" + id, "name=" + contents}, null), data -> {
             if (data == null || data.has("error")) {
                 Toast.makeText(this, "A system error occurred and the subtask could not update", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private void onLabelClick(View view) {
-        Intent labelAct = new Intent(this, LabelActivity.class);
-        labelAct.putExtra("label", getJottingData().getLabels().get(labelsList.indexOfChild(view) - 1));
-        startActivity(labelAct);
     }
 
     public void navigateToShare() {

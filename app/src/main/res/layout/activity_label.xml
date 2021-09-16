@@ -50,7 +50,7 @@
             android:layout_marginHorizontal="10dp"
             android:textSize="18sp"
             android:text="@string/add_label_to_jot"
-            android:textColor="?attr/colorPrimaryDark"
+            android:textColor="?attr/colorSecondaryVariant"
             android:gravity="center_horizontal"/>
     </LinearLayout>
 
