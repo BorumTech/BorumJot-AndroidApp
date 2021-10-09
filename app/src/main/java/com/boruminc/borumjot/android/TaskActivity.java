@@ -528,7 +528,7 @@ public class TaskActivity extends JottingActivity {
         horizLayout.setTag(subtask.getId());
 
         TextView title = horizLayout.findViewById(R.id.subtask_title);
-        title.setText(subtask.getName());
+        title.setText(SlashNormalizer.unescapeUserSlashes(subtask.getName()));
         title.setOnFocusChangeListener(this::onSubtaskBoxFocus);
         // Display strikethrough if the subtask is marked as complete
         if (subtask.isCompleted())
@@ -655,14 +655,14 @@ public class TaskActivity extends JottingActivity {
                                 */
                                 ArrayList<Task> currSubtasks = getTaskData().getSubtasks();
                                 int i = getTaskData().getSubtasks().size() / 2;
-                                Log.d("Size", String.valueOf(i * 2));
+
                                 while (i < getTaskData().getSubtasks().size()) {
-                                    Log.d("i", String.valueOf(i));
+
                                     if (currSubtasks.get(i).isCompleted()) {
                                         if (i == 0 || !currSubtasks.get(i - 1).isCompleted()) {
                                             getTaskData().addSubtask(i, subtask);
                                             subtaskList.addView(addSubtaskToTable(subtask), i);
-                                            Log.d("status", "breaking now");
+
                                             break;
                                         } else {
                                             i /= 2;
@@ -671,7 +671,7 @@ public class TaskActivity extends JottingActivity {
                                         if (i != currSubtasks.size() - 1 && currSubtasks.get(i + 1).isCompleted()) {
                                             getTaskData().addSubtask(i, subtask);
                                             subtaskList.addView(addSubtaskToTable(subtask), i + 1);
-                                            Log.d("status", "breaking now");
+
                                             break;
                                         } else {
                                             i = (currSubtasks.size() + i) / 2;
