@@ -114,4 +114,7 @@
     <string name="empty_label">No jottings with this label at the moment</string>
     <string name="add_label_to_jot">Categorize your jottings with labels to better organize your notes and tasks</string>
     <string name="empty_label_content_desc">Empty label</string>
+    <string name="toggle_completed_tasks">Toggle Completed Tasks</string>
+    <string name="hide_completed_tasks">Hide Completed Tasks</string>
+    <string name="show_completed_tasks">Show Completed Tasks</string>
 </resources>

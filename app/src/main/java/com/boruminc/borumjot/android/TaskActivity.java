@@ -17,7 +17,6 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -33,11 +32,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.boruminc.borumjot.Label;
 import com.boruminc.borumjot.Task;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
 import com.boruminc.borumjot.android.labels.JotLabelsList;
-import com.boruminc.borumjot.android.labels.LabelActivity;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
@@ -46,7 +43,6 @@ import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.PinJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
-import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
@@ -58,6 +54,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TaskActivity extends JottingActivity {
     /* Views */
@@ -102,6 +100,10 @@ public class TaskActivity extends JottingActivity {
                 case R.id.pin_btn:
                     onPinClick(item);
                     break;
+                case R.id.toggle_completed_tasks:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        onToggleCompletedTasks(item);
+                    }
                 default:
                     return false;
             }
@@ -191,6 +193,19 @@ public class TaskActivity extends JottingActivity {
         getLabelsList().setArguments(b);
 
 }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void onToggleCompletedTasks(MenuItem item) {
+        if (item.getTitle().equals(getString(R.string.show_completed_tasks))) {
+            setSubtasksTableContent(getTaskData().getSubtasks());
+            item.setTitle(getString(R.string.hide_completed_tasks));
+        } else {
+            Stream<Task> incompleteTasks = getTaskData().getSubtasks().stream().filter(subtask -> !subtask.isCompleted());
+            ArrayList<Task> incompleteTasksList = (ArrayList<Task>) incompleteTasks.collect(Collectors.toList());
+            setSubtasksTableContent(incompleteTasksList);
+            item.setTitle(getString(R.string.show_completed_tasks));
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setTaskPriority(int priority) {
@@ -468,7 +483,9 @@ public class TaskActivity extends JottingActivity {
             taskTitle.setPaintFlags(taskTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
-    private void setSubtasks(ArrayList<Task> subtasks) {
+    private void setSubtasksTableContent(ArrayList<Task> subtasks) {
+        subtaskList.removeAllViews();
+
         TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subtaskTitleColumnLayoutParams.setMargins(10, 0, 10, 0);
 

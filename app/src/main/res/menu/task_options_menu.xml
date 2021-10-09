@@ -23,4 +23,8 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_delete"/>
 
+    <item android:id="@+id/toggle_completed_tasks"
+        android:title="@string/hide_completed_tasks"
+        app:showAsAction="never" />
+
 </menu>
