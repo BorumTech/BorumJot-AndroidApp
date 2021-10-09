@@ -53,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -285,7 +286,7 @@ public class TaskActivity extends JottingActivity {
                     try {
                         if (data != null && data.has("data") && data.getInt("statusCode") == 200) {
                             ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
-                            setSubtasks(subtaskData);
+                            setSubtasksTableContent(subtaskData);
                             getTaskData().setSubtasks(subtaskData);
                         }
                     } catch (JSONException e) {
@@ -639,10 +640,44 @@ public class TaskActivity extends JottingActivity {
                                 Task subtask = new Task(newSubtaskField.getText().toString());
                                 subtask.setId(result.getJSONObject("data").getInt("id"));
 
-                                getTaskData().getSubtasks().add(subtask);
-
-                                // Add right before "new subtask" row (1-indexed)
-                                subtaskList.addView(addSubtaskToTable(subtask), subtaskList.getChildCount() - 1);
+                                /*
+                                 * Add right after last incomplete task using binary search for the last incomplete subtask
+                                 * The algorithm is as follows:
+                                 * 1. Start at first element and check if complete
+                                 * 2. If complete, then
+                                 * 3. If the first element OR the previous element is incomplete, then
+                                 * ADD SUBTASK; END
+                                 * 4. Else, (previous element is complete), then
+                                 * (the last incomplete subtask is BEFORE i) divide i by 2 and REPEAT
+                                 * 7. Else, (current element is incomplete), then
+                                 * (the last incomplete subtask is AFTER i) set i to be between its current value
+                                 * and the index of the last element
+                                */
+                                ArrayList<Task> currSubtasks = getTaskData().getSubtasks();
+                                int i = getTaskData().getSubtasks().size() / 2;
+                                Log.d("Size", String.valueOf(i * 2));
+                                while (i < getTaskData().getSubtasks().size()) {
+                                    Log.d("i", String.valueOf(i));
+                                    if (currSubtasks.get(i).isCompleted()) {
+                                        if (i == 0 || !currSubtasks.get(i - 1).isCompleted()) {
+                                            getTaskData().addSubtask(i, subtask);
+                                            subtaskList.addView(addSubtaskToTable(subtask), i);
+                                            Log.d("status", "breaking now");
+                                            break;
+                                        } else {
+                                            i /= 2;
+                                        }
+                                    } else {
+                                        if (i != currSubtasks.size() - 1 && currSubtasks.get(i + 1).isCompleted()) {
+                                            getTaskData().addSubtask(i, subtask);
+                                            subtaskList.addView(addSubtaskToTable(subtask), i + 1);
+                                            Log.d("status", "breaking now");
+                                            break;
+                                        } else {
+                                            i = (currSubtasks.size() + i) / 2;
+                                        }
+                                    }
+                                }
 
                                 ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
@@ -661,7 +696,9 @@ public class TaskActivity extends JottingActivity {
                 new DeleteJottingRequest((Integer) subtaskRow.getTag(), getUserApiKey(), "task"), data -> {
                     if (data != null) {
                         if (data.optInt("statusCode") == 200) {
-                            ((ViewGroup) subtaskRow.getParent()).removeView(subtaskRow);
+                            TableLayout subtaskTable = (TableLayout) subtaskRow.getParent();
+                            getTaskData().getSubtasks().remove(subtaskTable.indexOfChild(subtaskRow));
+                            subtaskTable.removeView(subtaskRow);
                         }
                     }
                 }

@@ -85,6 +85,10 @@ public class Task extends Jotting implements Comparable<Jotting> {
     subtasks.add(newSubtask);
   }
 
+  public void addSubtask(int loc, Task newSubtask) {
+    subtasks.add(loc, newSubtask);
+  }
+
   public Date getDueDate() {
     return dueDate;
   }
