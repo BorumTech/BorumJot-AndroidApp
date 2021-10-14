@@ -49,6 +49,10 @@
             android:name=".TaskActivity"
             android:label="Task" />
 
+        <activity android:name=".subtasks.SubtaskActivity"
+            android:label="Subtask"
+            android:parentActivityName=".TaskActivity" />
+
         <activity
             android:name=".NoteActivity"
             android:label="Note" />

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".TaskActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="128dp">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/appbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:menu="@menu/subtask_options_menu"
+                style="@style/OverflowMenu"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="70dp">
+                <CheckBox
+                    android:id="@+id/complete_task_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:onClick="onCompleteClick"
+                    android:layout_marginLeft="10dp"
+                    android:buttonTint="@android:color/white"
+                    android:contentDescription="@string/checkbox_content_desc"
+                    android:layout_marginStart="10dp" />
+
+                <TextView
+                    android:id="@+id/task_title"
+                    style="@style/TextAppearance.App.CollapsingToolbar.Expanded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="20dp"
+                    android:paddingLeft="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/loading_task" />
+            </LinearLayout>
+
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar_layout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.boruminc.borumjot.android.customviews.EditTextV2
+                android:id="@+id/task_description_box"
+                style="@style/NoteArea"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_details_fill"
+                android:inputType="textMultiLine" />
+
+            <TableLayout
+                android:id="@+id/task_subtasks_box"
+                style="@style/SubtaskList" />
+
+            <LinearLayout style="@style/DueDateRow">
+
+                <ImageButton
+                    android:id="@+id/due_date_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/action_due_date"
+                    android:src="@android:drawable/ic_menu_my_calendar" />
+
+                <TextView
+                    android:id="@+id/due_date"
+                    style="@style/DueDateLabel"
+                    android:text="@string/action_due_date" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

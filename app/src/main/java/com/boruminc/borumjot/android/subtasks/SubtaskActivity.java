@@ -1,4 +1,4 @@
-package com.boruminc.borumjot.android;
+package com.boruminc.borumjot.android.subtasks;
 
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
@@ -29,12 +29,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.boruminc.borumjot.Task;
+import com.boruminc.borumjot.android.HomeActivity;
+import com.boruminc.borumjot.android.JottingActivity;
+import com.boruminc.borumjot.android.R;
+import com.boruminc.borumjot.android.TaskActivity;
+import com.boruminc.borumjot.android.TaskNotificationPublisher;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
-import com.boruminc.borumjot.android.labels.JotLabelsList;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
@@ -43,7 +45,6 @@ import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.PinJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
-import com.boruminc.borumjot.android.subtasks.SubtaskActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
@@ -58,7 +59,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TaskActivity extends JottingActivity {
+public class SubtaskActivity extends JottingActivity {
     /* Views */
     private MaterialToolbar appBar;
     private EditText taskDescriptionBox;
@@ -89,12 +90,6 @@ public class TaskActivity extends JottingActivity {
         appBar = findViewById(R.id.appbar);
         appBar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
-                case R.id.labels_btn:
-                    onLabelListClick(item);
-                    break;
-                case R.id.share_btn:
-                    navigateToShare();
-                    break;
                 case R.id.delete_btn:
                     onDeleteClick();
                     break;
@@ -111,8 +106,6 @@ public class TaskActivity extends JottingActivity {
 
             return true;
         });
-
-        setLabelsList(new JotLabelsList());
 
         setJottingType("Task");
         if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog((dialog, which) -> {
@@ -145,7 +138,7 @@ public class TaskActivity extends JottingActivity {
                 try {
                     if (data != null) {
                         if (data.has("error") && data.getJSONObject("error").has("message")) {
-                            Toast.makeText(TaskActivity.this, "The task could not be created at this time. ",
+                            Toast.makeText(SubtaskActivity.this, "The task could not be created at this time. ",
                                     Toast.LENGTH_SHORT).show();
                         } else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
                             getJottingData().setName(titleTextView.getText().toString());
@@ -161,15 +154,28 @@ public class TaskActivity extends JottingActivity {
                 }
             });
         });
-        else if (getIntent().hasExtra("data")) {
-            setJottingData((Task) getIntent().getSerializableExtra("data"));
-            assert getJottingData() != null;
-            setJottingName(getJottingData().getName());
-            setTaskDetails(getJottingData().getBody());
-            setTaskStatus(getTaskData().isCompleted());
-            setTaskPriority(getTaskData().getPriority());
-            setDueDate(getTaskData().getDueDate());
-            loadSubtasks(); // Set subtasks asynchronously
+        else if (getIntent().hasExtra("id")) {
+            int subtaskId = getIntent().getIntExtra("id", 0);
+            new SubtaskRetrieval(subtaskId).runAsync(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""), new ApiResponseExecutor() {
+                @Override
+                public void onComplete(JSONObject result) {
+                    super.onComplete(result);
+                    try {
+                        if (ranOk()) {
+                            setJottingData(JSONToModel.convertJSONToTask(result.getJSONObject("data")));
+                            setJottingName(getJottingData().getName());
+                            setTaskDetails(getJottingData().getBody());
+                            setTaskStatus(getTaskData().isCompleted());
+                            setTaskPriority(getTaskData().getPriority());
+                            setDueDate(getTaskData().getDueDate());
+                            loadSubtasks(); // Set subtasks asynchronously
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         }
 
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
@@ -178,22 +184,7 @@ public class TaskActivity extends JottingActivity {
         if (getJottingData() == null) return;
 
         handleDueDates();
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        ft
-                .add(R.id.label_frame, getLabelsList())
-                .hide(getLabelsList())
-                .commit();
-
-        Bundle b = new Bundle();
-        b.putSerializable("jotting", getJottingData());
-        b.putString("jotType", "task");
-
-        getLabelsList().setArguments(b);
-
-}
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void onToggleCompletedTasks(MenuItem item) {
@@ -526,10 +517,10 @@ public class TaskActivity extends JottingActivity {
 
     private LinearLayout addSubtaskToTable(Task subtask) {
         LinearLayout horizLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.subtask, null);
+        horizLayout.setTag(subtask.getId());
 
         TextView title = horizLayout.findViewById(R.id.subtask_title);
         title.setText(SlashNormalizer.unescapeUserSlashes(subtask.getName()));
-        title.setTag(subtask.getId());
         title.setOnFocusChangeListener(this::onSubtaskBoxFocus);
         // Display strikethrough if the subtask is marked as complete
         if (subtask.isCompleted())
@@ -544,9 +535,8 @@ public class TaskActivity extends JottingActivity {
     /* Event Handlers */
 
     public void onEnterSubtaskClick(View v) {
-        Intent subtask = new Intent(getApplicationContext(), SubtaskActivity.class);
-        Log.d("id", String.valueOf(v));
-        subtask.putExtra("id", (int) v.getTag());
+        Intent subtask = new Intent(getApplicationContext(), TaskActivity.class);
+        subtask.putExtra("data", (Bundle) v.getTag());
         startActivity(subtask);
     }
 
@@ -660,7 +650,7 @@ public class TaskActivity extends JottingActivity {
                                  * 7. Else, (current element is incomplete), then
                                  * (the last incomplete subtask is AFTER i) set i to be between its current value
                                  * and the index of the last element
-                                */
+                                 */
                                 ArrayList<Task> currSubtasks = getTaskData().getSubtasks();
                                 int i = getTaskData().getSubtasks().size() / 2;
 
@@ -793,11 +783,5 @@ public class TaskActivity extends JottingActivity {
             }
         });
     }
-
-    public void navigateToShare() {
-        nextIntent = new Intent(this, ShareActivity.class);
-        nextIntent.putExtra("jotting", getTaskData());
-        nextIntent.putExtra("jotType", "task");
-        startActivity(nextIntent);
-    }
 }
+

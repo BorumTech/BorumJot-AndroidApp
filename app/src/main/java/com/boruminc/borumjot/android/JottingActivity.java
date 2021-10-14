@@ -31,7 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-abstract class JottingActivity extends AppCompatActivity {
+public abstract class JottingActivity extends AppCompatActivity {
     private String jottingType;
     private String userApiKey;
     private Jotting jottingData;
@@ -270,5 +270,5 @@ abstract class JottingActivity extends AppCompatActivity {
      * Updates the UI of the appbar to display the passed in text
      * @param name The new name of the jotting
      */
-    abstract void setJottingName(String name);
+    protected abstract void setJottingName(String name);
 }
