@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <item android:id="@+id/pin_btn"
+        android:title="@string/action_pin"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_outline_pin"/>
+
+    <item android:id="@+id/delete_btn"
+        android:title="@string/action_delete"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_delete"/>
+
+    <item android:id="@+id/toggle_completed_tasks"
+        android:title="@string/hide_completed_tasks"
+        app:showAsAction="never" />
+
+</menu>

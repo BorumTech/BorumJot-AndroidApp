@@ -71,7 +71,7 @@ public class JSONToModel {
         return notes;
     }
 
-    private static Task convertJSONToTask(JSONObject row) throws JSONException {
+    public static Task convertJSONToTask(JSONObject row) throws JSONException {
         // Set task information
         Task task = new Task(row.getString("title"), row.optString("body"), new ArrayList<Label>());
         task.setId(row.getInt("id"));

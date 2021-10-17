@@ -1,4 +1,4 @@
-package com.boruminc.borumjot.android;
+package com.boruminc.borumjot.android.subtasks;
 
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
@@ -29,12 +29,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.boruminc.borumjot.Task;
+import com.boruminc.borumjot.android.JottingActivity;
+import com.boruminc.borumjot.android.R;
+import com.boruminc.borumjot.android.TaskNotificationPublisher;
 import com.boruminc.borumjot.android.customviews.EditTextV2;
-import com.boruminc.borumjot.android.labels.JotLabelsList;
 import com.boruminc.borumjot.android.server.ApiRequestExecutor;
 import com.boruminc.borumjot.android.server.ApiResponseExecutor;
 import com.boruminc.borumjot.android.server.JSONToModel;
@@ -43,7 +43,6 @@ import com.boruminc.borumjot.android.server.TaskRunner;
 import com.boruminc.borumjot.android.server.requests.DeleteJottingRequest;
 import com.boruminc.borumjot.android.server.requests.PinJottingRequest;
 import com.boruminc.borumjot.android.server.requests.UpdateTaskRequest;
-import com.boruminc.borumjot.android.subtasks.SubtaskActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import org.json.JSONException;
@@ -58,7 +57,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TaskActivity extends JottingActivity {
+public class SubtaskActivity extends JottingActivity {
     /* Views */
     private MaterialToolbar appBar;
     private EditText taskDescriptionBox;
@@ -74,7 +73,7 @@ public class TaskActivity extends JottingActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.task_activity);
+        setContentView(R.layout.subtask_activity);
 
         taskDescriptionBox = findViewById(R.id.task_description_box);
         taskCompletionBox = findViewById(R.id.complete_task_btn);
@@ -89,12 +88,6 @@ public class TaskActivity extends JottingActivity {
         appBar = findViewById(R.id.appbar);
         appBar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
-                case R.id.labels_btn:
-                    onLabelListClick(item);
-                    break;
-                case R.id.share_btn:
-                    navigateToShare();
-                    break;
                 case R.id.delete_btn:
                     onDeleteClick();
                     break;
@@ -111,8 +104,6 @@ public class TaskActivity extends JottingActivity {
 
             return true;
         });
-
-        setLabelsList(new JotLabelsList());
 
         setJottingType("Task");
         if (getIntent().getBooleanExtra("Rename", false)) displayRenameDialog((dialog, which) -> {
@@ -145,7 +136,7 @@ public class TaskActivity extends JottingActivity {
                 try {
                     if (data != null) {
                         if (data.has("error") && data.getJSONObject("error").has("message")) {
-                            Toast.makeText(TaskActivity.this, "The task could not be created at this time. ",
+                            Toast.makeText(SubtaskActivity.this, "The task could not be created at this time. ",
                                     Toast.LENGTH_SHORT).show();
                         } else if (data.optInt("statusCode") >= 200 && data.optInt("statusCode") < 300) {
                             getJottingData().setName(titleTextView.getText().toString());
@@ -161,15 +152,28 @@ public class TaskActivity extends JottingActivity {
                 }
             });
         });
-        else if (getIntent().hasExtra("data")) {
-            setJottingData((Task) getIntent().getSerializableExtra("data"));
-            assert getJottingData() != null;
-            setJottingName(getJottingData().getName());
-            setTaskDetails(getJottingData().getBody());
-            setTaskStatus(getTaskData().isCompleted());
-            setTaskPriority(getTaskData().getPriority());
-            setDueDate(getTaskData().getDueDate());
-            loadSubtasks(); // Set subtasks asynchronously
+        else if (getIntent().hasExtra("id")) {
+            int subtaskId = getIntent().getIntExtra("id", 0);
+            new SubtaskRetrieval(subtaskId).runAsync(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""), new ApiResponseExecutor() {
+                @Override
+                public void onComplete(JSONObject result) {
+                    super.onComplete(result);
+                    try {
+                        if (ranOk()) {
+                            setJottingData(JSONToModel.convertJSONToTask(result.getJSONObject("data")));
+                            setJottingName(getJottingData().getName());
+                            setTaskDetails(getJottingData().getBody());
+                            setTaskStatus(getTaskData().isCompleted());
+                            setTaskPriority(getTaskData().getPriority());
+                            setDueDate(getTaskData().getDueDate());
+                            loadSubtasks(); // Set subtasks asynchronously
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         }
 
         taskDescriptionBox.setOnFocusChangeListener(this::onDetailsBoxFocus);
@@ -178,22 +182,7 @@ public class TaskActivity extends JottingActivity {
         if (getJottingData() == null) return;
 
         handleDueDates();
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        ft
-                .add(R.id.label_frame, getLabelsList())
-                .hide(getLabelsList())
-                .commit();
-
-        Bundle b = new Bundle();
-        b.putSerializable("jotting", getJottingData());
-        b.putString("jotType", "task");
-
-        getLabelsList().setArguments(b);
-
-}
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void onToggleCompletedTasks(MenuItem item) {
@@ -441,7 +430,7 @@ public class TaskActivity extends JottingActivity {
      * @param name The new name of the jotting
      */
     protected void setJottingName(String name) {
-        taskTitle.setText(SlashNormalizer.unescapeUserSlashes(name));
+        taskTitle.setText(name);
     }
 
     /**
@@ -545,7 +534,6 @@ public class TaskActivity extends JottingActivity {
 
     public void onEnterSubtaskClick(View v) {
         Intent subtask = new Intent(getApplicationContext(), SubtaskActivity.class);
-
         subtask.putExtra("id", (int) ((ViewGroup) v.getParent()).getTag());
         startActivity(subtask);
     }
@@ -562,10 +550,10 @@ public class TaskActivity extends JottingActivity {
                                 try {
                                     if (data != null) {
                                         if (data.has("error") || data.getInt("statusCode") == 500) {
-                                            Toast.makeText(this, "The task could not be deleted due to a system error", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(this, "The subtask could not be deleted due to a system error", Toast.LENGTH_SHORT).show();
                                         } else {
-                                            startActivity(new Intent(this, HomeActivity.class));
-                                            Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                            Toast.makeText(this, "Subtask deleted", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 } catch (JSONException e) {
@@ -660,7 +648,6 @@ public class TaskActivity extends JottingActivity {
                 }
         );
     }
-
     /**
      * Add right after last incomplete task using binary search for the last incomplete subtask
      * @implNote The algorithm is as follows:
@@ -704,6 +691,7 @@ public class TaskActivity extends JottingActivity {
         // There are no (incomplete or complete) subtasks
         return currSubtasks.size();
     }
+
 
     public void onCompleteSubtaskClick(View view) {
         TableRow subtaskRow = (TableRow) view.getParent();
@@ -785,11 +773,5 @@ public class TaskActivity extends JottingActivity {
             }
         });
     }
-
-    public void navigateToShare() {
-        nextIntent = new Intent(this, ShareActivity.class);
-        nextIntent.putExtra("jotting", getTaskData());
-        nextIntent.putExtra("jotType", "task");
-        startActivity(nextIntent);
-    }
 }
+
