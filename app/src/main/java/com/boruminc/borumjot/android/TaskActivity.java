@@ -441,7 +441,7 @@ public class TaskActivity extends JottingActivity {
      * @param name The new name of the jotting
      */
     protected void setJottingName(String name) {
-        taskTitle.setText(name);
+        taskTitle.setText(SlashNormalizer.unescapeUserSlashes(name));
     }
 
     /**
@@ -545,7 +545,7 @@ public class TaskActivity extends JottingActivity {
 
     public void onEnterSubtaskClick(View v) {
         Intent subtask = new Intent(getApplicationContext(), SubtaskActivity.class);
-        Log.d("id", String.valueOf(v));
+
         subtask.putExtra("id", (int) v.getTag());
         startActivity(subtask);
     }
@@ -648,44 +648,8 @@ public class TaskActivity extends JottingActivity {
                                 Task subtask = new Task(newSubtaskField.getText().toString());
                                 subtask.setId(result.getJSONObject("data").getInt("id"));
 
-                                /*
-                                 * Add right after last incomplete task using binary search for the last incomplete subtask
-                                 * The algorithm is as follows:
-                                 * 1. Start at first element and check if complete
-                                 * 2. If complete, then
-                                 * 3. If the first element OR the previous element is incomplete, then
-                                 * ADD SUBTASK; END
-                                 * 4. Else, (previous element is complete), then
-                                 * (the last incomplete subtask is BEFORE i) divide i by 2 and REPEAT
-                                 * 7. Else, (current element is incomplete), then
-                                 * (the last incomplete subtask is AFTER i) set i to be between its current value
-                                 * and the index of the last element
-                                */
-                                ArrayList<Task> currSubtasks = getTaskData().getSubtasks();
-                                int i = getTaskData().getSubtasks().size() / 2;
-
-                                while (i < getTaskData().getSubtasks().size()) {
-
-                                    if (currSubtasks.get(i).isCompleted()) {
-                                        if (i == 0 || !currSubtasks.get(i - 1).isCompleted()) {
-                                            getTaskData().addSubtask(i, subtask);
-                                            subtaskList.addView(addSubtaskToTable(subtask), i);
-
-                                            break;
-                                        } else {
-                                            i /= 2;
-                                        }
-                                    } else {
-                                        if (i != currSubtasks.size() - 1 && currSubtasks.get(i + 1).isCompleted()) {
-                                            getTaskData().addSubtask(i, subtask);
-                                            subtaskList.addView(addSubtaskToTable(subtask), i + 1);
-
-                                            break;
-                                        } else {
-                                            i = (currSubtasks.size() + i) / 2;
-                                        }
-                                    }
-                                }
+                                int indexAfterLastIncompleteTask = searchForLastIncompleteTask(subtask);
+                                subtaskList.addView(addSubtaskToTable(subtask), indexAfterLastIncompleteTask);
 
                                 ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
@@ -697,20 +661,48 @@ public class TaskActivity extends JottingActivity {
         );
     }
 
-    public void onDeleteSubtaskClick(View view) {
-        TableRow subtaskRow = (TableRow) view.getParent();
+    /**
+     * Add right after last incomplete task using binary search for the last incomplete subtask
+     * @implNote The algorithm is as follows:
+     * <ol>
+     *     <li>Start at first element and check if complete</li>
+     *     <li>If complete, then</li>
+     *     <li>If the first element OR the previous element is incomplete, then</li>
+     *          ADD SUBTASK; END
+     *      <li>Else, (previous element is complete), then
+     *          (the last incomplete subtask is BEFORE i) divide i by 2 and REPEAT
+     *      <li>Else, (current element is incomplete), then</li>
+     *          (the last incomplete subtask is AFTER i) set i to be between its current value
+     *          and the index of the last element</li>
+     * </ol>
+     * @return one index after the last incomplete subtask, or 0 if there were no subtasks
+     */
+    private int searchForLastIncompleteTask(Task subtask) {
+        ArrayList<Task> currSubtasks = getTaskData().getSubtasks();
+        int subtaskSize = currSubtasks.size();
+        int i = subtaskSize / 2;
 
-        new TaskRunner().executeAsync(
-                new DeleteJottingRequest((Integer) subtaskRow.getTag(), getUserApiKey(), "task"), data -> {
-                    if (data != null) {
-                        if (data.optInt("statusCode") == 200) {
-                            TableLayout subtaskTable = (TableLayout) subtaskRow.getParent();
-                            getTaskData().getSubtasks().remove(subtaskTable.indexOfChild(subtaskRow));
-                            subtaskTable.removeView(subtaskRow);
-                        }
-                    }
+        while (i < subtaskSize) {
+            if (currSubtasks.get(i).isCompleted()) {
+                if (i == 0 || !currSubtasks.get(i - 1).isCompleted()) {
+                    getTaskData().addSubtask(i, subtask);
+
+                    return i;
+                } else {
+                    i /= 2;
                 }
-        );
+            } else {
+                if (i != currSubtasks.size() - 1 && currSubtasks.get(i + 1).isCompleted()) {
+                    getTaskData().addSubtask(i + 1, subtask);
+                    return i + 1;
+                } else {
+                    i = (int) Math.round((currSubtasks.size() + i) / 2.0);
+                }
+            }
+        }
+
+        // There are no (incomplete or complete) subtasks
+        return currSubtasks.size();
     }
 
     public void onCompleteSubtaskClick(View view) {
