@@ -30,7 +30,7 @@ public class SubtaskRetrieval {
         };
     }
 
-    public void runAsync(String userApiKey, Callback<JSONObject> callback) {
+    void runAsync(String userApiKey, Callback<JSONObject> callback) {
         new TaskRunner().executeAsync(makeSubtaskGetRequest(userApiKey), callback);
     }
 }

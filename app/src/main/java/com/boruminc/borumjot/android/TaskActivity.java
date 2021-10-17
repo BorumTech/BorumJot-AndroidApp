@@ -526,10 +526,10 @@ public class TaskActivity extends JottingActivity {
 
     private LinearLayout addSubtaskToTable(Task subtask) {
         LinearLayout horizLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.subtask, null);
+        horizLayout.setTag(subtask.getId());
 
         TextView title = horizLayout.findViewById(R.id.subtask_title);
         title.setText(SlashNormalizer.unescapeUserSlashes(subtask.getName()));
-        title.setTag(subtask.getId());
         title.setOnFocusChangeListener(this::onSubtaskBoxFocus);
         // Display strikethrough if the subtask is marked as complete
         if (subtask.isCompleted())
@@ -546,7 +546,7 @@ public class TaskActivity extends JottingActivity {
     public void onEnterSubtaskClick(View v) {
         Intent subtask = new Intent(getApplicationContext(), SubtaskActivity.class);
 
-        subtask.putExtra("id", (int) v.getTag());
+        subtask.putExtra("id", (int) ((ViewGroup) v.getParent()).getTag());
         startActivity(subtask);
     }
 
