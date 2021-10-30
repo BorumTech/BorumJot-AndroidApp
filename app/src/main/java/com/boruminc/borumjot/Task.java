@@ -7,17 +7,17 @@ import java.util.ArrayList;
 
 public class Task extends Jotting implements Comparable<Jotting> {
   private int userId;
-  private int status;
   private Date timeCreated;
   private boolean completed;
   private ArrayList<Task> subtasks;
   private Date dueDate;
+  private int parentId;
 
   public Task() {
     super();
     subtasks = new ArrayList<Task>();
     completed = false;
-    status = 0;
+    parentId = 0;
   }
 
   public Task(String n) {
@@ -28,10 +28,16 @@ public class Task extends Jotting implements Comparable<Jotting> {
     super(n, b, labels);
   }
 
+  public Task(String n, String b, ArrayList<Label> labels, int p) {
+    super(n, b, labels);
+    parentId = p;
+  }
+
   @NonNull
   public String toString() {
     String str = super.toString();
     str += "Completed: " + completed;
+    str += "Parent Id: " + parentId;
 
     return str;
   }
@@ -49,19 +55,11 @@ public class Task extends Jotting implements Comparable<Jotting> {
     this.userId = userId;
   }
 
-  public int getStatus() {
-    return status;
-  }
-
-  public void setStatus(int status) {
-    this.status = status;
-  }
-
   public Date getTimeCreated() {
     return timeCreated;
   }
 
-  public void setTimeCreated(Date timeCreated) {
+  void setTimeCreated(Date timeCreated) {
     this.timeCreated = timeCreated;
   }
 
@@ -89,6 +87,10 @@ public class Task extends Jotting implements Comparable<Jotting> {
     subtasks.add(loc, newSubtask);
   }
 
+  public void setSubtask(int loc, Task subtask) {
+    subtasks.set(loc, subtask);
+  }
+
   public Date getDueDate() {
     return dueDate;
   }
@@ -96,4 +98,8 @@ public class Task extends Jotting implements Comparable<Jotting> {
   public void setDueDate(Date newDate) {
     dueDate = newDate;
   }
+
+  public int getParentId() { return parentId; }
+
+  public void setParentId(int newParentId) { parentId = newParentId; }
 }

@@ -1,5 +1,6 @@
 package com.boruminc.borumjot.android;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -193,7 +194,7 @@ public class TaskActivity extends JottingActivity {
 
         getLabelsList().setArguments(b);
 
-}
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void onToggleCompletedTasks(MenuItem item) {
@@ -264,29 +265,36 @@ public class TaskActivity extends JottingActivity {
             view.setPaintFlags(view.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
+    private ApiRequestExecutor requestSubtasks(int id) {
+        return new ApiRequestExecutor() {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("GET");
+                addRequestHeader("Authorization", "Basic " + getUserApiKey());
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeQueryString("subtasks", "id=" + id));
+            }
+        };
+    }
+
+    ;
+
     /**
      * Loads the subtasks.
      */
     private void loadSubtasks() {
         new TaskRunner().executeAsync(
-                new ApiRequestExecutor() {
-                    @Override
-                    protected void initialize() {
-                        super.initialize();
-                        setRequestMethod("GET");
-                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
-                    }
-
-                    @Override
-                    public JSONObject call() {
-                        super.call();
-                        return this.connectToApi(encodeQueryString("subtasks", "id=" + getJottingData().getId()));
-                    }
-                }, data -> {
+                requestSubtasks(getJottingData().getId()), data -> {
                     try {
                         if (data != null && data.has("data") && data.getInt("statusCode") == 200) {
                             ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
                             setSubtasksTableContent(subtaskData);
+
                             getTaskData().setSubtasks(subtaskData);
                         }
                     } catch (JSONException e) {
@@ -326,7 +334,6 @@ public class TaskActivity extends JottingActivity {
                     super.onComplete(result);
                     try {
                         if (ranOk()) {
-                            Log.d("Due Date after update", String.valueOf(chosenDueDate.getTime()));
                             setDueDate(chosenDueDate);
                             getTaskData().setDueDate(chosenDueDate);
                         } else if (result.has("error") && result.getJSONObject("error").has("message")) {
@@ -484,6 +491,29 @@ public class TaskActivity extends JottingActivity {
             taskTitle.setPaintFlags(taskTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
+    /**
+     * @param secondLevelSubtasks The list of subtasks of a subtask
+     * @return The table of subtasks for a subtask
+     */
+    private LinearLayout createSecondLevelSubtaskTable(ArrayList<Task> secondLevelSubtasks) {
+        LinearLayout secondLevelSubtaskList = new LinearLayout(getApplicationContext());
+        secondLevelSubtaskList.setOrientation(LinearLayout.VERTICAL);
+
+        for (Task subtask : secondLevelSubtasks) {
+            LinearLayout subtaskRow = createSubtaskRow(subtask);
+            LinearLayout.LayoutParams subtaskRowParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            subtaskRowParams.bottomMargin = 10;
+            subtaskRowParams.topMargin = 10;
+            subtaskRowParams.leftMargin = 50;
+
+            subtaskRow.setLayoutParams(subtaskRowParams);
+
+            secondLevelSubtaskList.addView(subtaskRow);
+        }
+
+        return secondLevelSubtaskList;
+    }
+
     private void setSubtasksTableContent(ArrayList<Task> subtasks) {
         subtaskList.removeAllViews();
 
@@ -492,8 +522,12 @@ public class TaskActivity extends JottingActivity {
 
         subtaskList.setColumnShrinkable(2, true);
 
-        for (Task subtask : subtasks) {
-            subtaskList.addView(addSubtaskToTable(subtask));
+        for (int i = 0; i < subtasks.size(); i++) {
+            Task subtask = subtasks.get(i);
+            subtaskList.addView(createSubtaskRow(subtask), i * 2);
+            subtaskList.addView(new TableRow(getApplicationContext()), i * 2 + 1);
+
+            new TaskRunner().executeAsync(requestSubtasks(subtask.getId()), handleGetSecondLevelSubtasksResponse(i * 2 + 1));
         }
 
         TableRow addSubtaskLayout = new TableRow(this);
@@ -524,12 +558,13 @@ public class TaskActivity extends JottingActivity {
         }
     }
 
-    private LinearLayout addSubtaskToTable(Task subtask) {
+    private LinearLayout createSubtaskRow(Task subtask) {
         LinearLayout horizLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.subtask, null);
         horizLayout.setTag(subtask.getId());
 
         TextView title = horizLayout.findViewById(R.id.subtask_title);
         title.setText(SlashNormalizer.unescapeUserSlashes(subtask.getName()));
+
         title.setOnFocusChangeListener(this::onSubtaskBoxFocus);
         // Display strikethrough if the subtask is marked as complete
         if (subtask.isCompleted())
@@ -548,6 +583,39 @@ public class TaskActivity extends JottingActivity {
 
         subtask.putExtra("id", (int) ((ViewGroup) v.getParent()).getTag());
         startActivity(subtask);
+    }
+
+    private ApiResponseExecutor handleGetSecondLevelSubtasksResponse(int loc) {
+        return new ApiResponseExecutor() {
+            @Override
+            public void onComplete(JSONObject data) {
+                super.onComplete(data);
+                try {
+                    if (ranOk()) {
+                        ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
+                        TableRow subtaskListRow = new TableRow(getApplicationContext());
+                        subtaskListRow.addView(createSecondLevelSubtaskTable(subtaskData));
+                        subtaskList.removeViewAt(loc);
+                        subtaskList.addView(subtaskListRow, loc);
+
+                        if (subtaskData.isEmpty()) return;
+
+                        // Set subtask data in task for non-UI reference
+                        ArrayList<Task> topLevelSubtasks = getTaskData().getSubtasks();
+                        int numTopLevelSubtasks = topLevelSubtasks.size();
+                        for (int i = 0; i < numTopLevelSubtasks; i++) {
+                            Task subtask = topLevelSubtasks.get(i);
+                            if (subtask.getId() == subtaskData.get(0).getParentId()) {
+                                subtask.setSubtasks(subtaskData);
+                                getTaskData().setSubtask(i, subtask);
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 
     public void onDeleteClick() {
@@ -649,7 +717,7 @@ public class TaskActivity extends JottingActivity {
                                 subtask.setId(result.getJSONObject("data").getInt("id"));
 
                                 int indexAfterLastIncompleteTask = searchForLastIncompleteTask(subtask);
-                                subtaskList.addView(addSubtaskToTable(subtask), indexAfterLastIncompleteTask);
+                                subtaskList.addView(createSubtaskRow(subtask), indexAfterLastIncompleteTask * 2);
 
                                 ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
                             }
@@ -663,6 +731,8 @@ public class TaskActivity extends JottingActivity {
 
     /**
      * Add right after last incomplete task using binary search for the last incomplete subtask
+     *
+     * @return one index after the last incomplete subtask, or 0 if there were no subtasks
      * @implNote The algorithm is as follows:
      * <ol>
      *     <li>Start at first element and check if complete</li>
@@ -675,7 +745,6 @@ public class TaskActivity extends JottingActivity {
      *          (the last incomplete subtask is AFTER i) set i to be between its current value
      *          and the index of the last element</li>
      * </ol>
-     * @return one index after the last incomplete subtask, or 0 if there were no subtasks
      */
     private int searchForLastIncompleteTask(Task subtask) {
         ArrayList<Task> currSubtasks = getTaskData().getSubtasks();

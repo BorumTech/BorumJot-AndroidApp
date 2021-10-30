@@ -77,6 +77,7 @@ public class JSONToModel {
         task.setId(row.getInt("id"));
         task.setCompleted(row.optString("completed").equals("1"));
         task.setPriority(row.optInt("priority"));
+        task.setParentId(row.optInt("parentId"));
 
         if (!row.isNull("due_date")) {
             Date dueDate = new Date(row.getLong("due_date") * 1000);
