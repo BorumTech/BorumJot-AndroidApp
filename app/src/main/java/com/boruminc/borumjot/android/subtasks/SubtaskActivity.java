@@ -54,6 +54,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -154,7 +155,7 @@ public class SubtaskActivity extends JottingActivity {
         });
         else if (getIntent().hasExtra("id")) {
             int subtaskId = getIntent().getIntExtra("id", 0);
-            new SubtaskRetrieval(subtaskId).runAsync(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""), new ApiResponseExecutor() {
+            new TaskRetrieval(subtaskId).runAsync(getSharedPreferences("user identification", Context.MODE_PRIVATE).getString("apiKey", ""), new ApiResponseExecutor() {
                 @Override
                 public void onComplete(JSONObject result) {
                     super.onComplete(result);
@@ -258,31 +259,8 @@ public class SubtaskActivity extends JottingActivity {
      */
     private void loadSubtasks() {
         new TaskRunner().executeAsync(
-                new ApiRequestExecutor() {
-                    @Override
-                    protected void initialize() {
-                        super.initialize();
-                        setRequestMethod("GET");
-                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
-                    }
-
-                    @Override
-                    public JSONObject call() {
-                        super.call();
-                        return this.connectToApi(encodeQueryString("subtasks", "id=" + getJottingData().getId()));
-                    }
-                }, data -> {
-                    try {
-                        if (data != null && data.has("data") && data.getInt("statusCode") == 200) {
-                            ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
-                            setSubtasksTableContent(subtaskData);
-                            getTaskData().setSubtasks(subtaskData);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(this, "The subtasks could not load", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                requestSubtasks(getTaskData().getId()),
+                handleGetSubtasksResponse()
         );
 
     }
@@ -481,8 +459,12 @@ public class SubtaskActivity extends JottingActivity {
 
         subtaskList.setColumnShrinkable(2, true);
 
-        for (Task subtask : subtasks) {
-            subtaskList.addView(addSubtaskToTable(subtask));
+        for (int i = 0; i < subtasks.size(); i++) {
+            Task subtask = subtasks.get(i);
+            subtaskList.addView(createSubtaskRow(subtask), i * 2);
+            subtaskList.addView(new TableRow(getApplicationContext()), i * 2 + 1);
+
+            new TaskRunner().executeAsync(requestSubtasks(subtask.getId()), handleGetSecondLevelSubtasksResponse(i * 2 + 1));
         }
 
         TableRow addSubtaskLayout = new TableRow(this);
@@ -513,12 +495,13 @@ public class SubtaskActivity extends JottingActivity {
         }
     }
 
-    private LinearLayout addSubtaskToTable(Task subtask) {
+    private LinearLayout createSubtaskRow(Task subtask) {
         LinearLayout horizLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.subtask, null);
         horizLayout.setTag(subtask.getId());
 
         TextView title = horizLayout.findViewById(R.id.subtask_title);
         title.setText(SlashNormalizer.unescapeUserSlashes(subtask.getName()));
+
         title.setOnFocusChangeListener(this::onSubtaskBoxFocus);
         // Display strikethrough if the subtask is marked as complete
         if (subtask.isCompleted())
@@ -529,6 +512,30 @@ public class SubtaskActivity extends JottingActivity {
 
         return horizLayout;
     }
+
+    /**
+     * @param secondLevelSubtasks The list of subtasks of a subtask
+     * @return The table of subtasks for a subtask
+     */
+    private LinearLayout createSecondLevelSubtaskTable(ArrayList<Task> secondLevelSubtasks) {
+        LinearLayout secondLevelSubtaskList = new LinearLayout(getApplicationContext());
+        secondLevelSubtaskList.setOrientation(LinearLayout.VERTICAL);
+
+        for (Task subtask : secondLevelSubtasks) {
+            LinearLayout subtaskRow = createSubtaskRow(subtask);
+            LinearLayout.LayoutParams subtaskRowParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            subtaskRowParams.bottomMargin = 10;
+            subtaskRowParams.topMargin = 10;
+            subtaskRowParams.leftMargin = 50;
+
+            subtaskRow.setLayoutParams(subtaskRowParams);
+
+            secondLevelSubtaskList.addView(subtaskRow);
+        }
+
+        return secondLevelSubtaskList;
+    }
+
 
     /* Event Handlers */
 
@@ -602,6 +609,116 @@ public class SubtaskActivity extends JottingActivity {
         );
     }
 
+    private ApiRequestExecutor createSubtask(int parentId, String subtaskName) {
+        return new ApiRequestExecutor(String.valueOf(parentId), subtaskName) {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("POST");
+                addRequestHeader("Authorization", "Basic " + getUserApiKey());
+                setQuery(encodePostQuery("id=%s&name=%s"));
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(this.encodeQueryString("subtasks"));
+            }
+        };
+    }
+
+    private ApiRequestExecutor requestSubtasks(int id) {
+        return new ApiRequestExecutor() {
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setRequestMethod("GET");
+                addRequestHeader("Authorization", "Basic " + getUserApiKey());
+            }
+
+            @Override
+            public JSONObject call() {
+                super.call();
+                return this.connectToApi(encodeQueryString("subtasks", "id=" + id));
+            }
+        };
+    }
+
+    private ApiResponseExecutor handleCreateSubtaskResponse() {
+        return new ApiResponseExecutor() {
+            @Override
+            public void onComplete(JSONObject result) {
+                super.onComplete(result);
+                try {
+                    if (ranOk()) {
+                        Task subtask = new Task(Objects.requireNonNull(newSubtaskField.getText()).toString());
+                        subtask.setId(result.getJSONObject("data").getInt("id"));
+
+                        int indexAfterLastIncompleteTask = searchForLastIncompleteTask(subtask);
+                        subtaskList.addView(createSubtaskRow(subtask), indexAfterLastIncompleteTask);
+
+                        ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+    }
+
+    private ApiResponseExecutor handleGetSubtasksResponse() {
+        return new ApiResponseExecutor() {
+            @Override
+            public void onComplete(JSONObject data) {
+                super.onComplete(data);
+                try {
+                    if (data != null && data.has("data") && data.getInt("statusCode") == 200) {
+                        ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
+                        setSubtasksTableContent(subtaskData);
+                        getTaskData().setSubtasks(subtaskData);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "The subtasks could not load", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+    }
+
+    private ApiResponseExecutor handleGetSecondLevelSubtasksResponse(int loc) {
+        return new ApiResponseExecutor() {
+            @Override
+            public void onComplete(JSONObject data) {
+                super.onComplete(data);
+                try {
+                    if (ranOk()) {
+                        ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
+                        TableRow subtaskListRow = new TableRow(getApplicationContext());
+                        subtaskListRow.addView(createSecondLevelSubtaskTable(subtaskData));
+                        subtaskList.removeViewAt(loc);
+                        subtaskList.addView(subtaskListRow, loc);
+
+                        if (subtaskData.isEmpty()) return;
+
+                        // Set subtask data in task for non-UI reference
+                        ArrayList<Task> topLevelSubtasks = getTaskData().getSubtasks();
+                        int numTopLevelSubtasks = topLevelSubtasks.size();
+                        for (int i = 0; i < numTopLevelSubtasks; i++) {
+                            Task subtask = topLevelSubtasks.get(i);
+                            if (subtask.getId() == subtaskData.get(0).getParentId()) {
+                                subtask.setSubtasks(subtaskData);
+                                getTaskData().setSubtask(i, subtask);
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+    }
+
+
     public void onAddSubtaskClick(View view) {
         // Exit early if the field unexpectedly doesn't exist
         if (newSubtaskField == null || newSubtaskField.getText() == null) return;
@@ -613,41 +730,11 @@ public class SubtaskActivity extends JottingActivity {
         }
 
         new TaskRunner().executeAsync(
-                new ApiRequestExecutor(String.valueOf(getTaskData().getId()), newSubtaskField.getText().toString()) {
-                    @Override
-                    protected void initialize() {
-                        super.initialize();
-                        setRequestMethod("POST");
-                        addRequestHeader("Authorization", "Basic " + getUserApiKey());
-                        setQuery(encodePostQuery("id=%s&name=%s"));
-                    }
-
-                    @Override
-                    public JSONObject call() {
-                        super.call();
-                        return this.connectToApi(this.encodeQueryString("subtasks"));
-                    }
-                }, new ApiResponseExecutor() {
-                    @Override
-                    public void onComplete(JSONObject result) {
-                        super.onComplete(result);
-                        try {
-                            if (ranOk()) {
-                                Task subtask = new Task(newSubtaskField.getText().toString());
-                                subtask.setId(result.getJSONObject("data").getInt("id"));
-
-                                int indexAfterLastIncompleteTask = searchForLastIncompleteTask(subtask);
-                                subtaskList.addView(addSubtaskToTable(subtask), indexAfterLastIncompleteTask);
-
-                                ((EditText) subtaskList.findViewById(R.id.newSubtaskFieldId)).setText("");
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+                createSubtask(getTaskData().getId(), newSubtaskField.getText().toString()),
+                handleCreateSubtaskResponse()
         );
     }
+
     /**
      * Add right after last incomplete task using binary search for the last incomplete subtask
      * @implNote The algorithm is as follows:
@@ -691,7 +778,6 @@ public class SubtaskActivity extends JottingActivity {
         // There are no (incomplete or complete) subtasks
         return currSubtasks.size();
     }
-
 
     public void onCompleteSubtaskClick(View view) {
         TableRow subtaskRow = (TableRow) view.getParent();

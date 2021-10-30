@@ -17,23 +17,13 @@
         android:layout_height="wrap_content"
         android:layout_weight="25"
         android:maxLines="4"
+        android:textColor="@android:color/black"
         android:minLines="1"
         android:scrollHorizontally="false"
         android:textSize="20sp"
         android:layout_marginHorizontal="5dp"
         android:padding="10dp"
         android:onClick="onEnterSubtaskClick" />
-
-<!--    <ImageButton-->
-<!--        android:id="@+id/delete_subtask_btn"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_weight="2"-->
-<!--        android:layout_gravity="center_vertical"-->
-<!--        android:src="@drawable/ic_close_black_24dp"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        android:contentDescription="@string/delete_subtask_content_desc"-->
-<!--        android:onClick="onDeleteSubtaskClick" />-->
 
 
 </TableRow>

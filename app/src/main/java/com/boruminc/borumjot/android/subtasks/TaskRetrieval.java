@@ -6,14 +6,14 @@ import com.boruminc.borumjot.android.server.TaskRunner;
 
 import org.json.JSONObject;
 
-public class SubtaskRetrieval {
+class TaskRetrieval {
     private int id;
 
-    SubtaskRetrieval(int id) {
+    TaskRetrieval(int id) {
         this.id = id;
     }
 
-    private ApiRequestExecutor makeSubtaskGetRequest(String userApiKey) {
+    private ApiRequestExecutor makeTaskGetRequest(String userApiKey) {
         return new ApiRequestExecutor() {
             @Override
             protected void initialize() {
@@ -31,6 +31,6 @@ public class SubtaskRetrieval {
     }
 
     void runAsync(String userApiKey, Callback<JSONObject> callback) {
-        new TaskRunner().executeAsync(makeSubtaskGetRequest(userApiKey), callback);
+        new TaskRunner().executeAsync(makeTaskGetRequest(userApiKey), callback);
     }
 }
