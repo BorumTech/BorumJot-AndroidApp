@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <CheckBox
         android:id="@+id/completed_status"
-        android:layout_width="0dp"
-        android:layout_weight="2"
-        android:layout_height="match_parent"
+        android:layout_width="30dp"
+        android:layout_weight="0"
+        android:layout_height="wrap_content"
         app:buttonTint="?attr/colorPrimary"
-        android:onClick="onCompleteSubtaskClick" />
+        android:onClick="onCompleteSubtaskClick"
+        tools:ignore="InefficientWeight" />
 
     <TextView
         android:id="@+id/subtask_title"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="25"
-        android:maxLines="4"
+        android:layout_weight="1"
         android:textColor="@android:color/black"
-        android:minLines="1"
-        android:scrollHorizontally="false"
         android:textSize="20sp"
-        android:layout_marginHorizontal="5dp"
-        android:padding="10dp"
+        android:paddingVertical="10dp"
         android:onClick="onEnterSubtaskClick" />
 
-
-</TableRow>
+</LinearLayout>

@@ -517,7 +517,7 @@ public class TaskActivity extends JottingActivity {
     private void setSubtasksTableContent(ArrayList<Task> subtasks) {
         subtaskList.removeAllViews();
 
-        TableRow.LayoutParams subtaskTitleColumnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams subtaskTitleColumnLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subtaskTitleColumnLayoutParams.setMargins(10, 0, 10, 0);
 
         subtaskList.setColumnShrinkable(2, true);
@@ -525,18 +525,18 @@ public class TaskActivity extends JottingActivity {
         for (int i = 0; i < subtasks.size(); i++) {
             Task subtask = subtasks.get(i);
             subtaskList.addView(createSubtaskRow(subtask), i * 2);
-            subtaskList.addView(new TableRow(getApplicationContext()), i * 2 + 1);
+            subtaskList.addView(new LinearLayout(getApplicationContext()), i * 2 + 1);
 
             new TaskRunner().executeAsync(requestSubtasks(subtask.getId()), handleGetSecondLevelSubtasksResponse(i * 2 + 1));
         }
 
-        TableRow addSubtaskLayout = new TableRow(this);
+        LinearLayout addSubtaskLayout = new LinearLayout(this);
 
-        addSubtaskLayout.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        addSubtaskLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         addSubtaskLayout.setGravity(Gravity.START);
         ImageButton addSubtaskBtn = generateCherryRasboraPlusButton();
         addSubtaskBtn.setOnClickListener(this::onAddSubtaskClick);
-        TableRow.LayoutParams addSubtaskBtnLayoutParams = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams addSubtaskBtnLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addSubtaskBtnLayoutParams.gravity = Gravity.CENTER_VERTICAL;
         newSubtaskField = new EditTextV2(this);
         newSubtaskField.setLayoutParams(subtaskTitleColumnLayoutParams);
@@ -593,7 +593,7 @@ public class TaskActivity extends JottingActivity {
                 try {
                     if (ranOk()) {
                         ArrayList<Task> subtaskData = JSONToModel.convertJSONToTasks(data.getJSONArray("data"));
-                        TableRow subtaskListRow = new TableRow(getApplicationContext());
+                        LinearLayout subtaskListRow = new LinearLayout(getApplicationContext());
                         subtaskListRow.addView(createSecondLevelSubtaskTable(subtaskData));
                         subtaskList.removeViewAt(loc);
                         subtaskList.addView(subtaskListRow, loc);
@@ -775,7 +775,7 @@ public class TaskActivity extends JottingActivity {
     }
 
     public void onCompleteSubtaskClick(View view) {
-        TableRow subtaskRow = (TableRow) view.getParent();
+        LinearLayout subtaskRow = (LinearLayout) view.getParent();
         int completed = ((CheckBox) view).isChecked() ? 1 : 0;
         new TaskRunner().executeAsync(
                 new ApiRequestExecutor() {
@@ -839,7 +839,7 @@ public class TaskActivity extends JottingActivity {
     }
 
     private void onSubtaskBoxFocus(View view, boolean isFocused) {
-        ViewGroup subtaskRow = (TableRow) view.getParent();
+        ViewGroup subtaskRow = (LinearLayout) view.getParent();
         ViewGroup subtasksBox = (TableLayout) subtaskRow.getParent();
 
         int id = (int) subtaskRow.getTag();

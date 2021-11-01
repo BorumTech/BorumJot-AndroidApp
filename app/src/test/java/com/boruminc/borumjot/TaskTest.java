@@ -30,17 +30,6 @@ public class TaskTest {
     }
 
     @Test
-    public void statusGetterAndSetter_areConnected() {
-        int taskStatus = 1;
-        task.setStatus(taskStatus);
-        Assert.assertEquals(taskStatus, task.getStatus());
-
-        taskStatus = 0;
-        task.setStatus(taskStatus);
-        Assert.assertEquals(taskStatus, task.getStatus());
-    }
-
-    @Test
     public void timeCreatedGetterAndSetter_areConnected() {
         Date taskCreationTime = Date.valueOf("2020-10-06");
         task.setTimeCreated(taskCreationTime);
